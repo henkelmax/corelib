@@ -1,0 +1,49 @@
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+    }
+}
+
+plugins {
+    id 'maven'
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'maven-publish'
+
+version = lib_version
+archivesBaseName = lib_id
+group = lib_group
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+minecraft {
+    mappings channel: 'snapshot', version: '20180921-1.13'
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${lib_minecraft_version}-${forge_version}"
+}
+
+task sourcesJar(type: Jar) {
+    //classifier = "sources"
+    from sourceSets.main.output
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            //artifact reobfArtifact
+            artifact sourcesJar
+        }
+    }
+}
