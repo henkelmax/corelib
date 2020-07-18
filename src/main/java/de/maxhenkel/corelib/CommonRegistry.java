@@ -11,6 +11,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
@@ -87,11 +88,12 @@ public class CommonRegistry {
     /**
      * Registers a config for the provided config type
      *
-     * @param type        the config type
-     * @param configClass the config class
-     * @return the instanciated config
+     * @param type             the config type
+     * @param configClass      the config class
+     * @param registerListener if a config reload listener should be registered
+     * @return the instantiated config
      */
-    public static <T extends ConfigBase> T registerConfig(ModConfig.Type type, Class<T> configClass) {
+    public static <T extends ConfigBase> T registerConfig(ModConfig.Type type, Class<T> configClass, boolean registerListener) {
         Pair<T, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(builder -> {
             try {
                 return configClass.getConstructor(ForgeConfigSpec.Builder.class).newInstance(builder);
@@ -102,7 +104,26 @@ public class CommonRegistry {
         ModLoadingContext.get().registerConfig(type, specPair.getRight());
         T config = specPair.getLeft();
         config.setConfigSpec(specPair.getRight());
+        if (registerListener) {
+            Consumer<ModConfig.ModConfigEvent> consumer = evt -> {
+                if (evt.getConfig().getType() == type) {
+                    config.onReload(evt);
+                }
+            };
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+        }
         return config;
+    }
+
+    /**
+     * Registers a config for the provided config type
+     *
+     * @param type        the config type
+     * @param configClass the config class
+     * @return the instantiated config
+     */
+    public static <T extends ConfigBase> T registerConfig(ModConfig.Type type, Class<T> configClass) {
+        return registerConfig(type, configClass, false);
     }
 
 }
