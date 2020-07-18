@@ -2,6 +2,7 @@ package de.maxhenkel.corelib;
 
 import de.maxhenkel.corelib.net.Message;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -32,14 +33,31 @@ public class CommonRegistry {
         });
     }
 
-    public static EntityType registerEntity(String modId, String name, Class<? extends Entity> entityClass, int range, int updateFrequency, boolean sendVelocityUpdates) {
-        return EntityType.register(modId + ":" + name, EntityType.Builder.create(entityClass, (world -> {
-            try {
-                return entityClass.getConstructor(World.class).newInstance(world);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        })).tracker(range, updateFrequency, sendVelocityUpdates));
+    /**
+     * Registers the provided entity
+     * Note that the entity class has to have a constructor with the parameters {@link EntityType} and {@link World}
+     *
+     * @param modId               the mod ID
+     * @param name                the entity name
+     * @param classification      the entity classification
+     * @param entityClass         the entity class
+     * @param range               the range in blocks where the entity is being updated
+     * @param updateFrequency     the frequency in tich in which te entity gets updated
+     * @param sendVelocityUpdates if the entity should send velocity updates
+     * @return the entity type of the registered entity
+     */
+    public static <T extends Entity> EntityType<T> registerEntity(String modId, String name, EntityClassification classification, Class<? extends Entity> entityClass, int range, int updateFrequency, boolean sendVelocityUpdates) {
+        return EntityType.Builder
+                .<T>create((type, world) -> {
+                    try {
+                        return (T) entityClass.getConstructor(EntityType.class, World.class).newInstance(type, world);
+                    } catch (Throwable e) {
+                        throw new RuntimeException(e);
+                    }
+                }, classification)
+                .setTrackingRange(range)
+                .setUpdateInterval(updateFrequency)
+                .setShouldReceiveVelocityUpdates(sendVelocityUpdates).build(modId + ":" + name);
     }
 
 }
