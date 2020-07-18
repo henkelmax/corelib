@@ -1,5 +1,6 @@
 package de.maxhenkel.corelib;
 
+import de.maxhenkel.corelib.config.ConfigBase;
 import de.maxhenkel.corelib.net.Message;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
@@ -7,8 +8,12 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.function.Consumer;
 
@@ -16,8 +21,9 @@ public class CommonRegistry {
 
     /**
      * Creates a new network channel
+     *
      * @param modId the mod ID
-     * @param name the name of the channel
+     * @param name  the name of the channel
      * @return the channel
      */
     public static SimpleChannel registerChannel(String modId, String name) {
@@ -26,8 +32,9 @@ public class CommonRegistry {
 
     /**
      * Registers a new message on the provided network channel
+     *
      * @param channel the channel to register the message on
-     * @param id the packed id (has to be unique)
+     * @param id      the packed id (has to be unique)
      * @param message the message
      */
     public static <T extends Message<?>> void registerMessage(SimpleChannel channel, int id, Class<T> message) {
@@ -75,6 +82,27 @@ public class CommonRegistry {
         EntityType<T> type = builder.build(modId + ":" + name);
         type.setRegistryName(new ResourceLocation(modId, name));
         return type;
+    }
+
+    /**
+     * Registers a config for the provided config type
+     *
+     * @param type        the config type
+     * @param configClass the config class
+     * @return the instanciated config
+     */
+    public static <T extends ConfigBase> T registerConfig(ModConfig.Type type, Class<T> configClass) {
+        Pair<T, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(builder -> {
+            try {
+                return configClass.getConstructor(ForgeConfigSpec.Builder.class).newInstance(builder);
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        });
+        ModLoadingContext.get().registerConfig(type, specPair.getRight());
+        T config = specPair.getLeft();
+        config.setConfigSpec(specPair.getRight());
+        return config;
     }
 
 }
