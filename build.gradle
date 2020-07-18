@@ -93,9 +93,25 @@ task apiJar(type: Jar) {
     exclude 'de/maxhenkel/corelib/dev'
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+javadoc {
+    failOnError = false
+}
+
 artifacts {
     archives jar
     archives apiJar
+    archives javadocJar
+    archives sourcesJar
 }
 
 publishing {
@@ -103,6 +119,13 @@ publishing {
         mavenJava(MavenPublication) {
             artifact jar
             artifact apiJar
+            artifact javadocJar
+        }
+    }
+    repositories {
+        maven {
+            name = 'henkelmax.public'
+            url = 'https://maven.maxhenkel.de/repository/public'
         }
     }
 }
