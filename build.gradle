@@ -8,6 +8,13 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
+
+// Plugin to use the settings.xml for authentication
+plugins {
+    id 'java'
+    id 'net.linguica.maven-settings' version '0.5'
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
 
