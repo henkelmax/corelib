@@ -119,4 +119,48 @@ public class ItemUtils {
         inventory.setInventorySlotContents(index, ItemStack.EMPTY);
     }
 
+    /**
+     * Returns if the provided stacks are stackable on each other
+     *
+     * @param stack1 the first stack
+     * @param stack2 the second stack
+     * @return if the provided stacks are stackable on each other
+     */
+    public static boolean isStackable(ItemStack stack1, ItemStack stack2) {
+        return stack1.isItemEqual(stack2) && ItemStack.areItemStackTagsEqual(stack1, stack2);
+    }
+
+    /**
+     * Writes the provided item stack to the provided NBT compound.
+     * Ignores the maximum stack size of the stack.
+     * Can stack up to the integer limit.
+     *
+     * @param compound the compound to store the stack in
+     * @param stack the stack to store
+     * @return the provided compound
+     */
+    public static CompoundNBT writeOverstackedItem(CompoundNBT compound, ItemStack stack) {
+        stack.write(compound);
+        compound.remove("Count");
+        compound.putInt("Count", stack.getCount());
+        return compound;
+    }
+
+    /**
+     * Reads the provided item stack from the provided NBT compound.
+     * Ignores the maximum stack size of the stack.
+     * Can stack up to the integer limit.
+     *
+     * @param compound the compound to store the stack in
+     * @return the deserialized stack
+     */
+    public static ItemStack readOverstackedItem(CompoundNBT compound) {
+        CompoundNBT data= compound.copy();
+        int count = data.getInt("Count");
+        data.remove("Count");
+        data.putByte("Count", (byte) 1);
+        ItemStack stack = ItemStack.read(data);
+        stack.setCount(count);
+        return stack;
+    }
 }
