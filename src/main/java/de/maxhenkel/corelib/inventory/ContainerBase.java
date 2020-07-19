@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 public abstract class ContainerBase extends Container {
 
+    @Nullable
     protected IInventory inventory;
     protected IInventory playerInventory;
 
@@ -38,7 +39,12 @@ public abstract class ContainerBase extends Container {
         return 0;
     }
 
-    public abstract int getInventorySize();
+    public int getInventorySize() {
+        if (inventory == null) {
+            return 0;
+        }
+        return inventory.getSizeInventory();
+    }
 
     @Nullable
     public IInventory getPlayerInventory() {
@@ -73,13 +79,18 @@ public abstract class ContainerBase extends Container {
 
     @Override
     public boolean canInteractWith(PlayerEntity player) {
+        if (inventory == null) {
+            return true;
+        }
         return inventory.isUsableByPlayer(player);
     }
 
     @Override
     public void onContainerClosed(PlayerEntity player) {
         super.onContainerClosed(player);
-        inventory.closeInventory(player);
+        if (inventory != null) {
+            inventory.closeInventory(player);
+        }
     }
 
 }
