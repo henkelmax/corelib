@@ -20,8 +20,14 @@ public class ScreenBase<T extends Container> extends ContainerScreen<T> {
     }
 
     @Override
-    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    public void func_230430_a_(MatrixStack matrixStack, int x, int y, float partialTicks) {
         func_230446_a_(matrixStack);
+        super.func_230430_a_(matrixStack, x, y, partialTicks);
+        func_230459_a_(matrixStack, x, y);
+    }
+
+    @Override
+    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1F, 1F, 1F, 1F);
         field_230706_i_.getTextureManager().bindTexture(texture);
 
@@ -29,7 +35,8 @@ public class ScreenBase<T extends Container> extends ContainerScreen<T> {
     }
 
     @Override
-    protected void func_230451_b_(MatrixStack p_230451_1_, int p_230451_2_, int p_230451_3_) {
+    protected void func_230451_b_(MatrixStack matrixStack, int x, int y) {
 
     }
+
 }
