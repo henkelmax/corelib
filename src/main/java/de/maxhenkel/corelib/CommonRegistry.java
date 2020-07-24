@@ -1,24 +1,34 @@
 package de.maxhenkel.corelib;
 
 import de.maxhenkel.corelib.config.ConfigBase;
+import de.maxhenkel.corelib.config.DynamicConfig;
 import de.maxhenkel.corelib.net.Message;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.FolderName;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLConfig;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class CommonRegistry {
+
+    private static final FolderName SERVERCONFIG = new FolderName("serverconfig");
+    private static final Path DEFAULT_CONFIG_PATH = FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath());
 
     /**
      * Creates a new network channel
@@ -124,6 +134,42 @@ public class CommonRegistry {
      */
     public static <T extends ConfigBase> T registerConfig(ModConfig.Type type, Class<T> configClass) {
         return registerConfig(type, configClass, false);
+    }
+
+    /**
+     * Registers a config that can have dynamic config keys
+     *
+     * @param type        the config type
+     * @param folderName  the name of the folder that contains the config
+     * @param configName  the name of the config (without extension)
+     * @param configClass the config class
+     * @param <T>         the config
+     * @return the config
+     */
+    public static <T extends DynamicConfig> T registerDynamicConfig(DynamicConfig.DynamicConfigType type, String folderName, String configName, Class<T> configClass) {
+        try {
+            T config = configClass.newInstance();
+            String configFileName = configName + ".toml";
+            if (type.equals(DynamicConfig.DynamicConfigType.SERVER)) {
+                Consumer<FMLServerAboutToStartEvent> consumer = event -> {
+                    Path serverConfig = event.getServer().func_240776_a_(SERVERCONFIG).resolve(folderName);
+                    serverConfig.toFile().mkdirs();
+                    Path configPath = serverConfig.resolve(configFileName);
+                    Path defaultPath = DEFAULT_CONFIG_PATH.resolve(folderName).resolve(configFileName);
+                    config.init(configPath, defaultPath);
+                };
+                MinecraftForge.EVENT_BUS.addListener(consumer);
+            } else {
+                Path commonConfig = FMLPaths.CONFIGDIR.get().resolve(folderName);
+                commonConfig.toFile().mkdirs();
+                Path configPath = commonConfig.resolve(configFileName);
+                config.init(configPath);
+            }
+
+            return config;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
