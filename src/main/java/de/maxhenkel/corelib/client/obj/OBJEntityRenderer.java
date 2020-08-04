@@ -16,7 +16,7 @@ public abstract class OBJEntityRenderer<T extends Entity> extends EntityRenderer
         super(renderManager);
     }
 
-    public abstract List<OBJModelInstance> getModels(T entity);
+    public abstract List<OBJModelInstance<T>> getModels(T entity);
 
     @Override
     public ResourceLocation getEntityTexture(T entity) {
@@ -30,33 +30,39 @@ public abstract class OBJEntityRenderer<T extends Entity> extends EntityRenderer
     }
 
     protected void renderModels(T entity, float yaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
-        List<OBJModelInstance> models = getModels(entity);
+        List<OBJModelInstance<T>> models = getModels(entity);
 
         matrixStack.push();
-        setupRotation(entity, yaw, matrixStack);
 
-        for (int i = 0; i < models.size(); i++) {
+        setupYaw(entity, yaw, matrixStack);
+        setupPitch(entity, partialTicks, matrixStack);
+
+        for (OBJModelInstance<T> model : models) {
             matrixStack.push();
 
-            matrixStack.translate(models.get(i).getOptions().getOffset().x, models.get(i).getOptions().getOffset().y, models.get(i).getOptions().getOffset().z);
-            matrixStack.rotate(Vector3f.XP.rotationDegrees(-90F));
+            matrixStack.translate(model.getOptions().getOffset().x, model.getOptions().getOffset().y, model.getOptions().getOffset().z);
 
-            if (models.get(i).getOptions().getRotation() != null) {
-                models.get(i).getOptions().getRotation().applyRotation(matrixStack);
+            if (model.getOptions().getRotation() != null) {
+                model.getOptions().getRotation().applyRotation(matrixStack);
             }
 
-            if (models.get(i).getOptions().getOnRender() != null) {
-                models.get(i).getOptions().getOnRender().onRender(matrixStack, partialTicks);
+            if (model.getOptions().getOnRender() != null) {
+                model.getOptions().getOnRender().onRender(entity, matrixStack, partialTicks);
             }
 
-            models.get(i).getModel().render(models.get(i).getOptions().getTexture(), matrixStack, buffer, packedLight);
+            model.getModel().render(model.getOptions().getTexture(), matrixStack, buffer, packedLight);
             matrixStack.pop();
         }
         matrixStack.pop();
     }
 
-    protected void setupRotation(T entity, float yaw, MatrixStack matrixStack) {
+    protected void setupYaw(T entity, float yaw, MatrixStack matrixStack) {
         matrixStack.rotate(Vector3f.YP.rotationDegrees(180F - yaw));
+    }
+
+    protected void setupPitch(T entity, float partialTicks, MatrixStack matrixStack) {
+        float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
+        matrixStack.rotate(Vector3f.XN.rotationDegrees(pitch));
     }
 
 }

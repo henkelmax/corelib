@@ -5,14 +5,14 @@ import de.maxhenkel.corelib.math.Rotation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 
-public class OBJModelOptions {
+public class OBJModelOptions<T> {
 
     private ResourceLocation texture;
     private Vector3d offset;
     private Rotation rotation;
-    private RenderListener onRender;
+    private RenderListener<T> onRender;
 
-    public OBJModelOptions(ResourceLocation texture, Vector3d offset, Rotation rotation, RenderListener onRender) {
+    public OBJModelOptions(ResourceLocation texture, Vector3d offset, Rotation rotation, RenderListener<T> onRender) {
         this.texture = texture;
         this.offset = offset;
         this.rotation = rotation;
@@ -27,7 +27,7 @@ public class OBJModelOptions {
         this(texture, offset, null, null);
     }
 
-    public OBJModelOptions(ResourceLocation texture, Vector3d offset, RenderListener onRender) {
+    public OBJModelOptions(ResourceLocation texture, Vector3d offset, RenderListener<T> onRender) {
         this(texture, offset, null, onRender);
     }
 
@@ -43,7 +43,7 @@ public class OBJModelOptions {
         return offset;
     }
 
-    public OBJModelOptions setOffset(Vector3d offset) {
+    public OBJModelOptions<T> setOffset(Vector3d offset) {
         this.offset = offset;
         return this;
     }
@@ -52,17 +52,17 @@ public class OBJModelOptions {
         return rotation;
     }
 
-    public OBJModelOptions setRotation(Rotation rotation) {
+    public OBJModelOptions<T> setRotation(Rotation rotation) {
         this.rotation = rotation;
         return this;
     }
 
-    public RenderListener getOnRender() {
+    public RenderListener<T> getOnRender() {
         return onRender;
     }
 
-    public interface RenderListener {
-        void onRender(MatrixStack matrixStack, float partialTicks);
+    public interface RenderListener<T> {
+        void onRender(T object, MatrixStack matrixStack, float partialTicks);
     }
 
 }

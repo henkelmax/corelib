@@ -3,6 +3,7 @@ package de.maxhenkel.corelib.math;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.util.math.vector.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,14 @@ public class Rotation {
         return this;
     }
 
-    private class AxisRotation {
+    public Rotation add(@Nullable Rotation rotation) {
+        if (rotation != null) {
+            rotations.addAll(rotation.rotations);
+        }
+        return this;
+    }
+
+    private static class AxisRotation {
         private float angle;
         private Vector3f axis;
 

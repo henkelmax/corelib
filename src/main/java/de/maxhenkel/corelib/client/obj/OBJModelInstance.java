@@ -1,11 +1,11 @@
 package de.maxhenkel.corelib.client.obj;
 
-public class OBJModelInstance {
+public class OBJModelInstance<T> {
 
     private OBJModel model;
-    private OBJModelOptions options;
+    private OBJModelOptions<T> options;
 
-    public OBJModelInstance(OBJModel model, OBJModelOptions options) {
+    public OBJModelInstance(OBJModel model, OBJModelOptions<T> options) {
         this.model = model;
         this.options = options;
     }
@@ -14,7 +14,7 @@ public class OBJModelInstance {
         return model;
     }
 
-    public OBJModelOptions getOptions() {
+    public OBJModelOptions<T> getOptions() {
         return options;
     }
 }

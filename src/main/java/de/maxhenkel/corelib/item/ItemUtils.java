@@ -127,7 +127,7 @@ public class ItemUtils {
      * @return if the provided stacks are stackable on each other
      */
     public static boolean isStackable(ItemStack stack1, ItemStack stack2) {
-        return stack1.isItemEqual(stack2) && ItemStack.areItemStackTagsEqual(stack1, stack2);
+        return stack1.isItemEqual(stack2) && ItemStack.areItemStackTagsEqual(stack1, stack2) && stack1.getDamage() == stack2.getDamage();
     }
 
     /**
@@ -136,7 +136,7 @@ public class ItemUtils {
      * Can stack up to the integer limit.
      *
      * @param compound the compound to store the stack in
-     * @param stack the stack to store
+     * @param stack    the stack to store
      * @return the provided compound
      */
     public static CompoundNBT writeOverstackedItem(CompoundNBT compound, ItemStack stack) {
@@ -155,7 +155,7 @@ public class ItemUtils {
      * @return the deserialized stack
      */
     public static ItemStack readOverstackedItem(CompoundNBT compound) {
-        CompoundNBT data= compound.copy();
+        CompoundNBT data = compound.copy();
         int count = data.getInt("Count");
         data.remove("Count");
         data.putByte("Count", (byte) 1);
