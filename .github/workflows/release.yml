@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  release:
+    types: 
+      - created
+
+env:
+  MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+  MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+          server-id: henkelmax.public
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      - name: Publish to maven
+        run:  |
+          chmod +x ./gradlew
+          ./gradlew publish -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
+      - name: Zip project
+        run: |
+          mkdir -p release
+          zip --junk-paths release/corelib.zip readme.md build/libs/*.jar
+
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.0
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+      - name: Upload release asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: ./release/corelib.zip
+          asset_name: corelib_${{ steps.get_version.outputs.VERSION }}.zip
+          asset_content_type: application/zip
