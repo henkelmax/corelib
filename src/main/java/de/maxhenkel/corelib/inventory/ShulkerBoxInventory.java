@@ -99,7 +99,9 @@ public abstract class ShulkerBoxInventory implements IInventory, INamedContainer
 
     @Override
     public ItemStack removeStackFromSlot(int index) {
-        return ItemStackHelper.getAndRemove(items, index);
+        ItemStack stack = ItemStackHelper.getAndRemove(items, index);
+        markDirty();
+        return stack;
     }
 
     @Override
@@ -115,9 +117,11 @@ public abstract class ShulkerBoxInventory implements IInventory, INamedContainer
 
     @Override
     public void markDirty() {
+        CompoundNBT tag = shulkerBox.getOrCreateTag();
         if (blockEntityTag == null) {
-            CompoundNBT tag = shulkerBox.getOrCreateTag();
             tag.put("BlockEntityTag", blockEntityTag = new CompoundNBT());
+        } else {
+            tag.put("BlockEntityTag", blockEntityTag);
         }
 
         ItemStackHelper.saveAllItems(blockEntityTag, items, true);
@@ -130,6 +134,7 @@ public abstract class ShulkerBoxInventory implements IInventory, INamedContainer
 
     @Override
     public void closeInventory(PlayerEntity player) {
+        markDirty();
         player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), getCloseSound(), SoundCategory.BLOCKS, 0.5F, player.world.rand.nextFloat() * 0.1F + 0.9F);
     }
 
