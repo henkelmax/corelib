@@ -1,4 +1,4 @@
-# CoreLib
+# CoreLib ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/henkelmax/corelib/Build) ![GitHub issues](https://img.shields.io/github/issues-raw/henkelmax/corelib) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/henkelmax/corelib)
 
 A library containing shared code for all of [my mods](https://modrepo.de/minecraft).
 
