@@ -5,6 +5,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.NonNullList;
 
 public class ItemUtils {
 
@@ -86,7 +87,45 @@ public class ItemUtils {
     }
 
     /**
-     * Loads the provided compoung to the provided inventory
+     * Stores the provided item list to the provided compound under the given name
+     *
+     * @param compound the compound to save the inventory to
+     * @param name     the name of the tag list in the compound
+     * @param inv      the item list
+     */
+    public static void saveInventory(CompoundNBT compound, String name, NonNullList<ItemStack> inv) {
+        ListNBT tagList = new ListNBT();
+        for (int i = 0; i < inv.size(); i++) {
+            if (!inv.get(i).isEmpty()) {
+                CompoundNBT slot = new CompoundNBT();
+                slot.putInt("Slot", i);
+                inv.get(i).write(slot);
+                tagList.add(slot);
+            }
+        }
+
+        compound.put(name, tagList);
+    }
+
+    /**
+     * Stores the provided item list to the provided compound under the given name
+     * Stores empty items
+     *
+     * @param compound the compound to save the inventory to
+     * @param name     the name of the tag list in the compound
+     * @param list     the item list
+     */
+    public static void saveItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list) {
+        ListNBT itemList = new ListNBT();
+        for (ItemStack stack : list) {
+            itemList.add(stack.write(new CompoundNBT()));
+        }
+        compound.put(name, itemList);
+    }
+
+    /**
+     * Loads the provided compound to the provided inventory
+     * Does not clear inventory - empty stacks will not overwrite existing items
      *
      * @param compound the compound to read the inventory from
      * @param name     the name of the tag list in the compound
@@ -106,6 +145,73 @@ public class ItemUtils {
             if (j >= 0 && j < inv.getSizeInventory()) {
                 inv.setInventorySlotContents(j, ItemStack.read(slot));
             }
+        }
+    }
+
+    /**
+     * Loads the provided compound to the provided item list
+     * Does not clear the list - empty stacks will not overwrite existing items
+     *
+     * @param compound the compound to read the inventory from
+     * @param name     the name of the tag list in the compound
+     * @param inv      the item list
+     */
+    public static void readInventory(CompoundNBT compound, String name, NonNullList<ItemStack> inv) {
+        if (!compound.contains(name)) {
+            return;
+        }
+
+        ListNBT tagList = compound.getList(name, 10);
+
+        for (int i = 0; i < tagList.size(); i++) {
+            CompoundNBT slot = tagList.getCompound(i);
+            int j = slot.getInt("Slot");
+
+            if (j >= 0 && j < inv.size()) {
+                inv.set(j, ItemStack.read(slot));
+            }
+        }
+    }
+
+    /**
+     * Loads the provided compound to the provided item list
+     *
+     * @param compound the compound to read the item list from
+     * @param name     the name of the tag list in the compound
+     * @return the item list
+     */
+    public static NonNullList<ItemStack> readItemList(CompoundNBT compound, String name) {
+        NonNullList<ItemStack> items = NonNullList.create();
+        if (!compound.contains(name)) {
+            return items;
+        }
+
+        ListNBT itemList = compound.getList(name, 10);
+        for (int i = 0; i < itemList.size(); i++) {
+            items.add(ItemStack.read(itemList.getCompound(i)));
+        }
+        return items;
+    }
+
+    /**
+     * Reads the compound into the item list
+     * Only fills the list to its maximum capacity
+     *
+     * @param compound the compound to read the item list from
+     * @param name     the name of the tag list in the compound
+     * @param list     the item list
+     */
+    public static void readItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list) {
+        if (!compound.contains(name)) {
+            return;
+        }
+
+        ListNBT itemList = compound.getList(name, 10);
+        for (int i = 0; i < itemList.size(); i++) {
+            if (i >= list.size()) {
+                break;
+            }
+            list.set(i, ItemStack.read(itemList.getCompound(i)));
         }
     }
 
