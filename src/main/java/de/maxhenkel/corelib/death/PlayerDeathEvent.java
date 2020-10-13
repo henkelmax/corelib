@@ -16,6 +16,7 @@ public class PlayerDeathEvent extends Event {
     private DamageSource source;
 
     private boolean storeDeath;
+    private boolean removeDrops;
 
     public PlayerDeathEvent(Death death, ServerPlayerEntity player, DamageSource source) {
         this.death = death;
@@ -25,6 +26,10 @@ public class PlayerDeathEvent extends Event {
 
     public void storeDeath() {
         this.storeDeath = true;
+    }
+
+    public void removeDrops() {
+        this.removeDrops = true;
     }
 
     public Death getDeath() {
@@ -41,5 +46,9 @@ public class PlayerDeathEvent extends Event {
 
     boolean isStoreDeath() {
         return storeDeath;
+    }
+
+    boolean isRemoveDrops() {
+        return removeDrops;
     }
 }

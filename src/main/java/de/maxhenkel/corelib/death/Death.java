@@ -142,7 +142,6 @@ public class Death {
 
     /**
      * Matches the actual drops with the items the player had on death.
-     * Clears the drops list.
      *
      * @param items the drops list
      */
@@ -156,7 +155,6 @@ public class Death {
         processInventory(drops, armorInventory);
         processInventory(drops, offHandInventory);
         additionalItems.addAll(drops);
-        items.clear();
     }
 
     private void processInventory(List<ItemStack> drops, NonNullList<ItemStack> inventory) {

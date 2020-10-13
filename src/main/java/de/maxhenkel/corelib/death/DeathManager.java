@@ -44,8 +44,21 @@ public class DeathManager {
      */
     @Nullable
     public static Death getDeath(ServerPlayerEntity player, UUID id) {
+        return getDeath(player.getServerWorld(), player.getUniqueID(), id);
+    }
+
+    /**
+     * Gets the death with the provided ID of a specific player
+     *
+     * @param world      the world
+     * @param playerUUID the players UUID
+     * @param id         the death ID
+     * @return the death
+     */
+    @Nullable
+    public static Death getDeath(ServerWorld world, UUID playerUUID, UUID id) {
         try {
-            CompoundNBT data = CompressedStreamTools.read(getDeathFile(player, id));
+            CompoundNBT data = CompressedStreamTools.read(getDeathFile(world, playerUUID, id));
             if (data == null) {
                 return null;
             }
@@ -122,6 +135,18 @@ public class DeathManager {
      */
     public static File getDeathFile(ServerPlayerEntity player, UUID id) {
         return new File(getPlayerDeathFolder(player), id.toString() + ".dat");
+    }
+
+    /**
+     * Gets the death file of a player with the provided death ID
+     *
+     * @param world      the world
+     * @param playerUUID the players UUID
+     * @param id         the death ID
+     * @return the death file
+     */
+    public static File getDeathFile(ServerWorld world, UUID playerUUID, UUID id) {
+        return new File(getPlayerDeathFolder(world, playerUUID), id.toString() + ".dat");
     }
 
     /**

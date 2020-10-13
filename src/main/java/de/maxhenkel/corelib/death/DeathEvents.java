@@ -1,6 +1,7 @@
 package de.maxhenkel.corelib.death;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -8,6 +9,8 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,14 +41,17 @@ public final class DeathEvents {
             if (death == null) {
                 death = Death.fromPlayer(player);
             }
-
-            death.processDrops(event.getDrops());
+            Collection<ItemEntity> drops = event.getDrops();
+            death.processDrops(new ArrayList<>(drops));
 
             PlayerDeathEvent playerDeathEvent = new PlayerDeathEvent(death, player, event.getSource());
             MinecraftForge.EVENT_BUS.post(playerDeathEvent);
 
             if (playerDeathEvent.isStoreDeath()) {
                 DeathManager.addDeath(player, death);
+            }
+            if (playerDeathEvent.isRemoveDrops()) {
+                drops.clear();
             }
         } catch (Exception e) {
             e.printStackTrace();
