@@ -70,6 +70,35 @@ public class DeathManager {
     }
 
     /**
+     * Gets a death from its ID
+     * Note that this searches for every players deaths
+     *
+     * @param world the world
+     * @param id    the death id
+     * @return the death
+     */
+    @Nullable
+    public static Death getDeath(ServerWorld world, UUID id) {
+        File deathFolder = getDeathFolder(world);
+        File[] players = deathFolder.listFiles((dir, name) -> name.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"));
+
+        if (players == null) {
+            return null;
+        }
+
+        for (File f : players) {
+            if (!f.isDirectory()) {
+                continue;
+            }
+            File[] files = f.listFiles((dir, name) -> name.equals(id.toString() + ".dat"));
+            if (files != null && files.length > 0) {
+                return getDeath(world, UUID.fromString(f.getName()), id);
+            }
+        }
+        return null;
+    }
+
+    /**
      * Gets all deaths of a player
      *
      * @param player the player
@@ -93,20 +122,7 @@ public class DeathManager {
             return Collections.emptyList();
         }
 
-        File[] deaths = playerDeathFolder.listFiles((dir, name) -> {
-            String[] split = name.split("\\.");
-            if (split.length != 2) {
-                return false;
-            }
-            if (split[1].equals("dat")) {
-                try {
-                    UUID.fromString(split[0]);
-                    return true;
-                } catch (Exception e) {
-                }
-            }
-            return false;
-        });
+        File[] deaths = playerDeathFolder.listFiles((dir, name) -> name.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.dat$"));
 
         if (deaths == null) {
             return Collections.emptyList();
