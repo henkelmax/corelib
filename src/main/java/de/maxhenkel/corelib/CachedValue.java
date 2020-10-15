@@ -16,7 +16,7 @@ public class CachedValue<T> {
     }
 
     /**
-     * Gets the cached value or gets it from the supplier if it wasnt called before or has been invalidated
+     * Gets the cached value or gets it from the supplier if it wasn't called before or has been invalidated
      * @return the value
      */
     public T get() {
