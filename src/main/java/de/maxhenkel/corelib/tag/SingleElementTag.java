@@ -9,7 +9,7 @@ import java.util.List;
 
 public class SingleElementTag<T extends ForgeRegistryEntry<?>> implements ITag.INamedTag<T> {
 
-    private T element;
+    private final T element;
 
     public SingleElementTag(T element) {
         this.element = element;
