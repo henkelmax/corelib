@@ -1,6 +1,7 @@
 package de.maxhenkel.corelib.death;
 
 import de.maxhenkel.corelib.CommonUtils;
+import de.maxhenkel.corelib.Logger;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -59,6 +60,26 @@ public class DeathManager {
     public static Death getDeath(ServerWorld world, UUID playerUUID, UUID id) {
         try {
             CompoundNBT data = CompressedStreamTools.read(getDeathFile(world, playerUUID, id));
+            if (data == null) {
+                return null;
+            }
+            return Death.fromNBT(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Reads the death from the provided file
+     *
+     * @param file the death file
+     * @return the death
+     */
+    @Nullable
+    public static Death getDeath(File file) {
+        try {
+            CompoundNBT data = CompressedStreamTools.read(file);
             if (data == null) {
                 return null;
             }
@@ -140,6 +161,58 @@ public class DeathManager {
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparingLong(Death::getTimestamp).reversed())
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Deletes the death file from the filesystem
+     *
+     * @param world the world
+     * @param death the death to delete
+     * @return if the death was deleted from the filesystem
+     */
+    public static boolean removeDeath(ServerWorld world, Death death) {
+        File file = getDeathFile(world, death.getPlayerUUID(), death.getId());
+        if (file.exists()) {
+            return file.delete();
+        }
+        return true;
+    }
+
+    /**
+     * Deletes all deaths that are older than the provided time
+     *
+     * @param world the world
+     * @param age   the age in milliseconds
+     */
+    public static void removeDeathsOlderThan(ServerWorld world, long age) {
+        long now = System.currentTimeMillis();
+        File deathFolder = getDeathFolder(world);
+        File[] players = deathFolder.listFiles((dir, name) -> name.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"));
+
+        if (players == null) {
+            return;
+        }
+
+        for (File f : players) {
+            if (!f.isDirectory()) {
+                continue;
+            }
+            File[] deaths = f.listFiles(file -> (now - file.lastModified()) > age);
+            if (deaths == null) {
+                continue;
+            }
+            for (File d : deaths) {
+                Death death = getDeath(d);
+                if (death == null) {
+                    continue;
+                }
+                if ((now - death.getTimestamp()) > age) {
+                    if (d.delete()) {
+                        Logger.INSTANCE.info("Removed death file of '{}' ({}), since it is older than {} milliseconds", death.getPlayerName(), death.getId().toString(), age);
+                    }
+                }
+            }
+        }
     }
 
     /**
