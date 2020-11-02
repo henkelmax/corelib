@@ -20,22 +20,22 @@ public class ScreenBase<T extends Container> extends ContainerScreen<T> {
     }
 
     @Override
-    public void func_230430_a_(MatrixStack matrixStack, int x, int y, float partialTicks) {
-        func_230446_a_(matrixStack);
-        super.func_230430_a_(matrixStack, x, y, partialTicks);
-        func_230459_a_(matrixStack, x, y);
+    public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
+        renderBackground(matrixStack);
+        super.render(matrixStack, x, y, partialTicks);
+        renderHoveredTooltip(matrixStack, x, y);
     }
 
     @Override
-    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1F, 1F, 1F, 1F);
-        field_230706_i_.getTextureManager().bindTexture(texture);
+        minecraft.getTextureManager().bindTexture(texture);
 
-        func_238474_b_(matrixStack, guiLeft, guiTop, 0, 0, xSize, ySize);
+        blit(matrixStack, guiLeft, guiTop, 0, 0, xSize, ySize);
     }
 
     @Override
-    protected void func_230451_b_(MatrixStack matrixStack, int x, int y) {
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int x, int y) {
 
     }
 

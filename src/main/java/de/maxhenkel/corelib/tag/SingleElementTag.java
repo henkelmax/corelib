@@ -16,17 +16,17 @@ public class SingleElementTag<T extends ForgeRegistryEntry<?>> implements ITag.I
     }
 
     @Override
-    public ResourceLocation func_230234_a_() {
+    public ResourceLocation getName() {
         return element.getRegistryName();
     }
 
     @Override
-    public boolean func_230235_a_(T element) {
+    public boolean contains(T element) {
         return this.element == element;
     }
 
     @Override
-    public List<T> func_230236_b_() {
+    public List<T> getAllElements() {
         return Collections.singletonList(element);
     }
 
