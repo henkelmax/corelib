@@ -7,7 +7,35 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.NonNullList;
 
+import java.util.Comparator;
+
 public class ItemUtils {
+
+    /**
+     * Does not compare compound entries, just if they are the same hashcode
+     */
+    public static final Comparator<ItemStack> ITEM_COMPARATOR = (item1, item2) -> {
+        int cmp = item2.getItem().hashCode() - item1.getItem().hashCode();
+        if (cmp != 0) {
+            return cmp;
+        }
+        cmp = item2.getDamage() - item1.getDamage();
+        if (cmp != 0) {
+            return cmp;
+        }
+        CompoundNBT c1 = item1.getTag();
+        CompoundNBT c2 = item2.getTag();
+
+        if (c1 == null && c2 == null) {
+            return 0;
+        } else if (c1 == null) {
+            return 1;
+        } else if (c2 == null) {
+            return -1;
+        }
+
+        return c1.hashCode() - c2.hashCode();
+    };
 
     /**
      * Changes the item stack amount. If a player is provided and the player is in Creative Mode, the stack wont be changed

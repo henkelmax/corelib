@@ -1,8 +1,6 @@
 package de.maxhenkel.corelib;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -12,12 +10,24 @@ public class CachedMap<K, V> {
     private final long lifespan;
     private long lastCheck;
 
+    protected CachedMap(Map<K, ValueWrapper> map, long lifespan) {
+        this.lifespan = lifespan;
+        this.cache = map;
+    }
+
+    /**
+     * @param lifespan   the minimum lifespan of an entry
+     * @param comparator the comparator to compare the keys
+     */
+    public CachedMap(long lifespan, Comparator<K> comparator) {
+        this(new TreeMap<>(comparator), lifespan);
+    }
+
     /**
      * @param lifespan the minimum lifespan of an entry
      */
     public CachedMap(long lifespan) {
-        this.lifespan = lifespan;
-        this.cache = new HashMap<>();
+        this(new HashMap<>(), lifespan);
     }
 
     public CachedMap() {
