@@ -6,7 +6,6 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.FolderName;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -14,11 +13,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DeathManager {
-
-    /**
-     * The name of the folder that stores all player deaths
-     */
-    public static FolderName DEATHS = new FolderName("deaths");
 
     /**
      * Adds a death to the deaths folder as the provided player
@@ -266,6 +260,6 @@ public class DeathManager {
      * @return the player deaths folder
      */
     public static File getDeathFolder(ServerWorld world) {
-        return CommonUtils.getWorldFolder(world, DEATHS);
+        return CommonUtils.getWorldFolder(world, "deaths");
     }
 }

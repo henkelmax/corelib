@@ -2,8 +2,8 @@ package de.maxhenkel.corelib.client.obj;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import de.maxhenkel.corelib.math.Rotation;
+import net.minecraft.client.renderer.Vector3d;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
 
 public class OBJModelOptions<T> {
 

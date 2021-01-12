@@ -8,7 +8,7 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -22,12 +22,12 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class CommonRegistry {
 
-    private static final FolderName SERVERCONFIG = new FolderName("serverconfig");
     private static final Path DEFAULT_CONFIG_PATH = FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath());
 
     /**
@@ -152,7 +152,7 @@ public class CommonRegistry {
             String configFileName = configName + ".toml";
             if (type.equals(DynamicConfig.DynamicConfigType.SERVER)) {
                 Consumer<FMLServerAboutToStartEvent> consumer = event -> {
-                    Path serverConfig = event.getServer().func_240776_a_(SERVERCONFIG).resolve(folderName);
+                    Path serverConfig = new File(event.getServer().getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(), "serverconfig").toPath().resolve(folderName);
                     serverConfig.toFile().mkdirs();
                     Path configPath = serverConfig.resolve(configFileName);
                     Path defaultPath = DEFAULT_CONFIG_PATH.resolve(folderName).resolve(configFileName);

@@ -1,6 +1,5 @@
 package de.maxhenkel.corelib.inventory;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -20,23 +19,22 @@ public class ScreenBase<T extends Container> extends ContainerScreen<T> {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
-        renderBackground(matrixStack);
-        super.render(matrixStack, x, y, partialTicks);
-        renderHoveredTooltip(matrixStack, x, y);
+    public void render(int x, int y, float partialTicks) {
+        renderBackground();
+        super.render(x, y, partialTicks);
+        renderHoveredToolTip(x, y);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1F, 1F, 1F, 1F);
         minecraft.getTextureManager().bindTexture(texture);
 
-        blit(matrixStack, guiLeft, guiTop, 0, 0, xSize, ySize);
+        blit(guiLeft, guiTop, 0, 0, xSize, ySize);
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int x, int y) {
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 
     }
-
 }

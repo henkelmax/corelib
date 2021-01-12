@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Collection;
 import java.util.List;
@@ -135,7 +136,7 @@ public class Death {
         death.posX = player.getPosX();
         death.posY = player.getPosY();
         death.posZ = player.getPosZ();
-        death.dimension = player.world.getDimensionKey().getLocation().toString();
+        death.dimension = DimensionType.getKey(player.dimension).toString();
         death.model = PlayerUtils.getModel(player);
         return death;
     }

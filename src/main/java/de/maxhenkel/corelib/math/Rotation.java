@@ -1,7 +1,7 @@
 package de.maxhenkel.corelib.math;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.Vector3f;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

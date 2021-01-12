@@ -5,8 +5,8 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -18,7 +18,7 @@ public class TagUtils {
      * @param name the registry name of the block or a block tag starting with '#'
      * @return the tag
      */
-    public static ITag<Block> getBlock(String name) {
+    public static Tag<Block> getBlock(String name) {
         if (name.startsWith("#")) {
             return BlockTags.getCollection().get(new ResourceLocation(name.substring(1)));
         } else {
@@ -37,7 +37,7 @@ public class TagUtils {
      * @param name the registry name of the item or a item tag starting with '#'
      * @return the tag
      */
-    public static ITag<Item> getItem(String name) {
+    public static Tag<Item> getItem(String name) {
         if (name.startsWith("#")) {
             return ItemTags.getCollection().get(new ResourceLocation(name.substring(1)));
         } else {
@@ -56,7 +56,7 @@ public class TagUtils {
      * @param name the registry name of the fluid or a fluid tag starting with '#'
      * @return the tag
      */
-    public static ITag<Fluid> getFluid(String name) {
+    public static Tag<Fluid> getFluid(String name) {
         if (name.startsWith("#")) {
             return FluidTags.getCollection().get(new ResourceLocation(name.substring(1)));
         } else {

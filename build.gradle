@@ -63,6 +63,9 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
+
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+
 }
 
 jar {
