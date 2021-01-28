@@ -17,9 +17,9 @@ import javax.annotation.Nullable;
 
 public class TagUtils {
 
-    public static ITag<Block> AIR_BLOCK_TAG = new SingleElementTag<>(Blocks.AIR);
-    public static ITag<Item> AIR_ITEM_TAG = new SingleElementTag<>(Items.AIR);
-    public static ITag<Fluid> AIR_FLUID_TAG = new SingleElementTag<>(Fluids.EMPTY);
+    public static ITag.INamedTag<Block> AIR_BLOCK_TAG = new SingleElementTag<>(Blocks.AIR);
+    public static ITag.INamedTag<Item> AIR_ITEM_TAG = new SingleElementTag<>(Items.AIR);
+    public static ITag.INamedTag<Fluid> AIR_FLUID_TAG = new SingleElementTag<>(Fluids.EMPTY);
 
     /**
      * Gets the tag of the provided registry name
@@ -29,9 +29,14 @@ public class TagUtils {
      * @return the tag
      */
     @Nullable
-    public static ITag<Block> getBlock(String name, boolean nullIfNotExists) {
+    public static ITag.INamedTag<Block> getBlock(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
-            return BlockTags.getCollection().get(new ResourceLocation(name.substring(1)));
+            ResourceLocation id = new ResourceLocation(name.substring(1));
+            ITag<Block> tag = BlockTags.getCollection().get(id);
+            if (tag == null) {
+                return null;
+            }
+            return new NamedTagWrapper<>(tag, id);
         } else {
             ResourceLocation resourceLocation = new ResourceLocation(name);
             if (!ForgeRegistries.BLOCKS.containsKey(resourceLocation)) {
@@ -60,7 +65,7 @@ public class TagUtils {
      * @param name the registry name of the block or a block tag starting with '#'
      * @return the tag
      */
-    public static ITag<Block> getBlock(String name) {
+    public static ITag.INamedTag<Block> getBlock(String name) {
         return getBlock(name, false);
     }
 
@@ -72,9 +77,14 @@ public class TagUtils {
      * @return the tag
      */
     @Nullable
-    public static ITag<Item> getItem(String name, boolean nullIfNotExists) {
+    public static ITag.INamedTag<Item> getItem(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
-            return ItemTags.getCollection().get(new ResourceLocation(name.substring(1)));
+            ResourceLocation id = new ResourceLocation(name.substring(1));
+            ITag<Item> tag = ItemTags.getCollection().get(id);
+            if (tag == null) {
+                return null;
+            }
+            return new NamedTagWrapper<>(tag, id);
         } else {
             ResourceLocation resourceLocation = new ResourceLocation(name);
             if (!ForgeRegistries.ITEMS.containsKey(resourceLocation)) {
@@ -103,7 +113,7 @@ public class TagUtils {
      * @param name the registry name of the item or a item tag starting with '#'
      * @return the tag
      */
-    public static ITag<Item> getItem(String name) {
+    public static ITag.INamedTag<Item> getItem(String name) {
         return getItem(name, false);
     }
 
@@ -115,9 +125,14 @@ public class TagUtils {
      * @return the tag
      */
     @Nullable
-    public static ITag<Fluid> getFluid(String name, boolean nullIfNotExists) {
+    public static ITag.INamedTag<Fluid> getFluid(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
-            return FluidTags.getCollection().get(new ResourceLocation(name.substring(1)));
+            ResourceLocation id = new ResourceLocation(name.substring(1));
+            ITag<Fluid> tag = FluidTags.getCollection().get(id);
+            if (tag == null) {
+                return null;
+            }
+            return new NamedTagWrapper<>(tag, id);
         } else {
             ResourceLocation resourceLocation = new ResourceLocation(name);
             if (!ForgeRegistries.FLUIDS.containsKey(resourceLocation)) {
@@ -146,7 +161,7 @@ public class TagUtils {
      * @param name the registry name of the fluid or a fluid tag starting with '#'
      * @return the tag
      */
-    public static ITag<Fluid> getFluid(String name) {
+    public static ITag.INamedTag<Fluid> getFluid(String name) {
         return getFluid(name, false);
     }
 

@@ -60,6 +60,15 @@ public class ScreenBase<T extends Container> extends ContainerScreen<T> {
         return size - (int) (((float) amount / (float) max) * (float) size);
     }
 
+    protected void drawCentered(MatrixStack matrixStack, ITextComponent text, int y, int color) {
+        drawCentered(matrixStack, text, xSize / 2, y, color);
+    }
+
+    protected void drawCentered(MatrixStack matrixStack, ITextComponent text, int x, int y, int color) {
+        int width = font.getStringWidth(text.getString());
+        font.func_243248_b(matrixStack, text, x - width / 2, y, color);
+    }
+
     public static class HoverArea {
         private final int posX, posY;
         private final int width, height;
