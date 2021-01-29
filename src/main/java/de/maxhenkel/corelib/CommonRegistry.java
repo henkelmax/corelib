@@ -20,7 +20,6 @@ import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -104,16 +103,17 @@ public class CommonRegistry {
      * @return the instantiated config
      */
     public static <T extends ConfigBase> T registerConfig(ModConfig.Type type, Class<T> configClass, boolean registerListener) {
-        Pair<T, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(builder -> {
-            try {
-                return configClass.getConstructor(ForgeConfigSpec.Builder.class).newInstance(builder);
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
-        });
-        ModLoadingContext.get().registerConfig(type, specPair.getRight());
-        T config = specPair.getLeft();
-        config.setConfigSpec(specPair.getRight());
+        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        T config;
+        try {
+            config = configClass.getConstructor(ForgeConfigSpec.Builder.class).newInstance(builder);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+
+        ForgeConfigSpec spec = builder.build();
+        ModLoadingContext.get().registerConfig(type, spec);
+        config.setConfigSpec(spec);
         if (registerListener) {
             Consumer<ModConfig.ModConfigEvent> consumer = evt -> {
                 if (evt.getConfig().getType() == type) {

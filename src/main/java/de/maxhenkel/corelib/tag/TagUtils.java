@@ -34,7 +34,11 @@ public class TagUtils {
             ResourceLocation id = new ResourceLocation(name.substring(1));
             ITag<Block> tag = BlockTags.getCollection().get(id);
             if (tag == null) {
-                return null;
+                if (nullIfNotExists) {
+                    return null;
+                } else {
+                    return AIR_BLOCK_TAG;
+                }
             }
             return new NamedTagWrapper<>(tag, id);
         } else {
@@ -82,7 +86,11 @@ public class TagUtils {
             ResourceLocation id = new ResourceLocation(name.substring(1));
             ITag<Item> tag = ItemTags.getCollection().get(id);
             if (tag == null) {
-                return null;
+                if (nullIfNotExists) {
+                    return null;
+                } else {
+                    return AIR_ITEM_TAG;
+                }
             }
             return new NamedTagWrapper<>(tag, id);
         } else {
@@ -130,7 +138,11 @@ public class TagUtils {
             ResourceLocation id = new ResourceLocation(name.substring(1));
             ITag<Fluid> tag = FluidTags.getCollection().get(id);
             if (tag == null) {
-                return null;
+                if (nullIfNotExists) {
+                    return null;
+                } else {
+                    return AIR_FLUID_TAG;
+                }
             }
             return new NamedTagWrapper<>(tag, id);
         } else {
