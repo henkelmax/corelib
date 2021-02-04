@@ -2,6 +2,7 @@ package de.maxhenkel.corelib.inventory;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -64,6 +65,10 @@ public class ScreenBase<T extends Container> extends ContainerScreen<T> {
     }
 
     public void drawCentered(MatrixStack matrixStack, ITextComponent text, int x, int y, int color) {
+        drawCentered(font, matrixStack, text, x, y, color);
+    }
+
+    public static void drawCentered(FontRenderer font, MatrixStack matrixStack, ITextComponent text, int x, int y, int color) {
         int width = font.getStringPropertyWidth(text);
         font.func_243248_b(matrixStack, text, x - width / 2, y, color);
     }
