@@ -144,8 +144,24 @@ public class ItemUtils {
      * @param list     the item list
      */
     public static void saveItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list) {
+        saveItemList(compound, name, list, true);
+    }
+
+    /**
+     * Stores the provided item list to the provided compound under the given name
+     * Stores empty items
+     *
+     * @param compound     the compound to save the inventory to
+     * @param name         the name of the tag list in the compound
+     * @param list         the item list
+     * @param includeEmpty if empty item stacks should be included
+     */
+    public static void saveItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list, boolean includeEmpty) {
         ListNBT itemList = new ListNBT();
         for (ItemStack stack : list) {
+            if (!includeEmpty && stack.isEmpty()) {
+                continue;
+            }
             itemList.add(stack.write(new CompoundNBT()));
         }
         compound.put(name, itemList);
@@ -204,11 +220,12 @@ public class ItemUtils {
     /**
      * Loads the provided compound to the provided item list
      *
-     * @param compound the compound to read the item list from
-     * @param name     the name of the tag list in the compound
+     * @param compound     the compound to read the item list from
+     * @param name         the name of the tag list in the compound
+     * @param includeEmpty if empty stacks should be included
      * @return the item list
      */
-    public static NonNullList<ItemStack> readItemList(CompoundNBT compound, String name) {
+    public static NonNullList<ItemStack> readItemList(CompoundNBT compound, String name, boolean includeEmpty) {
         NonNullList<ItemStack> items = NonNullList.create();
         if (!compound.contains(name)) {
             return items;
@@ -216,9 +233,28 @@ public class ItemUtils {
 
         ListNBT itemList = compound.getList(name, 10);
         for (int i = 0; i < itemList.size(); i++) {
-            items.add(ItemStack.read(itemList.getCompound(i)));
+            ItemStack item = ItemStack.read(itemList.getCompound(i));
+            if (!includeEmpty) {
+                if (!item.isEmpty()) {
+                    items.add(item);
+                }
+            } else {
+                items.add(item);
+            }
         }
         return items;
+    }
+
+    /**
+     * Loads the provided compound to the provided item list
+     * Inclues empty items
+     *
+     * @param compound the compound to read the item list from
+     * @param name     the name of the tag list in the compound
+     * @return the item list
+     */
+    public static NonNullList<ItemStack> readItemList(CompoundNBT compound, String name) {
+        return readItemList(compound, name, true);
     }
 
     /**
