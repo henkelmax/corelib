@@ -34,10 +34,10 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(MatrixStack matrixStack) {
+    public void render(MatrixStack matrixStack, int x, int y) {
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlasTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE).getSprite(stack.getFluid().getAttributes().getStillTexture());
         Minecraft.getInstance().getTextureManager().bindTexture(texture.getAtlasTexture().getTextureLocation());
-        fluidBlit(matrixStack, 0, 0, 16, 16, texture, stack.getFluid().getAttributes().getColor());
+        fluidBlit(matrixStack, x, y, 16, 16, texture, stack.getFluid().getAttributes().getColor());
     }
 
     @OnlyIn(Dist.CLIENT)

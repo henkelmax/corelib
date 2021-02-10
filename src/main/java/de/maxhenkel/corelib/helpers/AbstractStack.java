@@ -17,7 +17,7 @@ public abstract class AbstractStack<T> {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public abstract void render(MatrixStack matrixStack);
+    public abstract void render(MatrixStack matrixStack, int x, int y);
 
     @OnlyIn(Dist.CLIENT)
     public abstract List<ITextComponent> getTooltip(Screen screen);

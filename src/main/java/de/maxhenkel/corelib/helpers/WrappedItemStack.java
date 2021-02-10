@@ -18,8 +18,8 @@ public class WrappedItemStack extends AbstractStack<ItemStack> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(MatrixStack matrixStack) {
-        Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(Minecraft.getInstance().player, stack, 0, 0);
+    public void render(MatrixStack matrixStack, int x, int y) {
+        Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(Minecraft.getInstance().player, stack, x, y);
     }
 
     @OnlyIn(Dist.CLIENT)
