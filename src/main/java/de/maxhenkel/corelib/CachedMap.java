@@ -59,6 +59,10 @@ public class CachedMap<K, V> {
         cache.remove(key);
     }
 
+    public void clear() {
+        cache.clear();
+    }
+
     private class ValueWrapper {
 
         private V value;

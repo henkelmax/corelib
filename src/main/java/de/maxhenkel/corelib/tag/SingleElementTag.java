@@ -30,4 +30,8 @@ public class SingleElementTag<T extends ForgeRegistryEntry<?>> implements ITag.I
         return Collections.singletonList(element);
     }
 
+    public T getElement() {
+        return element;
+    }
+
 }

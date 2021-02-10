@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.Comparator;
 
@@ -297,7 +298,7 @@ public class ItemUtils {
      * @return if the provided stacks are stackable on each other
      */
     public static boolean isStackable(ItemStack stack1, ItemStack stack2) {
-        return stack1.isItemEqual(stack2) && ItemStack.areItemStackTagsEqual(stack1, stack2) && stack1.getDamage() == stack2.getDamage();
+        return ItemHandlerHelper.canItemStacksStack(stack1, stack2);
     }
 
     /**
