@@ -48,10 +48,10 @@ public class PlayerSkins {
      */
     public static ResourceLocation getSkin(GameProfile gameProfile) {
         Minecraft minecraft = Minecraft.getInstance();
-        Map<Type, MinecraftProfileTexture> map = minecraft.getSkinManager().loadSkinFromCache(gameProfile);
+        Map<Type, MinecraftProfileTexture> map = minecraft.getSkinManager().getInsecureSkinInformation(gameProfile);
 
         if (map.containsKey(Type.SKIN)) {
-            return minecraft.getSkinManager().loadSkin(map.get(Type.SKIN), Type.SKIN);
+            return minecraft.getSkinManager().registerTexture(map.get(Type.SKIN), Type.SKIN);
         } else {
             return DefaultPlayerSkin.getDefaultSkin(gameProfile.getId());
         }
@@ -68,7 +68,7 @@ public class PlayerSkins {
         if (players.containsKey(uuid.toString())) {
             return players.get(uuid.toString());
         } else {
-            GameProfile profile = SkullTileEntity.updateGameProfile(new GameProfile(uuid, name));
+            GameProfile profile = SkullTileEntity.updateGameprofile(new GameProfile(uuid, name));
             players.put(uuid.toString(), profile);
             return profile;
         }
@@ -82,7 +82,7 @@ public class PlayerSkins {
      */
     public static boolean isSlim(UUID uuid) {
         NetworkPlayerInfo networkplayerinfo = Minecraft.getInstance().getConnection().getPlayerInfo(uuid);
-        return networkplayerinfo == null ? (uuid.hashCode() & 1) == 1 : networkplayerinfo.getSkinType().equals("slim");
+        return networkplayerinfo == null ? (uuid.hashCode() & 1) == 1 : networkplayerinfo.getModelName().equals("slim");
     }
 
     /**
@@ -92,7 +92,7 @@ public class PlayerSkins {
      * @return if the skin is slim
      */
     public static boolean isSlim(PlayerEntity player) {
-        return isSlim(player.getUniqueID());
+        return isSlim(player.getUUID());
     }
 
 }

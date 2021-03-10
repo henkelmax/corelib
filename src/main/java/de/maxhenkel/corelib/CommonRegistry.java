@@ -77,7 +77,7 @@ public class CommonRegistry {
      */
     public static <T extends Entity> EntityType<T> registerEntity(String modId, String name, EntityClassification classification, Class<? extends Entity> entityClass, Consumer<EntityType.Builder<T>> builderConsumer) {
         EntityType.Builder<T> builder = EntityType.Builder
-                .create((type, world) -> {
+                .of((type, world) -> {
                     try {
                         try {
                             return (T) entityClass.getConstructor(EntityType.class, World.class).newInstance(type, world);
@@ -152,7 +152,7 @@ public class CommonRegistry {
             String configFileName = configName + ".toml";
             if (type.equals(DynamicConfig.DynamicConfigType.SERVER)) {
                 Consumer<FMLServerAboutToStartEvent> consumer = event -> {
-                    Path serverConfig = event.getServer().func_240776_a_(SERVERCONFIG).resolve(folderName);
+                    Path serverConfig = event.getServer().getWorldPath(SERVERCONFIG).resolve(folderName);
                     serverConfig.toFile().mkdirs();
                     Path configPath = serverConfig.resolve(configFileName);
                     Path defaultPath = DEFAULT_CONFIG_PATH.resolve(folderName).resolve(configFileName);

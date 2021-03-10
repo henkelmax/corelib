@@ -26,7 +26,7 @@ public class NamedTagWrapper<T> implements ITag.INamedTag<T> {
     }
 
     @Override
-    public List<T> getAllElements() {
-        return tag.getAllElements();
+    public List<T> getValues() {
+        return tag.getValues();
     }
 }

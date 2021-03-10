@@ -21,20 +21,20 @@ public class LockedSlot extends Slot {
     }
 
     @Override
-    public boolean canTakeStack(PlayerEntity playerIn) {
+    public boolean mayPickup(PlayerEntity playerIn) {
         if (outputLocked) {
             return false;
         } else {
-            return super.canTakeStack(playerIn);
+            return super.mayPickup(playerIn);
         }
     }
 
     @Override
-    public boolean isItemValid(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         if (inputLocked) {
             return false;
         } else {
-            return super.isItemValid(stack);
+            return super.mayPlace(stack);
         }
     }
 

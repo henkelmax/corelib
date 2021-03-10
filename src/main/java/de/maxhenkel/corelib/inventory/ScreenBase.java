@@ -32,26 +32,26 @@ public class ScreenBase<T extends Container> extends ContainerScreen<T> {
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
-        renderHoveredTooltip(matrixStack, x, y);
+        renderTooltip(matrixStack, x, y);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1F, 1F, 1F, 1F);
-        minecraft.getTextureManager().bindTexture(texture);
+        minecraft.getTextureManager().bind(texture);
 
-        blit(matrixStack, guiLeft, guiTop, 0, 0, xSize, ySize);
+        blit(matrixStack, leftPos, topPos, 0, 0, imageWidth, imageHeight);
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
 
     }
 
     public void drawHoverAreas(MatrixStack matrixStack, int mouseX, int mouseY) {
         for (HoverArea hoverArea : hoverAreas) {
-            if (hoverArea.tooltip != null && hoverArea.isHovered(guiLeft, guiTop, mouseX, mouseY)) {
-                renderTooltip(matrixStack, hoverArea.tooltip.get(), mouseX - guiLeft, mouseY - guiTop);
+            if (hoverArea.tooltip != null && hoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
+                renderTooltip(matrixStack, hoverArea.tooltip.get(), mouseX - leftPos, mouseY - topPos);
             }
         }
     }
@@ -61,7 +61,7 @@ public class ScreenBase<T extends Container> extends ContainerScreen<T> {
     }
 
     public void drawCentered(MatrixStack matrixStack, ITextComponent text, int y, int color) {
-        drawCentered(matrixStack, text, xSize / 2, y, color);
+        drawCentered(matrixStack, text, imageWidth / 2, y, color);
     }
 
     public void drawCentered(MatrixStack matrixStack, ITextComponent text, int x, int y, int color) {
@@ -69,8 +69,8 @@ public class ScreenBase<T extends Container> extends ContainerScreen<T> {
     }
 
     public static void drawCentered(FontRenderer font, MatrixStack matrixStack, ITextComponent text, int x, int y, int color) {
-        int width = font.getStringPropertyWidth(text);
-        font.func_243248_b(matrixStack, text, x - width / 2, y, color);
+        int width = font.width(text);
+        font.draw(matrixStack, text, x - width / 2, y, color);
     }
 
     public static class HoverArea {

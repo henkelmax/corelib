@@ -44,7 +44,7 @@ public class Rotation {
 
     public void applyRotation(MatrixStack matrixStack) {
         for (AxisRotation rotation : rotations) {
-            matrixStack.rotate(rotation.axis.rotationDegrees(rotation.angle));
+            matrixStack.mulPose(rotation.axis.rotationDegrees(rotation.angle));
         }
     }
 

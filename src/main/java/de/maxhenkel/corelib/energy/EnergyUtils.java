@@ -40,7 +40,7 @@ public class EnergyUtils {
      */
     @Nullable
     public static IEnergyStorage getEnergyStorage(IWorldReader world, BlockPos pos, Direction side) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
 
         if (te == null) {
             return null;
@@ -59,7 +59,7 @@ public class EnergyUtils {
      */
     @Nullable
     public static IEnergyStorage getEnergyStorageOffset(IWorldReader world, BlockPos pos, Direction side) {
-        return getEnergyStorage(world, pos.offset(side), side.getOpposite());
+        return getEnergyStorage(world, pos.relative(side), side.getOpposite());
     }
 
 }

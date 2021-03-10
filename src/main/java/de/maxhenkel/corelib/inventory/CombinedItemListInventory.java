@@ -58,7 +58,7 @@ public class CombinedItemListInventory implements IInventory {
     }
 
     @Override
-    public int getSizeInventory() {
+    public int getContainerSize() {
         return Arrays.stream(items).map(NonNullList::size).reduce(0, Integer::sum);
     }
 
@@ -68,42 +68,42 @@ public class CombinedItemListInventory implements IInventory {
     }
 
     @Override
-    public ItemStack getStackInSlot(int index) {
+    public ItemStack getItem(int index) {
         return items[getListIndex(index)].get(getLocalIndex(index));
     }
 
     @Override
-    public ItemStack decrStackSize(int index, int count) {
-        ItemStack itemstack = ItemStackHelper.getAndSplit(items[getListIndex(index)], getLocalIndex(index), count);
+    public ItemStack removeItem(int index, int count) {
+        ItemStack itemstack = ItemStackHelper.removeItem(items[getListIndex(index)], getLocalIndex(index), count);
         if (!itemstack.isEmpty()) {
-            markDirty();
+            setChanged();
         }
         return itemstack;
     }
 
     @Override
-    public ItemStack removeStackFromSlot(int index) {
-        return ItemStackHelper.getAndRemove(items[getListIndex(index)], getLocalIndex(index));
+    public ItemStack removeItemNoUpdate(int index) {
+        return ItemStackHelper.takeItem(items[getListIndex(index)], getLocalIndex(index));
     }
 
     @Override
-    public void setInventorySlotContents(int index, ItemStack stack) {
+    public void setItem(int index, ItemStack stack) {
         items[getListIndex(index)].set(getLocalIndex(index), stack);
-        if (stack.getCount() > getInventoryStackLimit()) {
-            stack.setCount(getInventoryStackLimit());
+        if (stack.getCount() > getMaxStackSize()) {
+            stack.setCount(getMaxStackSize());
         }
-        markDirty();
+        setChanged();
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
         if (onMarkDirty != null) {
             onMarkDirty.run();
         }
     }
 
     @Override
-    public boolean isUsableByPlayer(PlayerEntity player) {
+    public boolean stillValid(PlayerEntity player) {
         if (onIsUsableByPlayer != null) {
             return onIsUsableByPlayer.apply(player);
         } else {
@@ -112,7 +112,7 @@ public class CombinedItemListInventory implements IInventory {
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         Arrays.stream(items).forEach(NonNullList::clear);
     }
 

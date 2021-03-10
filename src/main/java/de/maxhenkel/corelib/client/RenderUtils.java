@@ -28,7 +28,7 @@ public class RenderUtils {
     }
 
     public static void vertex(IVertexBuilder builder, MatrixStack matrixStack, Vector3f position, Vector2f texCoord, Vector3f normal, int light, int overlay) {
-        vertex(builder, matrixStack, position.getX(), position.getY(), position.getZ(), texCoord.x, texCoord.y, normal.getX(), normal.getY(), normal.getZ(), 255, 255, 255, light, overlay);
+        vertex(builder, matrixStack, position.x(), position.y(), position.z(), texCoord.x, texCoord.y, normal.x(), normal.y(), normal.z(), 255, 255, 255, light, overlay);
     }
 
     public static void vertex(IVertexBuilder builder, MatrixStack matrixStack, float posX, float posY, float posZ, float texX, float texY, int red, int green, int blue, int light, int overlay) {
@@ -40,13 +40,13 @@ public class RenderUtils {
     }
 
     public static void vertex(IVertexBuilder builder, MatrixStack matrixStack, float posX, float posY, float posZ, float texX, float texY, float norX, float norY, float norZ, int red, int green, int blue, int light, int overlay) {
-        MatrixStack.Entry entry = matrixStack.getLast();
-        builder.pos(entry.getMatrix(), posX, posY, posZ)
+        MatrixStack.Entry entry = matrixStack.last();
+        builder.vertex(entry.pose(), posX, posY, posZ)
                 .color(red, green, blue, 255)
-                .tex(texX, texY)
-                .overlay(overlay)
-                .lightmap(light)
-                .normal(entry.getNormal(), norX, norY, norZ)
+                .uv(texX, texY)
+                .overlayCoords(overlay)
+                .uv2(light)
+                .normal(entry.normal(), norX, norY, norZ)
                 .endVertex();
     }
 

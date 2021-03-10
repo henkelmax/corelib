@@ -22,12 +22,12 @@ public class TileEntityContainerProvider implements INamedContainerProvider {
 
     @Override
     public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(tileEntity.getBlockState().getBlock().getTranslationKey());
+        return new TranslationTextComponent(tileEntity.getBlockState().getBlock().getDescriptionId());
     }
 
     public static void openGui(PlayerEntity player, TileEntity tileEntity, ContainerCreator containerCreator) {
         if (player instanceof ServerPlayerEntity) {
-            NetworkHooks.openGui((ServerPlayerEntity) player, new TileEntityContainerProvider(containerCreator, tileEntity), packetBuffer -> packetBuffer.writeBlockPos(tileEntity.getPos()));
+            NetworkHooks.openGui((ServerPlayerEntity) player, new TileEntityContainerProvider(containerCreator, tileEntity), packetBuffer -> packetBuffer.writeBlockPos(tileEntity.getBlockPos()));
         }
     }
 

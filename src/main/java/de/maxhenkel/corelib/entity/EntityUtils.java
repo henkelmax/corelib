@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 public class EntityUtils {
 
     public static void forEachPlayerAround(ServerWorld world, BlockPos pos, double radius, Consumer<ServerPlayerEntity> playerEntityConsumer) {
-        world.getPlayers(player -> player.getDistanceSq(pos.getX(), pos.getY(), pos.getZ()) <= radius * radius).forEach(playerEntityConsumer);
+        world.getPlayers(player -> player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= radius * radius).forEach(playerEntityConsumer);
     }
 
 }

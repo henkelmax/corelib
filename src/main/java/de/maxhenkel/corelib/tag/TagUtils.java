@@ -32,7 +32,7 @@ public class TagUtils {
     public static ITag.INamedTag<Block> getBlock(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            ITag<Block> tag = BlockTags.getCollection().get(id);
+            ITag<Block> tag = BlockTags.getAllTags().getTag(id);
             if (tag == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -84,7 +84,7 @@ public class TagUtils {
     public static ITag.INamedTag<Item> getItem(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            ITag<Item> tag = ItemTags.getCollection().get(id);
+            ITag<Item> tag = ItemTags.getAllTags().getTag(id);
             if (tag == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -136,7 +136,7 @@ public class TagUtils {
     public static ITag.INamedTag<Fluid> getFluid(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            ITag<Fluid> tag = FluidTags.getCollection().get(id);
+            ITag<Fluid> tag = FluidTags.getAllTags().getTag(id);
             if (tag == null) {
                 if (nullIfNotExists) {
                     return null;

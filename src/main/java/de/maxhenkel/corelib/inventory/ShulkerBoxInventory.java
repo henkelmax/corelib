@@ -32,8 +32,8 @@ public abstract class ShulkerBoxInventory implements IInventory, INamedContainer
     public ShulkerBoxInventory(PlayerEntity player, ItemStack shulkerBox, int invSize) {
         this.shulkerBox = shulkerBox;
         this.invSize = invSize;
-        this.items = NonNullList.withSize(getSizeInventory(), ItemStack.EMPTY);
-        openInventory(player);
+        this.items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
+        startOpen(player);
 
         CompoundNBT c = shulkerBox.getTag();
 
@@ -64,59 +64,59 @@ public abstract class ShulkerBoxInventory implements IInventory, INamedContainer
 
     public void fillWithLoot(@Nullable PlayerEntity player) {
         if (lootTable != null && player != null) {
-            LootTable loottable = player.world.getServer().getLootTableManager().getLootTableFromLocation(lootTable);
+            LootTable loottable = player.level.getServer().getLootTables().get(lootTable);
             lootTable = null;
 
-            LootContext.Builder builder = new LootContext.Builder((ServerWorld) player.world);
+            LootContext.Builder builder = new LootContext.Builder((ServerWorld) player.level);
 
             if (lootTableSeed != 0L) {
-                builder.withSeed(lootTableSeed);
+                builder.withOptionalRandomSeed(lootTableSeed);
             }
 
             builder.withLuck(player.getLuck()).withParameter(LootParameters.THIS_ENTITY, player);
 
-            loottable.fillInventory(this, builder.build(LootParameterSets.CHEST));
-            markDirty();
+            loottable.fill(this, builder.create(LootParameterSets.CHEST));
+            setChanged();
         }
     }
 
     @Override
-    public int getSizeInventory() {
+    public int getContainerSize() {
         return invSize;
     }
 
     @Override
-    public ItemStack getStackInSlot(int index) {
+    public ItemStack getItem(int index) {
         return items.get(index);
     }
 
     @Override
-    public ItemStack decrStackSize(int index, int count) {
-        ItemStack itemstack = ItemStackHelper.getAndSplit(items, index, count);
-        markDirty();
+    public ItemStack removeItem(int index, int count) {
+        ItemStack itemstack = ItemStackHelper.removeItem(items, index, count);
+        setChanged();
         return itemstack;
     }
 
     @Override
-    public ItemStack removeStackFromSlot(int index) {
-        ItemStack stack = ItemStackHelper.getAndRemove(items, index);
-        markDirty();
+    public ItemStack removeItemNoUpdate(int index) {
+        ItemStack stack = ItemStackHelper.takeItem(items, index);
+        setChanged();
         return stack;
     }
 
     @Override
-    public void setInventorySlotContents(int index, ItemStack stack) {
+    public void setItem(int index, ItemStack stack) {
         items.set(index, stack);
-        markDirty();
+        setChanged();
     }
 
     @Override
-    public int getInventoryStackLimit() {
+    public int getMaxStackSize() {
         return 64;
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
         CompoundNBT tag = shulkerBox.getOrCreateTag();
         if (blockEntityTag == null) {
             tag.put("BlockEntityTag", blockEntityTag = new CompoundNBT());
@@ -128,28 +128,28 @@ public abstract class ShulkerBoxInventory implements IInventory, INamedContainer
     }
 
     @Override
-    public void openInventory(PlayerEntity player) {
-        player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), getOpenSound(), SoundCategory.BLOCKS, 0.5F, SoundUtils.getVariatedPitch(player.world));
+    public void startOpen(PlayerEntity player) {
+        player.level.playSound(null, player.getX(), player.getY(), player.getZ(), getOpenSound(), SoundCategory.BLOCKS, 0.5F, SoundUtils.getVariatedPitch(player.level));
     }
 
     @Override
-    public void closeInventory(PlayerEntity player) {
-        markDirty();
-        player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), getCloseSound(), SoundCategory.BLOCKS, 0.5F, player.world.rand.nextFloat() * 0.1F + 0.9F);
+    public void stopOpen(PlayerEntity player) {
+        setChanged();
+        player.level.playSound(null, player.getX(), player.getY(), player.getZ(), getCloseSound(), SoundCategory.BLOCKS, 0.5F, player.level.random.nextFloat() * 0.1F + 0.9F);
     }
 
     protected SoundEvent getOpenSound() {
-        return SoundEvents.BLOCK_SHULKER_BOX_OPEN;
+        return SoundEvents.SHULKER_BOX_OPEN;
     }
 
     protected SoundEvent getCloseSound() {
-        return SoundEvents.BLOCK_SHULKER_BOX_CLOSE;
+        return SoundEvents.SHULKER_BOX_CLOSE;
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         items.clear();
-        markDirty();
+        setChanged();
     }
 
     @Override
@@ -158,9 +158,9 @@ public abstract class ShulkerBoxInventory implements IInventory, INamedContainer
     }
 
     @Override
-    public boolean isUsableByPlayer(PlayerEntity player) {
+    public boolean stillValid(PlayerEntity player) {
         for (Hand hand : Hand.values()) {
-            if (player.getHeldItem(hand).equals(shulkerBox)) {
+            if (player.getItemInHand(hand).equals(shulkerBox)) {
                 return true;
             }
         }

@@ -19,7 +19,7 @@ public abstract class OBJEntityRenderer<T extends Entity> extends EntityRenderer
     public abstract List<OBJModelInstance<T>> getModels(T entity);
 
     @Override
-    public ResourceLocation getEntityTexture(T entity) {
+    public ResourceLocation getTextureLocation(T entity) {
         return null;
     }
 
@@ -32,13 +32,13 @@ public abstract class OBJEntityRenderer<T extends Entity> extends EntityRenderer
     protected void renderModels(T entity, float yaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
         List<OBJModelInstance<T>> models = getModels(entity);
 
-        matrixStack.push();
+        matrixStack.pushPose();
 
         setupYaw(entity, yaw, matrixStack);
         setupPitch(entity, partialTicks, matrixStack);
 
         for (OBJModelInstance<T> model : models) {
-            matrixStack.push();
+            matrixStack.pushPose();
 
             matrixStack.translate(model.getOptions().getOffset().x, model.getOptions().getOffset().y, model.getOptions().getOffset().z);
 
@@ -51,18 +51,18 @@ public abstract class OBJEntityRenderer<T extends Entity> extends EntityRenderer
             }
 
             model.getModel().render(model.getOptions().getTexture(), matrixStack, buffer, packedLight);
-            matrixStack.pop();
+            matrixStack.popPose();
         }
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
     protected void setupYaw(T entity, float yaw, MatrixStack matrixStack) {
-        matrixStack.rotate(Vector3f.YP.rotationDegrees(180F - yaw));
+        matrixStack.mulPose(Vector3f.YP.rotationDegrees(180F - yaw));
     }
 
     protected void setupPitch(T entity, float partialTicks, MatrixStack matrixStack) {
-        float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
-        matrixStack.rotate(Vector3f.XN.rotationDegrees(pitch));
+        float pitch = entity.xRotO + (entity.xRot - entity.xRotO) * partialTicks;
+        matrixStack.mulPose(Vector3f.XN.rotationDegrees(pitch));
     }
 
 }

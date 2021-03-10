@@ -12,7 +12,7 @@ public class BlockUtils {
      * @return if the block is an air block
      */
     public static boolean isAir(Block block) {
-        return block.getDefaultState().getMaterial() == Material.AIR;
+        return block.defaultBlockState().getMaterial() == Material.AIR;
     }
 
 }

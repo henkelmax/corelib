@@ -14,7 +14,7 @@ public class NetUtils {
      * @param message the message to send
      */
     public static void sendTo(SimpleChannel channel, ServerPlayerEntity player, Message<?> message) {
-        channel.sendTo(message, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+        channel.sendTo(message, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 
 }

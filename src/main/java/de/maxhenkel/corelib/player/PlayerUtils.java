@@ -18,7 +18,7 @@ public class PlayerUtils {
         try {
             Field flag = ObfuscationReflectionHelper.findField(PlayerEntity.class, "field_184827_bp");
             DataParameter<Byte> dataParameter = (DataParameter<Byte>) flag.get(null);
-            return player.getDataManager().get(dataParameter);
+            return player.getEntityData().get(dataParameter);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return 0;

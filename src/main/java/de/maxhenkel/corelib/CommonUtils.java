@@ -15,7 +15,7 @@ public class CommonUtils {
      * @return a file pointing to folder in the world directory
      */
     public static File getWorldFolder(ServerWorld serverWorld, FolderName folderName) {
-        return serverWorld.getServer().func_240776_a_(folderName).toFile();
+        return serverWorld.getServer().getWorldPath(folderName).toFile();
     }
 
 }

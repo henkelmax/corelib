@@ -35,8 +35,8 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void render(MatrixStack matrixStack, int x, int y) {
-        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlasTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE).getSprite(stack.getFluid().getAttributes().getStillTexture());
-        Minecraft.getInstance().getTextureManager().bindTexture(texture.getAtlasTexture().getTextureLocation());
+        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(PlayerContainer.BLOCK_ATLAS).getSprite(stack.getFluid().getAttributes().getStillTexture());
+        Minecraft.getInstance().getTextureManager().bind(texture.atlas().location());
         fluidBlit(matrixStack, x, y, 16, 16, texture, stack.getFluid().getAttributes().getColor());
     }
 
@@ -47,13 +47,13 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
         tooltip.add(getDisplayName());
 
-        if (Minecraft.getInstance().gameSettings.advancedItemTooltips) {
+        if (Minecraft.getInstance().options.advancedItemTooltips) {
             ResourceLocation registryName = ForgeRegistries.FLUIDS.getKey(stack.getFluid());
             if (registryName != null) {
-                tooltip.add((new StringTextComponent(registryName.toString())).mergeStyle(TextFormatting.DARK_GRAY));
+                tooltip.add((new StringTextComponent(registryName.toString())).withStyle(TextFormatting.DARK_GRAY));
             }
             if (stack.hasTag()) {
-                tooltip.add((new TranslationTextComponent("item.nbt_tags", stack.getTag().keySet().size())).mergeStyle(TextFormatting.DARK_GRAY));
+                tooltip.add((new TranslationTextComponent("item.nbt_tags", stack.getTag().getAllKeys().size())).withStyle(TextFormatting.DARK_GRAY));
             }
         }
 
@@ -62,7 +62,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
     @Override
     public ITextComponent getDisplayName() {
-        return new StringTextComponent("").append(stack.getDisplayName()).mergeStyle(stack.getFluid().getAttributes().getRarity().color);
+        return new StringTextComponent("").append(stack.getDisplayName()).withStyle(stack.getFluid().getAttributes().getRarity().color);
     }
 
     @Override
@@ -72,20 +72,20 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
     @OnlyIn(Dist.CLIENT)
     public static void fluidBlit(MatrixStack matrixStack, int x, int y, int width, int height, TextureAtlasSprite sprite, int color) {
-        innerBlit(matrixStack.getLast().getMatrix(), x, x + width, y, y + height, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), (sprite.getMaxV() - sprite.getMinV()) * (float) height / 16F + sprite.getMinV(), color);
+        innerBlit(matrixStack.last().pose(), x, x + width, y, y + height, sprite.getU0(), sprite.getU1(), sprite.getV0(), (sprite.getV1() - sprite.getV0()) * (float) height / 16F + sprite.getV0(), color);
     }
 
     @OnlyIn(Dist.CLIENT)
     private static void innerBlit(Matrix4f matrix, int x1, int x2, int y1, int y2, float minU, float maxU, float minV, float maxV, int color) {
-        BufferBuilder bufferbuilder = Tessellator.getInstance().getBuffer();
+        BufferBuilder bufferbuilder = Tessellator.getInstance().getBuilder();
         bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        bufferbuilder.pos(matrix, (float) x1, (float) y2, 0F).tex(minU, maxV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
-        bufferbuilder.pos(matrix, (float) x2, (float) y2, 0F).tex(maxU, maxV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
-        bufferbuilder.pos(matrix, (float) x2, (float) y1, 0F).tex(maxU, minV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
-        bufferbuilder.pos(matrix, (float) x1, (float) y1, 0F).tex(minU, minV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
-        bufferbuilder.finishDrawing();
+        bufferbuilder.vertex(matrix, (float) x1, (float) y2, 0F).uv(minU, maxV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
+        bufferbuilder.vertex(matrix, (float) x2, (float) y2, 0F).uv(maxU, maxV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
+        bufferbuilder.vertex(matrix, (float) x2, (float) y1, 0F).uv(maxU, minV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
+        bufferbuilder.vertex(matrix, (float) x1, (float) y1, 0F).uv(minU, minV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
+        bufferbuilder.end();
         RenderSystem.enableAlphaTest();
-        WorldVertexBufferUploader.draw(bufferbuilder);
+        WorldVertexBufferUploader.end(bufferbuilder);
     }
 
 }

@@ -20,7 +20,7 @@ public class ItemUtils {
         if (cmp != 0) {
             return cmp;
         }
-        cmp = item2.getDamage() - item1.getDamage();
+        cmp = item2.getDamageValue() - item1.getDamageValue();
         if (cmp != 0) {
             return cmp;
         }
@@ -51,7 +51,7 @@ public class ItemUtils {
             return ItemStack.EMPTY;
         }
 
-        if (player != null && player.abilities.isCreativeMode) {
+        if (player != null && player.abilities.instabuild) {
             return stack;
         }
 
@@ -88,7 +88,7 @@ public class ItemUtils {
             return false;
         }
         if (stack1.getItem() == stack2.getItem()) {
-            return stack1.getDamage() == stack2.getDamage();
+            return stack1.getDamageValue() == stack2.getDamageValue();
         }
         return false;
     }
@@ -103,11 +103,11 @@ public class ItemUtils {
     public static void saveInventory(CompoundNBT compound, String name, IInventory inv) {
         ListNBT tagList = new ListNBT();
 
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            if (!inv.getStackInSlot(i).isEmpty()) {
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            if (!inv.getItem(i).isEmpty()) {
                 CompoundNBT slot = new CompoundNBT();
                 slot.putInt("Slot", i);
-                inv.getStackInSlot(i).write(slot);
+                inv.getItem(i).save(slot);
                 tagList.add(slot);
             }
         }
@@ -128,7 +128,7 @@ public class ItemUtils {
             if (!inv.get(i).isEmpty()) {
                 CompoundNBT slot = new CompoundNBT();
                 slot.putInt("Slot", i);
-                inv.get(i).write(slot);
+                inv.get(i).save(slot);
                 tagList.add(slot);
             }
         }
@@ -163,7 +163,7 @@ public class ItemUtils {
             if (!includeEmpty && stack.isEmpty()) {
                 continue;
             }
-            itemList.add(stack.write(new CompoundNBT()));
+            itemList.add(stack.save(new CompoundNBT()));
         }
         compound.put(name, itemList);
     }
@@ -187,8 +187,8 @@ public class ItemUtils {
             CompoundNBT slot = tagList.getCompound(i);
             int j = slot.getInt("Slot");
 
-            if (j >= 0 && j < inv.getSizeInventory()) {
-                inv.setInventorySlotContents(j, ItemStack.read(slot));
+            if (j >= 0 && j < inv.getContainerSize()) {
+                inv.setItem(j, ItemStack.of(slot));
             }
         }
     }
@@ -213,7 +213,7 @@ public class ItemUtils {
             int j = slot.getInt("Slot");
 
             if (j >= 0 && j < inv.size()) {
-                inv.set(j, ItemStack.read(slot));
+                inv.set(j, ItemStack.of(slot));
             }
         }
     }
@@ -234,7 +234,7 @@ public class ItemUtils {
 
         ListNBT itemList = compound.getList(name, 10);
         for (int i = 0; i < itemList.size(); i++) {
-            ItemStack item = ItemStack.read(itemList.getCompound(i));
+            ItemStack item = ItemStack.of(itemList.getCompound(i));
             if (!includeEmpty) {
                 if (!item.isEmpty()) {
                     items.add(item);
@@ -276,7 +276,7 @@ public class ItemUtils {
             if (i >= list.size()) {
                 break;
             }
-            list.set(i, ItemStack.read(itemList.getCompound(i)));
+            list.set(i, ItemStack.of(itemList.getCompound(i)));
         }
     }
 
@@ -287,7 +287,7 @@ public class ItemUtils {
      * @param index     the slot index
      */
     public static void removeStackFromSlot(IInventory inventory, int index) {
-        inventory.setInventorySlotContents(index, ItemStack.EMPTY);
+        inventory.setItem(index, ItemStack.EMPTY);
     }
 
     /**
@@ -311,7 +311,7 @@ public class ItemUtils {
      * @return the provided compound
      */
     public static CompoundNBT writeOverstackedItem(CompoundNBT compound, ItemStack stack) {
-        stack.write(compound);
+        stack.save(compound);
         compound.remove("Count");
         compound.putInt("Count", stack.getCount());
         return compound;
@@ -330,7 +330,7 @@ public class ItemUtils {
         int count = data.getInt("Count");
         data.remove("Count");
         data.putByte("Count", (byte) 1);
-        ItemStack stack = ItemStack.read(data);
+        ItemStack stack = ItemStack.of(data);
         stack.setCount(count);
         return stack;
     }

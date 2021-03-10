@@ -38,7 +38,7 @@ public class OBJModel {
     @OnlyIn(Dist.CLIENT)
     public void render(ResourceLocation texture, MatrixStack matrixStack, IRenderTypeBuffer buffer, int light) {
         load();
-        matrixStack.push();
+        matrixStack.pushPose();
 
         IVertexBuilder builder = buffer.getBuffer(getRenderType(texture, true));
 
@@ -48,23 +48,23 @@ public class OBJModel {
             RenderUtils.vertex(builder, matrixStack, data.positions.get(face[1][0]), data.texCoords.get(face[1][1]), data.normals.get(face[1][2]), light, OverlayTexture.NO_OVERLAY);
             RenderUtils.vertex(builder, matrixStack, data.positions.get(face[2][0]), data.texCoords.get(face[2][1]), data.normals.get(face[2][2]), light, OverlayTexture.NO_OVERLAY);
         }
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
     @OnlyIn(Dist.CLIENT)
     private static RenderType getRenderType(ResourceLocation resourceLocation, boolean culling) {
         RenderType.State state = RenderType.State
-                .getBuilder()
-                .texture(new RenderState.TextureState(resourceLocation, false, false))
-                .transparency(new RenderState.TransparencyState("no_transparency", RenderSystem::disableBlend, () -> {
+                .builder()
+                .setTextureState(new RenderState.TextureState(resourceLocation, false, false))
+                .setTransparencyState(new RenderState.TransparencyState("no_transparency", RenderSystem::disableBlend, () -> {
                 }))
-                .diffuseLighting(new RenderState.DiffuseLightingState(false))
-                .alpha(new RenderState.AlphaState(0.003921569F))
-                .lightmap(new RenderState.LightmapState(true))
-                .overlay(new RenderState.OverlayState(true))
-                .cull(new RenderState.CullState(culling))
-                .build(true);
-        return RenderType.makeType("entity_cutout", DefaultVertexFormats.ENTITY, GL11.GL_TRIANGLES, 256, true, false, state);
+                .setDiffuseLightingState(new RenderState.DiffuseLightingState(false))
+                .setAlphaState(new RenderState.AlphaState(0.003921569F))
+                .setLightmapState(new RenderState.LightmapState(true))
+                .setOverlayState(new RenderState.OverlayState(true))
+                .setCullState(new RenderState.CullState(culling))
+                .createCompositeState(true);
+        return RenderType.create("entity_cutout", DefaultVertexFormats.NEW_ENTITY, GL11.GL_TRIANGLES, 256, true, false, state);
     }
 
     static class OBJModelData {

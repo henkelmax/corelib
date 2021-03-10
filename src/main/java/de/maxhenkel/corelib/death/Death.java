@@ -113,29 +113,29 @@ public class Death {
     public static Death fromPlayer(PlayerEntity player) {
         Death death = new Death();
         death.id = UUID.randomUUID();
-        death.playerUUID = player.getUniqueID();
-        death.playerName = player.getName().getUnformattedComponentText();
+        death.playerUUID = player.getUUID();
+        death.playerName = player.getName().getContents();
 
         for (int i = 0; i < death.mainInventory.size(); i++) {
-            death.mainInventory.set(i, player.inventory.mainInventory.get(i));
+            death.mainInventory.set(i, player.inventory.items.get(i));
         }
         for (int i = 0; i < death.armorInventory.size(); i++) {
-            death.armorInventory.set(i, player.inventory.armorInventory.get(i));
+            death.armorInventory.set(i, player.inventory.armor.get(i));
         }
         for (int i = 0; i < death.offHandInventory.size(); i++) {
-            death.offHandInventory.set(i, player.inventory.offHandInventory.get(i));
+            death.offHandInventory.set(i, player.inventory.offhand.get(i));
         }
         death.equipment = NonNullList.withSize(EquipmentSlotType.values().length, ItemStack.EMPTY);
         for (int i = 0; i < death.equipment.size(); i++) {
-            death.equipment.set(i, player.getItemStackFromSlot(EquipmentSlotType.values()[i]).copy());
+            death.equipment.set(i, player.getItemBySlot(EquipmentSlotType.values()[i]).copy());
         }
 
         death.timestamp = System.currentTimeMillis();
         death.experience = player.experienceLevel;
-        death.posX = player.getPosX();
-        death.posY = player.getPosY();
-        death.posZ = player.getPosZ();
-        death.dimension = player.world.getDimensionKey().getLocation().toString();
+        death.posX = player.getX();
+        death.posY = player.getY();
+        death.posZ = player.getZ();
+        death.dimension = player.level.dimension().location().toString();
         death.model = PlayerUtils.getModel(player);
         return death;
     }

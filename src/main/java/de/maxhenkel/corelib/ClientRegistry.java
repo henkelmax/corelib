@@ -14,9 +14,9 @@ public class ClientRegistry {
     /**
      * Registers a new keybinding
      *
-     * @param name the translation key
+     * @param name     the translation key
      * @param category the category
-     * @param keyCode the keycode
+     * @param keyCode  the keycode
      * @return the keybinding
      */
     public static KeyBinding registerKeyBinding(String name, String category, int keyCode) {
@@ -31,8 +31,8 @@ public class ClientRegistry {
      * @param containerType the container type
      * @param screenFactory the screen factory
      */
-    public static <C extends Container, S extends ContainerScreen<C>> void registerScreen(ContainerType<C> containerType, ScreenManager.IScreenFactory<C, S> screenFactory){
-        ScreenManager.registerFactory(containerType, screenFactory);
+    public static <C extends Container, S extends ContainerScreen<C>> void registerScreen(ContainerType<C> containerType, ScreenManager.IScreenFactory<C, S> screenFactory) {
+        ScreenManager.register(containerType, screenFactory);
     }
 
 }

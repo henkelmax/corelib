@@ -29,7 +29,7 @@ public class ItemListInventory implements IInventory {
     }
 
     @Override
-    public int getSizeInventory() {
+    public int getContainerSize() {
         return items.size();
     }
 
@@ -39,42 +39,42 @@ public class ItemListInventory implements IInventory {
     }
 
     @Override
-    public ItemStack getStackInSlot(int index) {
+    public ItemStack getItem(int index) {
         return items.get(index);
     }
 
     @Override
-    public ItemStack decrStackSize(int index, int count) {
-        ItemStack itemstack = ItemStackHelper.getAndSplit(items, index, count);
+    public ItemStack removeItem(int index, int count) {
+        ItemStack itemstack = ItemStackHelper.removeItem(items, index, count);
         if (!itemstack.isEmpty()) {
-            markDirty();
+            setChanged();
         }
         return itemstack;
     }
 
     @Override
-    public ItemStack removeStackFromSlot(int index) {
-        return ItemStackHelper.getAndRemove(items, index);
+    public ItemStack removeItemNoUpdate(int index) {
+        return ItemStackHelper.takeItem(items, index);
     }
 
     @Override
-    public void setInventorySlotContents(int index, ItemStack stack) {
+    public void setItem(int index, ItemStack stack) {
         items.set(index, stack);
-        if (stack.getCount() > getInventoryStackLimit()) {
-            stack.setCount(getInventoryStackLimit());
+        if (stack.getCount() > getMaxStackSize()) {
+            stack.setCount(getMaxStackSize());
         }
-        markDirty();
+        setChanged();
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
         if (onMarkDirty != null) {
             onMarkDirty.run();
         }
     }
 
     @Override
-    public boolean isUsableByPlayer(PlayerEntity player) {
+    public boolean stillValid(PlayerEntity player) {
         if (onIsUsableByPlayer != null) {
             return onIsUsableByPlayer.apply(player);
         } else {
@@ -83,7 +83,7 @@ public class ItemListInventory implements IInventory {
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         items.clear();
     }
 

@@ -45,7 +45,7 @@ public class DeathManager {
      */
     @Nullable
     public static Death getDeath(ServerPlayerEntity player, UUID id) {
-        return getDeath(player.getServerWorld(), player.getUniqueID(), id);
+        return getDeath(player.getLevel(), player.getUUID(), id);
     }
 
     /**
@@ -245,7 +245,7 @@ public class DeathManager {
      * @return the deaths folder
      */
     public static File getPlayerDeathFolder(ServerPlayerEntity player) {
-        return getPlayerDeathFolder(player.getServerWorld(), player.getUniqueID());
+        return getPlayerDeathFolder(player.getLevel(), player.getUUID());
     }
 
     /**

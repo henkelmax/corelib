@@ -43,7 +43,7 @@ public abstract class ContainerBase extends Container {
         if (inventory == null) {
             return 0;
         }
-        return inventory.getSizeInventory();
+        return inventory.getContainerSize();
     }
 
     @Nullable
@@ -52,44 +52,44 @@ public abstract class ContainerBase extends Container {
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = inventorySlots.get(index);
+        Slot slot = slots.get(index);
 
-        if (slot != null && slot.getHasStack()) {
-            ItemStack stack = slot.getStack();
+        if (slot != null && slot.hasItem()) {
+            ItemStack stack = slot.getItem();
             itemstack = stack.copy();
 
             if (index < getInventorySize()) {
-                if (!mergeItemStack(stack, getInventorySize(), inventorySlots.size(), true)) {
+                if (!moveItemStackTo(stack, getInventorySize(), slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!mergeItemStack(stack, 0, getInventorySize(), false)) {
+            } else if (!moveItemStackTo(stack, 0, getInventorySize(), false)) {
                 return ItemStack.EMPTY;
             }
 
             if (stack.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
         }
         return itemstack;
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity player) {
+    public boolean stillValid(PlayerEntity player) {
         if (inventory == null) {
             return true;
         }
-        return inventory.isUsableByPlayer(player);
+        return inventory.stillValid(player);
     }
 
     @Override
-    public void onContainerClosed(PlayerEntity player) {
-        super.onContainerClosed(player);
+    public void removed(PlayerEntity player) {
+        super.removed(player);
         if (inventory != null) {
-            inventory.closeInventory(player);
+            inventory.stopOpen(player);
         }
     }
 

@@ -23,7 +23,7 @@ public class DataSerializerItemList {
             packetBuffer.writeInt(itemStacks.size());
 
             for (ItemStack itemStack : itemStacks) {
-                packetBuffer.writeItemStack(itemStack);
+                packetBuffer.writeItem(itemStack);
             }
         }
 
@@ -31,7 +31,7 @@ public class DataSerializerItemList {
             int length = buf.readInt();
             NonNullList<ItemStack> list = NonNullList.withSize(length, ItemStack.EMPTY);
             for (int i = 0; i < list.size(); i++) {
-                list.set(i, buf.readItemStack());
+                list.set(i, buf.readItem());
             }
             return list;
         }
@@ -41,7 +41,7 @@ public class DataSerializerItemList {
         }
 
         @Override
-        public NonNullList<ItemStack> copyValue(NonNullList<ItemStack> itemStacks) {
+        public NonNullList<ItemStack> copy(NonNullList<ItemStack> itemStacks) {
             NonNullList<ItemStack> list = NonNullList.withSize(itemStacks.size(), ItemStack.EMPTY);
             for (int i = 0; i < itemStacks.size(); i++) {
                 list.set(i, itemStacks.get(i).copy());

@@ -55,7 +55,7 @@ public class FluidUtils {
      */
     @Nullable
     public static IFluidHandler getFluidHandler(IBlockReader world, BlockPos pos, Direction direction) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te == null) {
             return null;
         }
@@ -72,7 +72,7 @@ public class FluidUtils {
      */
     @Nullable
     public static IFluidHandler getFluidHandlerOffset(IBlockReader world, BlockPos pos, Direction direction) {
-        return getFluidHandler(world, pos.offset(direction), direction.getOpposite());
+        return getFluidHandler(world, pos.relative(direction), direction.getOpposite());
     }
 
     /**
@@ -136,7 +136,7 @@ public class FluidUtils {
      * @return if it was successful
      */
     public static boolean tryFluidInteraction(PlayerEntity player, Hand hand, World world, BlockPos pos) {
-        ItemStack stack = player.getHeldItem(hand);
+        ItemStack stack = player.getItemInHand(hand);
 
         FluidStack fluidStack = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
 
@@ -165,7 +165,7 @@ public class FluidUtils {
      * @return if it was successful
      */
     public static boolean handleEmpty(IBlockReader world, BlockPos pos, PlayerEntity player, Hand hand) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
 
         if (!(te instanceof IFluidHandler)) {
             return false;
@@ -175,12 +175,12 @@ public class FluidUtils {
 
         IItemHandler inv = new InvWrapper(player.inventory);
 
-        ItemStack stack = player.getHeldItem(hand);
+        ItemStack stack = player.getItemInHand(hand);
 
         FluidActionResult res = FluidUtil.tryEmptyContainerAndStow(stack, handler, inv, Integer.MAX_VALUE, player, true);
 
         if (res.isSuccess()) {
-            player.setHeldItem(hand, res.result);
+            player.setItemInHand(hand, res.result);
             return true;
         }
 
@@ -197,7 +197,7 @@ public class FluidUtils {
      * @return if it was successful
      */
     public static boolean handleFill(IBlockReader world, BlockPos pos, PlayerEntity player, Hand hand) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
 
         if (!(te instanceof IFluidHandler)) {
             return false;
@@ -207,12 +207,12 @@ public class FluidUtils {
 
         IItemHandler inv = new InvWrapper(player.inventory);
 
-        ItemStack stack = player.getHeldItem(hand);
+        ItemStack stack = player.getItemInHand(hand);
 
         FluidActionResult result = FluidUtil.tryFillContainerAndStow(stack, blockHandler, inv, Integer.MAX_VALUE, player, true);
 
         if (result.isSuccess()) {
-            player.setHeldItem(hand, result.result);
+            player.setItemInHand(hand, result.result);
             return true;
         }
 

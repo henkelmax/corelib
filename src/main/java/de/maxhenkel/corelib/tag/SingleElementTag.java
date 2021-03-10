@@ -26,7 +26,7 @@ public class SingleElementTag<T extends ForgeRegistryEntry<?>> implements ITag.I
     }
 
     @Override
-    public List<T> getAllElements() {
+    public List<T> getValues() {
         return Collections.singletonList(element);
     }
 
