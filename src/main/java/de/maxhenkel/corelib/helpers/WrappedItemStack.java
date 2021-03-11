@@ -30,7 +30,7 @@ public class WrappedItemStack extends AbstractStack<ItemStack> {
 
     @Override
     public ITextComponent getDisplayName() {
-        return stack.getDisplayName();
+        return stack.getHoverName();
     }
 
     @Override
