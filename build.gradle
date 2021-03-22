@@ -65,6 +65,8 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
+
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 jar {

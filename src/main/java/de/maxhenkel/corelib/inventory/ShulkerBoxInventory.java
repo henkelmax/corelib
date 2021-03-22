@@ -169,7 +169,7 @@ public abstract class ShulkerBoxInventory implements IInventory, INamedContainer
 
     @Override
     public ITextComponent getDisplayName() {
-        return shulkerBox.getDisplayName();
+        return shulkerBox.getHoverName();
     }
 
     @Nullable
