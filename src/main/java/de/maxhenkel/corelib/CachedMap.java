@@ -47,12 +47,19 @@ public class CachedMap<K, V> {
     }
 
     private void cleanup() {
+        if (lifespan < 0) {
+            return;
+        }
         long time = System.currentTimeMillis();
-        if (lifespan > 0 && time - lastCheck > lifespan) {
+        if (time - lastCheck > lifespan) {
             Collection<K> collect = cache.entrySet().stream().filter(kValueWrapperEntry -> kValueWrapperEntry.getValue().checkInvalid(time)).map(Map.Entry::getKey).collect(Collectors.toSet());
             cache.keySet().removeAll(collect);
             lastCheck = time;
         }
+    }
+
+    public boolean has(K key) {
+        return cache.containsKey(key);
     }
 
     public void remove(K key) {
@@ -74,7 +81,10 @@ public class CachedMap<K, V> {
         }
 
         public boolean checkInvalid(long currentTime) {
-            return currentTime - accessTimestamp > lifespan;
+            if (lifespan >= 0) {
+                return currentTime - accessTimestamp > lifespan;
+            }
+            return false;
         }
 
         public V getValue() {
