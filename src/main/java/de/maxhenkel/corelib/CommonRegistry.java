@@ -32,12 +32,25 @@ public class CommonRegistry {
     /**
      * Creates a new network channel
      *
+     * @param modId           the mod ID
+     * @param name            the name of the channel
+     * @param protocolVersion the protocol version
+     * @return the channel
+     */
+    public static SimpleChannel registerChannel(String modId, String name, int protocolVersion) {
+        String protocolVersionString = String.valueOf(protocolVersion);
+        return NetworkRegistry.newSimpleChannel(new ResourceLocation(modId, name), () -> protocolVersionString, s -> s.equals(protocolVersionString), s -> s.equals(protocolVersionString));
+    }
+
+    /**
+     * Creates a new network channel
+     *
      * @param modId the mod ID
      * @param name  the name of the channel
      * @return the channel
      */
     public static SimpleChannel registerChannel(String modId, String name) {
-        return NetworkRegistry.newSimpleChannel(new ResourceLocation(modId, name), () -> "1.0.0", s -> true, s -> true);
+        return NetworkRegistry.newSimpleChannel(new ResourceLocation(modId, name), () -> "1.0.0", s -> true, s -> true); //TODO change default version
     }
 
     /**
