@@ -1,8 +1,8 @@
 package de.maxhenkel.corelib.helpers;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.text.ITextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -17,12 +17,12 @@ public abstract class AbstractStack<T> {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public abstract void render(MatrixStack matrixStack, int x, int y);
+    public abstract void render(PoseStack matrixStack, int x, int y);
 
     @OnlyIn(Dist.CLIENT)
-    public abstract List<ITextComponent> getTooltip(Screen screen);
+    public abstract List<Component> getTooltip(Screen screen);
 
-    public abstract ITextComponent getDisplayName();
+    public abstract Component getDisplayName();
 
     public abstract boolean isEmpty();
 }

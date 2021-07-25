@@ -1,14 +1,14 @@
 package de.maxhenkel.corelib.fluid;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidActionResult;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -29,7 +29,7 @@ public class FluidUtils {
      * @param direction the direction
      * @return if there is a fluid handler at this position and direction
      */
-    public static boolean isFluidHandler(IBlockReader world, BlockPos pos, Direction direction) {
+    public static boolean isFluidHandler(LevelAccessor world, BlockPos pos, Direction direction) {
         return getFluidHandler(world, pos, direction) != null;
     }
 
@@ -41,7 +41,7 @@ public class FluidUtils {
      * @param direction the direction
      * @return if there is a fluid handler offset to the specified direction
      */
-    public static boolean isFluidHandlerOffset(IBlockReader world, BlockPos pos, Direction direction) {
+    public static boolean isFluidHandlerOffset(LevelAccessor world, BlockPos pos, Direction direction) {
         return getFluidHandlerOffset(world, pos, direction) != null;
     }
 
@@ -54,8 +54,8 @@ public class FluidUtils {
      * @return the fluid handler
      */
     @Nullable
-    public static IFluidHandler getFluidHandler(IBlockReader world, BlockPos pos, Direction direction) {
-        TileEntity te = world.getBlockEntity(pos);
+    public static IFluidHandler getFluidHandler(LevelAccessor world, BlockPos pos, Direction direction) {
+        BlockEntity te = world.getBlockEntity(pos);
         if (te == null) {
             return null;
         }
@@ -71,7 +71,7 @@ public class FluidUtils {
      * @return the fluid handler
      */
     @Nullable
-    public static IFluidHandler getFluidHandlerOffset(IBlockReader world, BlockPos pos, Direction direction) {
+    public static IFluidHandler getFluidHandlerOffset(LevelAccessor world, BlockPos pos, Direction direction) {
         return getFluidHandler(world, pos.relative(direction), direction.getOpposite());
     }
 
@@ -135,7 +135,7 @@ public class FluidUtils {
      * @param pos    the position of the fluid handler
      * @return if it was successful
      */
-    public static boolean tryFluidInteraction(PlayerEntity player, Hand hand, World world, BlockPos pos) {
+    public static boolean tryFluidInteraction(Player player, InteractionHand hand, Level world, BlockPos pos) {
         ItemStack stack = player.getItemInHand(hand);
 
         FluidStack fluidStack = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
@@ -164,8 +164,8 @@ public class FluidUtils {
      * @param hand   the hand
      * @return if it was successful
      */
-    public static boolean handleEmpty(IBlockReader world, BlockPos pos, PlayerEntity player, Hand hand) {
-        TileEntity te = world.getBlockEntity(pos);
+    public static boolean handleEmpty(LevelAccessor world, BlockPos pos, Player player, InteractionHand hand) {
+        BlockEntity te = world.getBlockEntity(pos);
 
         if (!(te instanceof IFluidHandler)) {
             return false;
@@ -173,7 +173,7 @@ public class FluidUtils {
 
         IFluidHandler handler = (IFluidHandler) te;
 
-        IItemHandler inv = new InvWrapper(player.inventory);
+        IItemHandler inv = new InvWrapper(player.getInventory());
 
         ItemStack stack = player.getItemInHand(hand);
 
@@ -196,8 +196,8 @@ public class FluidUtils {
      * @param hand   the hand
      * @return if it was successful
      */
-    public static boolean handleFill(IBlockReader world, BlockPos pos, PlayerEntity player, Hand hand) {
-        TileEntity te = world.getBlockEntity(pos);
+    public static boolean handleFill(LevelAccessor world, BlockPos pos, Player player, InteractionHand hand) {
+        BlockEntity te = world.getBlockEntity(pos);
 
         if (!(te instanceof IFluidHandler)) {
             return false;
@@ -205,7 +205,7 @@ public class FluidUtils {
 
         IFluidHandler blockHandler = (IFluidHandler) te;
 
-        IItemHandler inv = new InvWrapper(player.inventory);
+        IItemHandler inv = new InvWrapper(player.getInventory());
 
         ItemStack stack = player.getItemInHand(hand);
 

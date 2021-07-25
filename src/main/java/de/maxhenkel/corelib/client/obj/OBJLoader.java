@@ -2,12 +2,12 @@ package de.maxhenkel.corelib.client.obj;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.mojang.math.Vector3f;
 import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.IResource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.phys.Vec2;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -32,11 +32,11 @@ public class OBJLoader {
             return modelCache.get(model);
         }
 
-        IResource resource = Minecraft.getInstance().getResourceManager().getResource(model);
+        Resource resource = Minecraft.getInstance().getResourceManager().getResource(model);
         LineReader reader = new LineReader(resource);
 
         List<Vector3f> positions = Lists.newArrayList();
-        List<Vector2f> texCoords = Lists.newArrayList();
+        List<Vec2> texCoords = Lists.newArrayList();
         List<Vector3f> normals = Lists.newArrayList();
         List<int[][]> faces = Lists.newArrayList();
 
@@ -47,8 +47,8 @@ public class OBJLoader {
                     positions.add(net.minecraftforge.client.model.obj.OBJModel.parseVector4To3(line));
                     break;
                 case "vt":
-                    Vector2f vec2f = net.minecraftforge.client.model.obj.OBJModel.parseVector2(line);
-                    texCoords.add(new Vector2f(vec2f.x, 1F - vec2f.y));
+                    Vec2 vec2f = net.minecraftforge.client.model.obj.OBJModel.parseVector2(line);
+                    texCoords.add(new Vec2(vec2f.x, 1F - vec2f.y));
                     break;
                 case "vn":
                     normals.add(net.minecraftforge.client.model.obj.OBJModel.parseVector3(line));
@@ -95,7 +95,7 @@ public class OBJLoader {
         private InputStreamReader lineStream;
         private BufferedReader lineReader;
 
-        public LineReader(IResource resource) {
+        public LineReader(Resource resource) {
             this.lineStream = new InputStreamReader(resource.getInputStream(), Charsets.UTF_8);
             this.lineReader = new BufferedReader(lineStream);
         }

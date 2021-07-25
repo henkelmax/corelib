@@ -1,21 +1,21 @@
 package de.maxhenkel.corelib.inventory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 
-public abstract class ContainerBase extends Container {
+public abstract class ContainerBase extends AbstractContainerMenu {
 
     @Nullable
-    protected IInventory inventory;
-    protected IInventory playerInventory;
+    protected Container inventory;
+    protected Container playerInventory;
 
-    public ContainerBase(ContainerType containerType, int id, IInventory playerInventory, IInventory inventory) {
+    public ContainerBase(MenuType containerType, int id, Container playerInventory, Container inventory) {
         super(containerType, id);
         this.playerInventory = playerInventory;
         this.inventory = inventory;
@@ -47,12 +47,12 @@ public abstract class ContainerBase extends Container {
     }
 
     @Nullable
-    public IInventory getPlayerInventory() {
+    public Container getPlayerInventory() {
         return playerInventory;
     }
 
     @Override
-    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(Player playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = slots.get(index);
 
@@ -78,7 +78,7 @@ public abstract class ContainerBase extends Container {
     }
 
     @Override
-    public boolean stillValid(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         if (inventory == null) {
             return true;
         }
@@ -86,7 +86,7 @@ public abstract class ContainerBase extends Container {
     }
 
     @Override
-    public void removed(PlayerEntity player) {
+    public void removed(Player player) {
         super.removed(player);
         if (inventory != null) {
             inventory.stopOpen(player);

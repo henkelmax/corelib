@@ -1,7 +1,7 @@
 package de.maxhenkel.corelib;
 
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.File;
 
@@ -14,7 +14,7 @@ public class CommonUtils {
      * @param folderName  the name of the folder
      * @return a file pointing to folder in the world directory
      */
-    public static File getWorldFolder(ServerWorld serverWorld, FolderName folderName) {
+    public static File getWorldFolder(ServerLevel serverWorld, LevelResource folderName) {
         return serverWorld.getServer().getWorldPath(folderName).toFile();
     }
 

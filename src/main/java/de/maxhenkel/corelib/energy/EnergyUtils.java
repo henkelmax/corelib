@@ -1,9 +1,9 @@
 package de.maxhenkel.corelib.energy;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -39,8 +39,8 @@ public class EnergyUtils {
      * @return the energy storage
      */
     @Nullable
-    public static IEnergyStorage getEnergyStorage(IWorldReader world, BlockPos pos, Direction side) {
-        TileEntity te = world.getBlockEntity(pos);
+    public static IEnergyStorage getEnergyStorage(LevelAccessor world, BlockPos pos, Direction side) {
+        BlockEntity te = world.getBlockEntity(pos);
 
         if (te == null) {
             return null;
@@ -58,7 +58,7 @@ public class EnergyUtils {
      * @return the energy storage
      */
     @Nullable
-    public static IEnergyStorage getEnergyStorageOffset(IWorldReader world, BlockPos pos, Direction side) {
+    public static IEnergyStorage getEnergyStorageOffset(LevelAccessor world, BlockPos pos, Direction side) {
         return getEnergyStorage(world, pos.relative(side), side.getOpposite());
     }
 

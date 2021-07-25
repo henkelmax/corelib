@@ -1,6 +1,6 @@
 package de.maxhenkel.corelib.item;
 
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.NonNullList;
 
 import java.util.*;
 import java.util.function.BiConsumer;

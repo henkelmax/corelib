@@ -1,20 +1,16 @@
 package de.maxhenkel.corelib.client.obj;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import de.maxhenkel.corelib.client.RenderUtils;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.RenderState;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
@@ -36,11 +32,11 @@ public class OBJModel {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void render(ResourceLocation texture, MatrixStack matrixStack, IRenderTypeBuffer buffer, int light) {
+    public void render(ResourceLocation texture, PoseStack matrixStack, MultiBufferSource buffer, int light) {
         load();
         matrixStack.pushPose();
 
-        IVertexBuilder builder = buffer.getBuffer(getRenderType(texture, true));
+        VertexConsumer builder = buffer.getBuffer(RenderType.entityCutout(texture));
 
         for (int i = 0; i < data.faces.size(); i++) {
             int[][] face = data.faces.get(i);
@@ -51,29 +47,13 @@ public class OBJModel {
         matrixStack.popPose();
     }
 
-    @OnlyIn(Dist.CLIENT)
-    private static RenderType getRenderType(ResourceLocation resourceLocation, boolean culling) {
-        RenderType.State state = RenderType.State
-                .builder()
-                .setTextureState(new RenderState.TextureState(resourceLocation, false, false))
-                .setTransparencyState(new RenderState.TransparencyState("no_transparency", RenderSystem::disableBlend, () -> {
-                }))
-                .setDiffuseLightingState(new RenderState.DiffuseLightingState(false))
-                .setAlphaState(new RenderState.AlphaState(0.003921569F))
-                .setLightmapState(new RenderState.LightmapState(true))
-                .setOverlayState(new RenderState.OverlayState(true))
-                .setCullState(new RenderState.CullState(culling))
-                .createCompositeState(true);
-        return RenderType.create("entity_cutout", DefaultVertexFormats.NEW_ENTITY, GL11.GL_TRIANGLES, 256, true, false, state);
-    }
-
     static class OBJModelData {
         private List<Vector3f> positions;
-        private List<Vector2f> texCoords;
+        private List<Vec2> texCoords;
         private List<Vector3f> normals;
         private List<int[][]> faces;
 
-        public OBJModelData(List<Vector3f> positions, List<Vector2f> texCoords, List<Vector3f> normals, List<int[][]> faces) {
+        public OBJModelData(List<Vector3f> positions, List<Vec2> texCoords, List<Vector3f> normals, List<int[][]> faces) {
             this.positions = positions;
             this.texCoords = texCoords;
             this.normals = normals;
@@ -84,7 +64,7 @@ public class OBJModel {
             return positions;
         }
 
-        public List<Vector2f> getTexCoords() {
+        public List<Vec2> getTexCoords() {
             return texCoords;
         }
 

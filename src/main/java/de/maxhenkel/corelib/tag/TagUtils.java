@@ -1,25 +1,25 @@
 package de.maxhenkel.corelib.tag;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
 public class TagUtils {
 
-    public static ITag.INamedTag<Block> AIR_BLOCK_TAG = new SingleElementTag<>(Blocks.AIR);
-    public static ITag.INamedTag<Item> AIR_ITEM_TAG = new SingleElementTag<>(Items.AIR);
-    public static ITag.INamedTag<Fluid> AIR_FLUID_TAG = new SingleElementTag<>(Fluids.EMPTY);
+    public static Tag.Named<Block> AIR_BLOCK_TAG = new SingleElementTag<>(Blocks.AIR);
+    public static Tag.Named<Item> AIR_ITEM_TAG = new SingleElementTag<>(Items.AIR);
+    public static Tag.Named<Fluid> AIR_FLUID_TAG = new SingleElementTag<>(Fluids.EMPTY);
 
     /**
      * Gets the tag of the provided registry name
@@ -29,10 +29,10 @@ public class TagUtils {
      * @return the tag
      */
     @Nullable
-    public static ITag.INamedTag<Block> getBlock(String name, boolean nullIfNotExists) {
+    public static Tag.Named<Block> getBlock(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            ITag<Block> tag = BlockTags.getAllTags().getTag(id);
+            Tag<Block> tag = BlockTags.getAllTags().getTag(id);
             if (tag == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -69,7 +69,7 @@ public class TagUtils {
      * @param name the registry name of the block or a block tag starting with '#'
      * @return the tag
      */
-    public static ITag.INamedTag<Block> getBlock(String name) {
+    public static Tag.Named<Block> getBlock(String name) {
         return getBlock(name, false);
     }
 
@@ -81,10 +81,10 @@ public class TagUtils {
      * @return the tag
      */
     @Nullable
-    public static ITag.INamedTag<Item> getItem(String name, boolean nullIfNotExists) {
+    public static Tag.Named<Item> getItem(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            ITag<Item> tag = ItemTags.getAllTags().getTag(id);
+            Tag<Item> tag = ItemTags.getAllTags().getTag(id);
             if (tag == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -121,7 +121,7 @@ public class TagUtils {
      * @param name the registry name of the item or a item tag starting with '#'
      * @return the tag
      */
-    public static ITag.INamedTag<Item> getItem(String name) {
+    public static Tag.Named<Item> getItem(String name) {
         return getItem(name, false);
     }
 
@@ -133,10 +133,10 @@ public class TagUtils {
      * @return the tag
      */
     @Nullable
-    public static ITag.INamedTag<Fluid> getFluid(String name, boolean nullIfNotExists) {
+    public static Tag.Named<Fluid> getFluid(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            ITag<Fluid> tag = FluidTags.getAllTags().getTag(id);
+            Tag<Fluid> tag = FluidTags.getAllTags().getTag(id);
             if (tag == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -173,7 +173,7 @@ public class TagUtils {
      * @param name the registry name of the fluid or a fluid tag starting with '#'
      * @return the tag
      */
-    public static ITag.INamedTag<Fluid> getFluid(String name) {
+    public static Tag.Named<Fluid> getFluid(String name) {
         return getFluid(name, false);
     }
 

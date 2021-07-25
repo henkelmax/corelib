@@ -1,10 +1,10 @@
 package de.maxhenkel.corelib.inventory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -13,13 +13,13 @@ import java.util.function.Function;
  * This class is not yet finished - use at own risk
  */
 @Deprecated
-public class CombinedItemListInventory implements IInventory {
+public class CombinedItemListInventory implements Container {
 
     protected NonNullList<ItemStack>[] items;
     private Runnable onMarkDirty;
-    private Function<PlayerEntity, Boolean> onIsUsableByPlayer;
+    private Function<Player, Boolean> onIsUsableByPlayer;
 
-    public CombinedItemListInventory(Runnable onMarkDirty, Function<PlayerEntity, Boolean> onIsUsableByPlayer, NonNullList<ItemStack>... items) {
+    public CombinedItemListInventory(Runnable onMarkDirty, Function<Player, Boolean> onIsUsableByPlayer, NonNullList<ItemStack>... items) {
         this.items = items;
         this.onMarkDirty = onMarkDirty;
         this.onIsUsableByPlayer = onIsUsableByPlayer;
@@ -74,7 +74,7 @@ public class CombinedItemListInventory implements IInventory {
 
     @Override
     public ItemStack removeItem(int index, int count) {
-        ItemStack itemstack = ItemStackHelper.removeItem(items[getListIndex(index)], getLocalIndex(index), count);
+        ItemStack itemstack = ContainerHelper.removeItem(items[getListIndex(index)], getLocalIndex(index), count);
         if (!itemstack.isEmpty()) {
             setChanged();
         }
@@ -83,7 +83,7 @@ public class CombinedItemListInventory implements IInventory {
 
     @Override
     public ItemStack removeItemNoUpdate(int index) {
-        return ItemStackHelper.takeItem(items[getListIndex(index)], getLocalIndex(index));
+        return ContainerHelper.takeItem(items[getListIndex(index)], getLocalIndex(index));
     }
 
     @Override
@@ -103,7 +103,7 @@ public class CombinedItemListInventory implements IInventory {
     }
 
     @Override
-    public boolean stillValid(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         if (onIsUsableByPlayer != null) {
             return onIsUsableByPlayer.apply(player);
         } else {

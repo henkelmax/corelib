@@ -1,8 +1,8 @@
 package de.maxhenkel.corelib.death;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -16,26 +16,26 @@ import java.util.Map;
 
 public final class DeathEvents {
 
-    private Map<ServerPlayerEntity, Death> deathMap = new HashMap<>();
+    private Map<ServerPlayer, Death> deathMap = new HashMap<>();
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     void playerDeath(LivingDeathEvent event) {
         Entity entity = event.getEntity();
-        if (!(entity instanceof ServerPlayerEntity)) {
+        if (!(entity instanceof ServerPlayer)) {
             return;
         }
-        ServerPlayerEntity player = (ServerPlayerEntity) event.getEntity();
+        ServerPlayer player = (ServerPlayer) event.getEntity();
         deathMap.put(player, Death.fromPlayer(player));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     void playerDeath(LivingDropsEvent event) {
         Entity entity = event.getEntity();
-        if (!(entity instanceof ServerPlayerEntity)) {
+        if (!(entity instanceof ServerPlayer)) {
             return;
         }
         try {
-            ServerPlayerEntity player = (ServerPlayerEntity) event.getEntity();
+            ServerPlayer player = (ServerPlayer) event.getEntity();
             Death death = deathMap.remove(player);
 
             if (death == null) {

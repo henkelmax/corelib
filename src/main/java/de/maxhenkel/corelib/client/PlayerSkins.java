@@ -8,13 +8,15 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.play.NetworkPlayerInfo;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.SkullTileEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.SkullBlockEntity;
 
 public class PlayerSkins {
+
+    private static Minecraft minecraft = Minecraft.getInstance();
 
     private static HashMap<String, GameProfile> players = new HashMap<>();
 
@@ -36,7 +38,7 @@ public class PlayerSkins {
      * @param player the player to get the skin of
      * @return the resource location to the skin
      */
-    public static ResourceLocation getSkin(PlayerEntity player) {
+    public static ResourceLocation getSkin(Player player) {
         return getSkin(player.getGameProfile());
     }
 
@@ -68,8 +70,10 @@ public class PlayerSkins {
         if (players.containsKey(uuid.toString())) {
             return players.get(uuid.toString());
         } else {
-            GameProfile profile = SkullTileEntity.updateGameprofile(new GameProfile(uuid, name));
-            players.put(uuid.toString(), profile);
+            GameProfile profile = new GameProfile(uuid, name);
+            SkullBlockEntity.updateGameprofile(profile, gameProfile -> {
+                players.put(uuid.toString(), gameProfile);
+            });
             return profile;
         }
     }
@@ -81,7 +85,7 @@ public class PlayerSkins {
      * @return if the skin is slim
      */
     public static boolean isSlim(UUID uuid) {
-        NetworkPlayerInfo networkplayerinfo = Minecraft.getInstance().getConnection().getPlayerInfo(uuid);
+        PlayerInfo networkplayerinfo = Minecraft.getInstance().getConnection().getPlayerInfo(uuid);
         return networkplayerinfo == null ? (uuid.hashCode() & 1) == 1 : networkplayerinfo.getModelName().equals("slim");
     }
 
@@ -91,7 +95,7 @@ public class PlayerSkins {
      * @param player the player
      * @return if the skin is slim
      */
-    public static boolean isSlim(PlayerEntity player) {
+    public static boolean isSlim(Player player) {
         return isSlim(player.getUUID());
     }
 

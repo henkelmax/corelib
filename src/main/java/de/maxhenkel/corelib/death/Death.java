@@ -2,13 +2,13 @@ package de.maxhenkel.corelib.death;
 
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.corelib.player.PlayerUtils;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +27,7 @@ public class Death {
     private NonNullList<ItemStack> offHandInventory = NonNullList.withSize(1, ItemStack.EMPTY);
     private NonNullList<ItemStack> additionalItems = NonNullList.create();
 
-    private NonNullList<ItemStack> equipment = NonNullList.withSize(EquipmentSlotType.values().length, ItemStack.EMPTY);
+    private NonNullList<ItemStack> equipment = NonNullList.withSize(EquipmentSlot.values().length, ItemStack.EMPTY);
 
     private long timestamp;
     private int experience;
@@ -110,24 +110,24 @@ public class Death {
         return "Death{name=" + playerName + "timestamp=" + timestamp + "}";
     }
 
-    public static Death fromPlayer(PlayerEntity player) {
+    public static Death fromPlayer(Player player) {
         Death death = new Death();
         death.id = UUID.randomUUID();
         death.playerUUID = player.getUUID();
         death.playerName = player.getName().getContents();
 
         for (int i = 0; i < death.mainInventory.size(); i++) {
-            death.mainInventory.set(i, player.inventory.items.get(i));
+            death.mainInventory.set(i, player.getInventory().items.get(i));
         }
         for (int i = 0; i < death.armorInventory.size(); i++) {
-            death.armorInventory.set(i, player.inventory.armor.get(i));
+            death.armorInventory.set(i, player.getInventory().armor.get(i));
         }
         for (int i = 0; i < death.offHandInventory.size(); i++) {
-            death.offHandInventory.set(i, player.inventory.offhand.get(i));
+            death.offHandInventory.set(i, player.getInventory().offhand.get(i));
         }
-        death.equipment = NonNullList.withSize(EquipmentSlotType.values().length, ItemStack.EMPTY);
+        death.equipment = NonNullList.withSize(EquipmentSlot.values().length, ItemStack.EMPTY);
         for (int i = 0; i < death.equipment.size(); i++) {
-            death.equipment.set(i, player.getItemBySlot(EquipmentSlotType.values()[i]).copy());
+            death.equipment.set(i, player.getItemBySlot(EquipmentSlot.values()[i]).copy());
         }
 
         death.timestamp = System.currentTimeMillis();
@@ -184,7 +184,7 @@ public class Death {
         return stacks.stream().filter(itemStack -> !itemStack.isEmpty()).collect(Collectors.toList());
     }
 
-    public static Death fromNBT(CompoundNBT compound) {
+    public static Death fromNBT(CompoundTag compound) {
         Death death = new Death();
         //TODO replace with put UUID
         death.id = new UUID(compound.getLong("IdMost"), compound.getLong("IdLeast"));
@@ -210,12 +210,12 @@ public class Death {
         return death;
     }
 
-    public CompoundNBT toNBT() {
+    public CompoundTag toNBT() {
         return toNBT(true);
     }
 
-    public CompoundNBT toNBT(boolean withItems) {
-        CompoundNBT compound = new CompoundNBT();
+    public CompoundTag toNBT(boolean withItems) {
+        CompoundTag compound = new CompoundTag();
         //TODO replace with put UUID
         compound.putLong("IdMost", id.getMostSignificantBits());
         compound.putLong("IdLeast", id.getLeastSignificantBits());

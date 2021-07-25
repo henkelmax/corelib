@@ -1,9 +1,9 @@
 package de.maxhenkel.corelib.client.obj;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3d;
 import de.maxhenkel.corelib.math.Rotation;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.resources.ResourceLocation;
 
 public class OBJModelOptions<T> {
 
@@ -62,7 +62,7 @@ public class OBJModelOptions<T> {
     }
 
     public interface RenderListener<T> {
-        void onRender(T object, MatrixStack matrixStack, float partialTicks);
+        void onRender(T object, PoseStack matrixStack, float partialTicks);
     }
 
 }

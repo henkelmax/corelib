@@ -1,8 +1,8 @@
 package de.maxhenkel.corelib.net;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 public class NetUtils {
 
@@ -13,7 +13,7 @@ public class NetUtils {
      * @param player  the player to send the message to
      * @param message the message to send
      */
-    public static void sendTo(SimpleChannel channel, ServerPlayerEntity player, Message<?> message) {
+    public static void sendTo(SimpleChannel channel, ServerPlayer player, Message<?> message) {
         channel.sendTo(message, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 

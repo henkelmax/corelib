@@ -1,8 +1,8 @@
 package de.maxhenkel.corelib.player;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
 
@@ -14,11 +14,10 @@ public class PlayerUtils {
      * @param player the player
      * @return the model flags
      */
-    public static byte getModel(PlayerEntity player) {
+    public static byte getModel(Player player) {
         try {
-            Field flag = ObfuscationReflectionHelper.findField(PlayerEntity.class, "field_184827_bp");
-            DataParameter<Byte> dataParameter = (DataParameter<Byte>) flag.get(null);
-            return player.getEntityData().get(dataParameter);
+            Field dataPlayerModeCustomization = ObfuscationReflectionHelper.findField(Player.class, "f_36089_");
+            return player.getEntityData().get((EntityDataAccessor<Byte>) dataPlayerModeCustomization.get(null));
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return 0;

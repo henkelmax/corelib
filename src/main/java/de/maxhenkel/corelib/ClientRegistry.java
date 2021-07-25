@@ -1,10 +1,11 @@
 package de.maxhenkel.corelib;
 
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,9 +20,9 @@ public class ClientRegistry {
      * @param keyCode  the keycode
      * @return the keybinding
      */
-    public static KeyBinding registerKeyBinding(String name, String category, int keyCode) {
-        KeyBinding keyBinding = new KeyBinding(name, keyCode, category);
-        net.minecraftforge.fml.client.registry.ClientRegistry.registerKeyBinding(keyBinding);
+    public static KeyMapping registerKeyBinding(String name, String category, int keyCode) {
+        KeyMapping keyBinding = new KeyMapping(name, keyCode, category);
+        net.minecraftforge.fmlclient.registry.ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
     }
 
@@ -31,8 +32,8 @@ public class ClientRegistry {
      * @param containerType the container type
      * @param screenFactory the screen factory
      */
-    public static <C extends Container, S extends ContainerScreen<C>> void registerScreen(ContainerType<C> containerType, ScreenManager.IScreenFactory<C, S> screenFactory) {
-        ScreenManager.register(containerType, screenFactory);
+    public static <C extends AbstractContainerMenu, S extends Screen & MenuAccess<C>> void registerScreen(MenuType<C> containerType, MenuScreens.ScreenConstructor<C, S> screenFactory) {
+        MenuScreens.register(containerType, screenFactory);
     }
 
 }

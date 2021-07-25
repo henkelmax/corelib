@@ -1,24 +1,23 @@
 package de.maxhenkel.corelib.net;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 public interface Message<T extends Message> {
 
     Dist getExecutingSide();
 
-    default void executeServerSide(NetworkEvent.Context context){
+    default void executeServerSide(NetworkEvent.Context context) {
 
     }
 
-    default void executeClientSide(NetworkEvent.Context context){
+    default void executeClientSide(NetworkEvent.Context context) {
 
     }
 
-    T fromBytes(PacketBuffer buf);
+    T fromBytes(FriendlyByteBuf buf);
 
-    void toBytes(PacketBuffer buf);
-
+    void toBytes(FriendlyByteBuf buf);
 
 }

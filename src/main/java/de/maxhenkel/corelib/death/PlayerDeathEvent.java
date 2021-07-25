@@ -1,7 +1,7 @@
 package de.maxhenkel.corelib.death;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.DamageSource;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.eventbus.api.Event;
 
 /**
@@ -12,13 +12,13 @@ import net.minecraftforge.eventbus.api.Event;
 public class PlayerDeathEvent extends Event {
 
     private Death death;
-    private ServerPlayerEntity player;
+    private ServerPlayer player;
     private DamageSource source;
 
     private boolean storeDeath;
     private boolean removeDrops;
 
-    public PlayerDeathEvent(Death death, ServerPlayerEntity player, DamageSource source) {
+    public PlayerDeathEvent(Death death, ServerPlayer player, DamageSource source) {
         this.death = death;
         this.player = player;
         this.source = source;
@@ -36,7 +36,7 @@ public class PlayerDeathEvent extends Event {
         return death;
     }
 
-    public ServerPlayerEntity getPlayer() {
+    public ServerPlayer getPlayer() {
         return player;
     }
 

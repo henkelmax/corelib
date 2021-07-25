@@ -1,16 +1,16 @@
 package de.maxhenkel.corelib.tag;
 
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
 
 import java.util.List;
 
-public class NamedTagWrapper<T> implements ITag.INamedTag<T> {
+public class NamedTagWrapper<T> implements Tag.Named<T> {
 
-    private ITag<T> tag;
+    private Tag<T> tag;
     private ResourceLocation name;
 
-    public NamedTagWrapper(ITag<T> tag, ResourceLocation name) {
+    public NamedTagWrapper(Tag<T> tag, ResourceLocation name) {
         this.tag = tag;
         this.name = name;
     }

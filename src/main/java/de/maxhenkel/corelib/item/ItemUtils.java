@@ -1,11 +1,11 @@
 package de.maxhenkel.corelib.item;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.Comparator;
@@ -24,8 +24,8 @@ public class ItemUtils {
         if (cmp != 0) {
             return cmp;
         }
-        CompoundNBT c1 = item1.getTag();
-        CompoundNBT c2 = item2.getTag();
+        CompoundTag c1 = item1.getTag();
+        CompoundTag c2 = item2.getTag();
 
         if (c1 == null && c2 == null) {
             return 0;
@@ -46,12 +46,12 @@ public class ItemUtils {
      * @param player the player (Can be null)
      * @return the resulting stack
      */
-    public static ItemStack itemStackAmount(int amount, ItemStack stack, PlayerEntity player) {
+    public static ItemStack itemStackAmount(int amount, ItemStack stack, Player player) {
         if (stack == null || stack.isEmpty()) {
             return ItemStack.EMPTY;
         }
 
-        if (player != null && player.abilities.instabuild) {
+        if (player != null && player.getAbilities().instabuild) {
             return stack;
         }
 
@@ -68,11 +68,11 @@ public class ItemUtils {
         return stack;
     }
 
-    public static ItemStack decrItemStack(ItemStack stack, PlayerEntity player) {
+    public static ItemStack decrItemStack(ItemStack stack, Player player) {
         return itemStackAmount(-1, stack, player);
     }
 
-    public static ItemStack incrItemStack(ItemStack stack, PlayerEntity player) {
+    public static ItemStack incrItemStack(ItemStack stack, Player player) {
         return itemStackAmount(1, stack, player);
     }
 
@@ -100,12 +100,12 @@ public class ItemUtils {
      * @param name     the name of the tag list in the compound
      * @param inv      the inventory
      */
-    public static void saveInventory(CompoundNBT compound, String name, IInventory inv) {
-        ListNBT tagList = new ListNBT();
+    public static void saveInventory(CompoundTag compound, String name, Container inv) {
+        ListTag tagList = new ListTag();
 
         for (int i = 0; i < inv.getContainerSize(); i++) {
             if (!inv.getItem(i).isEmpty()) {
-                CompoundNBT slot = new CompoundNBT();
+                CompoundTag slot = new CompoundTag();
                 slot.putInt("Slot", i);
                 inv.getItem(i).save(slot);
                 tagList.add(slot);
@@ -122,11 +122,11 @@ public class ItemUtils {
      * @param name     the name of the tag list in the compound
      * @param inv      the item list
      */
-    public static void saveInventory(CompoundNBT compound, String name, NonNullList<ItemStack> inv) {
-        ListNBT tagList = new ListNBT();
+    public static void saveInventory(CompoundTag compound, String name, NonNullList<ItemStack> inv) {
+        ListTag tagList = new ListTag();
         for (int i = 0; i < inv.size(); i++) {
             if (!inv.get(i).isEmpty()) {
-                CompoundNBT slot = new CompoundNBT();
+                CompoundTag slot = new CompoundTag();
                 slot.putInt("Slot", i);
                 inv.get(i).save(slot);
                 tagList.add(slot);
@@ -144,7 +144,7 @@ public class ItemUtils {
      * @param name     the name of the tag list in the compound
      * @param list     the item list
      */
-    public static void saveItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list) {
+    public static void saveItemList(CompoundTag compound, String name, NonNullList<ItemStack> list) {
         saveItemList(compound, name, list, true);
     }
 
@@ -157,13 +157,13 @@ public class ItemUtils {
      * @param list         the item list
      * @param includeEmpty if empty item stacks should be included
      */
-    public static void saveItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list, boolean includeEmpty) {
-        ListNBT itemList = new ListNBT();
+    public static void saveItemList(CompoundTag compound, String name, NonNullList<ItemStack> list, boolean includeEmpty) {
+        ListTag itemList = new ListTag();
         for (ItemStack stack : list) {
             if (!includeEmpty && stack.isEmpty()) {
                 continue;
             }
-            itemList.add(stack.save(new CompoundNBT()));
+            itemList.add(stack.save(new CompoundTag()));
         }
         compound.put(name, itemList);
     }
@@ -176,15 +176,15 @@ public class ItemUtils {
      * @param name     the name of the tag list in the compound
      * @param inv      the inventory
      */
-    public static void readInventory(CompoundNBT compound, String name, IInventory inv) {
+    public static void readInventory(CompoundTag compound, String name, Container inv) {
         if (!compound.contains(name)) {
             return;
         }
 
-        ListNBT tagList = compound.getList(name, 10);
+        ListTag tagList = compound.getList(name, 10);
 
         for (int i = 0; i < tagList.size(); i++) {
-            CompoundNBT slot = tagList.getCompound(i);
+            CompoundTag slot = tagList.getCompound(i);
             int j = slot.getInt("Slot");
 
             if (j >= 0 && j < inv.getContainerSize()) {
@@ -201,15 +201,15 @@ public class ItemUtils {
      * @param name     the name of the tag list in the compound
      * @param inv      the item list
      */
-    public static void readInventory(CompoundNBT compound, String name, NonNullList<ItemStack> inv) {
+    public static void readInventory(CompoundTag compound, String name, NonNullList<ItemStack> inv) {
         if (!compound.contains(name)) {
             return;
         }
 
-        ListNBT tagList = compound.getList(name, 10);
+        ListTag tagList = compound.getList(name, 10);
 
         for (int i = 0; i < tagList.size(); i++) {
-            CompoundNBT slot = tagList.getCompound(i);
+            CompoundTag slot = tagList.getCompound(i);
             int j = slot.getInt("Slot");
 
             if (j >= 0 && j < inv.size()) {
@@ -226,13 +226,13 @@ public class ItemUtils {
      * @param includeEmpty if empty stacks should be included
      * @return the item list
      */
-    public static NonNullList<ItemStack> readItemList(CompoundNBT compound, String name, boolean includeEmpty) {
+    public static NonNullList<ItemStack> readItemList(CompoundTag compound, String name, boolean includeEmpty) {
         NonNullList<ItemStack> items = NonNullList.create();
         if (!compound.contains(name)) {
             return items;
         }
 
-        ListNBT itemList = compound.getList(name, 10);
+        ListTag itemList = compound.getList(name, 10);
         for (int i = 0; i < itemList.size(); i++) {
             ItemStack item = ItemStack.of(itemList.getCompound(i));
             if (!includeEmpty) {
@@ -254,7 +254,7 @@ public class ItemUtils {
      * @param name     the name of the tag list in the compound
      * @return the item list
      */
-    public static NonNullList<ItemStack> readItemList(CompoundNBT compound, String name) {
+    public static NonNullList<ItemStack> readItemList(CompoundTag compound, String name) {
         return readItemList(compound, name, true);
     }
 
@@ -266,12 +266,12 @@ public class ItemUtils {
      * @param name     the name of the tag list in the compound
      * @param list     the item list
      */
-    public static void readItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list) {
+    public static void readItemList(CompoundTag compound, String name, NonNullList<ItemStack> list) {
         if (!compound.contains(name)) {
             return;
         }
 
-        ListNBT itemList = compound.getList(name, 10);
+        ListTag itemList = compound.getList(name, 10);
         for (int i = 0; i < itemList.size(); i++) {
             if (i >= list.size()) {
                 break;
@@ -286,7 +286,7 @@ public class ItemUtils {
      * @param inventory the inventory
      * @param index     the slot index
      */
-    public static void removeStackFromSlot(IInventory inventory, int index) {
+    public static void removeStackFromSlot(Container inventory, int index) {
         inventory.setItem(index, ItemStack.EMPTY);
     }
 
@@ -310,7 +310,7 @@ public class ItemUtils {
      * @param stack    the stack to store
      * @return the provided compound
      */
-    public static CompoundNBT writeOverstackedItem(CompoundNBT compound, ItemStack stack) {
+    public static CompoundTag writeOverstackedItem(CompoundTag compound, ItemStack stack) {
         stack.save(compound);
         compound.remove("Count");
         compound.putInt("Count", stack.getCount());
@@ -325,8 +325,8 @@ public class ItemUtils {
      * @param compound the compound to store the stack in
      * @return the deserialized stack
      */
-    public static ItemStack readOverstackedItem(CompoundNBT compound) {
-        CompoundNBT data = compound.copy();
+    public static ItemStack readOverstackedItem(CompoundTag compound) {
+        CompoundTag data = compound.copy();
         int count = data.getInt("Count");
         data.remove("Count");
         data.putByte("Count", (byte) 1);

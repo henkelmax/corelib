@@ -1,11 +1,11 @@
 package de.maxhenkel.corelib.dataserializers;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.DataSerializerEntry;
 
@@ -16,10 +16,11 @@ import net.minecraftforge.registries.DataSerializerEntry;
  */
 public class DataSerializerItemList {
 
-    public static final IDataSerializer<NonNullList<ItemStack>> ITEM_LIST = new IDataSerializer<NonNullList<ItemStack>>() {
+    public static final EntityDataSerializer<NonNullList<ItemStack>> ITEM_LIST = new EntityDataSerializer<NonNullList<ItemStack>>() {
+
 
         @Override
-        public void write(PacketBuffer packetBuffer, NonNullList<ItemStack> itemStacks) {
+        public void write(FriendlyByteBuf packetBuffer, NonNullList<ItemStack> itemStacks) {
             packetBuffer.writeInt(itemStacks.size());
 
             for (ItemStack itemStack : itemStacks) {
@@ -27,7 +28,7 @@ public class DataSerializerItemList {
             }
         }
 
-        public NonNullList<ItemStack> read(PacketBuffer buf) {
+        public NonNullList<ItemStack> read(FriendlyByteBuf buf) {
             int length = buf.readInt();
             NonNullList<ItemStack> list = NonNullList.withSize(length, ItemStack.EMPTY);
             for (int i = 0; i < list.size(); i++) {
@@ -36,8 +37,8 @@ public class DataSerializerItemList {
             return list;
         }
 
-        public DataParameter<NonNullList<ItemStack>> createKey(int id) {
-            return new DataParameter<>(id, this);
+        public EntityDataAccessor<NonNullList<ItemStack>> createKey(int id) {
+            return new EntityDataAccessor<>(id, this);
         }
 
         @Override

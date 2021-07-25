@@ -1,8 +1,8 @@
 package de.maxhenkel.corelib.block;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ public class DirectionalVoxelShape {
      * @return the voxel shape of the direction
      */
     public VoxelShape get(Direction direction) {
-        return shapes.getOrDefault(direction, VoxelShapes.empty());
+        return shapes.getOrDefault(direction, Shapes.empty());
     }
 
     public static class Builder {

@@ -3,30 +3,31 @@ package de.maxhenkel.corelib;
 import de.maxhenkel.corelib.config.ConfigBase;
 import de.maxhenkel.corelib.config.DynamicConfig;
 import de.maxhenkel.corelib.net.Message;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.NetworkRegistry;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
+import net.minecraftforge.fmlserverevents.FMLServerAboutToStartEvent;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class CommonRegistry {
 
-    private static final FolderName SERVERCONFIG = new FolderName("serverconfig");
+    private static final LevelResource SERVERCONFIG = new LevelResource("serverconfig");
     private static final Path DEFAULT_CONFIG_PATH = FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath());
 
     /**
@@ -63,7 +64,7 @@ public class CommonRegistry {
     public static <T extends Message<?>> void registerMessage(SimpleChannel channel, int id, Class<T> message) {
         channel.registerMessage(id, (Class) message, Message::toBytes, (buf) -> {
             try {
-                Message<?> msg = message.newInstance();
+                Message<?> msg = message.getDeclaredConstructor().newInstance();
                 return msg.fromBytes(buf);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -79,7 +80,7 @@ public class CommonRegistry {
 
     /**
      * Registers the provided entity
-     * Note that the entity class has to have a constructor with the parameters {@link EntityType} and {@link World} or a constructor with the parameter {@link World}
+     * Note that the entity class has to have a constructor with the parameters {@link EntityType} and {@link Level} or a constructor with the parameter {@link Level}
      *
      * @param modId           the mod ID
      * @param name            the entity name
@@ -88,14 +89,14 @@ public class CommonRegistry {
      * @param builderConsumer a consumer that provides the builder to apply properties
      * @return the entity type of the registered entity
      */
-    public static <T extends Entity> EntityType<T> registerEntity(String modId, String name, EntityClassification classification, Class<? extends Entity> entityClass, Consumer<EntityType.Builder<T>> builderConsumer) {
+    public static <T extends Entity> EntityType<T> registerEntity(String modId, String name, MobCategory classification, Class<? extends Entity> entityClass, Consumer<EntityType.Builder<T>> builderConsumer) {
         EntityType.Builder<T> builder = EntityType.Builder
                 .of((type, world) -> {
                     try {
                         try {
-                            return (T) entityClass.getConstructor(EntityType.class, World.class).newInstance(type, world);
+                            return (T) entityClass.getConstructor(EntityType.class, Level.class).newInstance(type, world);
                         } catch (NoSuchMethodException e) {
-                            return (T) entityClass.getConstructor(World.class).newInstance(world);
+                            return (T) entityClass.getConstructor(Level.class).newInstance(world);
                         }
                     } catch (Throwable e) {
                         throw new RuntimeException(e);
@@ -128,7 +129,7 @@ public class CommonRegistry {
         ModLoadingContext.get().registerConfig(type, spec);
         config.setConfigSpec(spec);
         if (registerListener) {
-            Consumer<ModConfig.ModConfigEvent> consumer = evt -> {
+            Consumer<ModConfigEvent> consumer = evt -> {
                 if (evt.getConfig().getType() == type) {
                     config.onReload(evt);
                 }
@@ -161,7 +162,7 @@ public class CommonRegistry {
      */
     public static <T extends DynamicConfig> T registerDynamicConfig(DynamicConfig.DynamicConfigType type, String folderName, String configName, Class<T> configClass) {
         try {
-            T config = configClass.newInstance();
+            T config = configClass.getDeclaredConstructor().newInstance();
             String configFileName = configName + ".toml";
             if (type.equals(DynamicConfig.DynamicConfigType.SERVER)) {
                 Consumer<FMLServerAboutToStartEvent> consumer = event -> {

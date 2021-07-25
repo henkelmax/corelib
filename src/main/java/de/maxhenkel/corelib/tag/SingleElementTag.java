@@ -1,13 +1,13 @@
 package de.maxhenkel.corelib.tag;
 
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import java.util.Collections;
 import java.util.List;
 
-public class SingleElementTag<T extends ForgeRegistryEntry<?>> implements ITag.INamedTag<T> {
+public class SingleElementTag<T extends ForgeRegistryEntry<?>> implements Tag.Named<T> {
 
     private final T element;
 

@@ -1,7 +1,7 @@
 package de.maxhenkel.corelib.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 public class ConfigBase {
 
@@ -11,7 +11,7 @@ public class ConfigBase {
 
     }
 
-    public void onReload(ModConfig.ModConfigEvent event) {
+    public void onReload(ModConfigEvent event) {
 
     }
 

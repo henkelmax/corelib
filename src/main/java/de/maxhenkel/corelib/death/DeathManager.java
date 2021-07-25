@@ -2,11 +2,11 @@ package de.maxhenkel.corelib.death;
 
 import de.maxhenkel.corelib.CommonUtils;
 import de.maxhenkel.corelib.Logger;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.LevelResource;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -18,7 +18,7 @@ public class DeathManager {
     /**
      * The name of the folder that stores all player deaths
      */
-    public static FolderName DEATHS = new FolderName("deaths");
+    public static LevelResource DEATHS = new LevelResource("deaths");
 
     /**
      * Adds a death to the deaths folder as the provided player
@@ -26,11 +26,11 @@ public class DeathManager {
      * @param player the player under which the death should get stored
      * @param death  the death to store
      */
-    public static void addDeath(ServerPlayerEntity player, Death death) {
+    public static void addDeath(ServerPlayer player, Death death) {
         try {
             File deathFile = getDeathFile(player, death.getId());
             deathFile.getParentFile().mkdirs();
-            CompressedStreamTools.write(death.toNBT(), deathFile);
+            NbtIo.write(death.toNBT(), deathFile);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -44,7 +44,7 @@ public class DeathManager {
      * @return the death
      */
     @Nullable
-    public static Death getDeath(ServerPlayerEntity player, UUID id) {
+    public static Death getDeath(ServerPlayer player, UUID id) {
         return getDeath(player.getLevel(), player.getUUID(), id);
     }
 
@@ -57,9 +57,9 @@ public class DeathManager {
      * @return the death
      */
     @Nullable
-    public static Death getDeath(ServerWorld world, UUID playerUUID, UUID id) {
+    public static Death getDeath(ServerLevel world, UUID playerUUID, UUID id) {
         try {
-            CompoundNBT data = CompressedStreamTools.read(getDeathFile(world, playerUUID, id));
+            CompoundTag data = NbtIo.read(getDeathFile(world, playerUUID, id));
             if (data == null) {
                 return null;
             }
@@ -79,7 +79,7 @@ public class DeathManager {
     @Nullable
     public static Death getDeath(File file) {
         try {
-            CompoundNBT data = CompressedStreamTools.read(file);
+            CompoundTag data = NbtIo.read(file);
             if (data == null) {
                 return null;
             }
@@ -99,7 +99,7 @@ public class DeathManager {
      * @return the death
      */
     @Nullable
-    public static Death getDeath(ServerWorld world, UUID id) {
+    public static Death getDeath(ServerLevel world, UUID id) {
         File deathFolder = getDeathFolder(world);
         File[] players = deathFolder.listFiles((dir, name) -> name.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"));
 
@@ -125,7 +125,7 @@ public class DeathManager {
      * @param player the player
      * @return all deaths of the player
      */
-    public static List<Death> getDeaths(ServerPlayerEntity player) {
+    public static List<Death> getDeaths(ServerPlayer player) {
         return getDeaths(player);
     }
 
@@ -136,7 +136,7 @@ public class DeathManager {
      * @param playerUUID the UUID of the player
      * @return a list containing all deaths of the player
      */
-    public static List<Death> getDeaths(ServerWorld world, UUID playerUUID) {
+    public static List<Death> getDeaths(ServerLevel world, UUID playerUUID) {
         File playerDeathFolder = getPlayerDeathFolder(world, playerUUID);
 
         if (!playerDeathFolder.exists()) {
@@ -152,7 +152,7 @@ public class DeathManager {
         return Arrays.stream(deaths)
                 .map(f -> {
                     try {
-                        return Death.fromNBT(CompressedStreamTools.read(f));
+                        return Death.fromNBT(NbtIo.read(f));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -170,7 +170,7 @@ public class DeathManager {
      * @param death the death to delete
      * @return if the death was deleted from the filesystem
      */
-    public static boolean removeDeath(ServerWorld world, Death death) {
+    public static boolean removeDeath(ServerLevel world, Death death) {
         File file = getDeathFile(world, death.getPlayerUUID(), death.getId());
         if (file.exists()) {
             return file.delete();
@@ -184,7 +184,7 @@ public class DeathManager {
      * @param world the world
      * @param age   the age in milliseconds
      */
-    public static void removeDeathsOlderThan(ServerWorld world, long age) {
+    public static void removeDeathsOlderThan(ServerLevel world, long age) {
         long now = System.currentTimeMillis();
         File deathFolder = getDeathFolder(world);
         File[] players = deathFolder.listFiles((dir, name) -> name.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"));
@@ -222,7 +222,7 @@ public class DeathManager {
      * @param id     the death ID
      * @return the death file
      */
-    public static File getDeathFile(ServerPlayerEntity player, UUID id) {
+    public static File getDeathFile(ServerPlayer player, UUID id) {
         return new File(getPlayerDeathFolder(player), id.toString() + ".dat");
     }
 
@@ -234,7 +234,7 @@ public class DeathManager {
      * @param id         the death ID
      * @return the death file
      */
-    public static File getDeathFile(ServerWorld world, UUID playerUUID, UUID id) {
+    public static File getDeathFile(ServerLevel world, UUID playerUUID, UUID id) {
         return new File(getPlayerDeathFolder(world, playerUUID), id.toString() + ".dat");
     }
 
@@ -244,7 +244,7 @@ public class DeathManager {
      * @param player the player
      * @return the deaths folder
      */
-    public static File getPlayerDeathFolder(ServerPlayerEntity player) {
+    public static File getPlayerDeathFolder(ServerPlayer player) {
         return getPlayerDeathFolder(player.getLevel(), player.getUUID());
     }
 
@@ -255,7 +255,7 @@ public class DeathManager {
      * @param uuid  the UUID of the player
      * @return the deaths folder
      */
-    public static File getPlayerDeathFolder(ServerWorld world, UUID uuid) {
+    public static File getPlayerDeathFolder(ServerLevel world, UUID uuid) {
         return new File(getDeathFolder(world), uuid.toString());
     }
 
@@ -265,7 +265,7 @@ public class DeathManager {
      * @param world the world - used to get the death folder location
      * @return the player deaths folder
      */
-    public static File getDeathFolder(ServerWorld world) {
+    public static File getDeathFolder(ServerLevel world) {
         return CommonUtils.getWorldFolder(world, DEATHS);
     }
 }

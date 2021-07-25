@@ -1,10 +1,10 @@
 package de.maxhenkel.corelib.sound;
 
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 
 public class SoundUtils {
 
-    public static float getVariatedPitch(World world) {
+    public static float getVariatedPitch(Level world) {
         return world.random.nextFloat() * 0.1F + 0.9F;
     }
 

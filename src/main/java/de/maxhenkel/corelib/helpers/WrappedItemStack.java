@@ -1,10 +1,10 @@
 package de.maxhenkel.corelib.helpers;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -18,18 +18,18 @@ public class WrappedItemStack extends AbstractStack<ItemStack> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(MatrixStack matrixStack, int x, int y) {
-        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(Minecraft.getInstance().player, stack, x, y);
+    public void render(PoseStack matrixStack, int x, int y) {
+        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(Minecraft.getInstance().player, stack, x, y, 0);
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public List<ITextComponent> getTooltip(Screen screen) {
+    public List<Component> getTooltip(Screen screen) {
         return screen.getTooltipFromItem(stack);
     }
 
     @Override
-    public ITextComponent getDisplayName() {
+    public Component getDisplayName() {
         return stack.getHoverName();
     }
 
