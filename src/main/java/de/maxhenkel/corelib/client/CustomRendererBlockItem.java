@@ -3,28 +3,34 @@ package de.maxhenkel.corelib.client;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.IItemRenderProperties;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class CustomRendererBlockItem extends BlockItem {
 
-    protected Supplier<ItemRenderer> itemRenderer;
-
-    public CustomRendererBlockItem(Block block, Properties properties, Supplier<ItemRenderer> itemRenderer) {
+    public CustomRendererBlockItem(Block block, Properties properties) {
         super(block, properties);
-        this.itemRenderer = itemRenderer;
     }
 
     @Override
     public void initializeClient(Consumer<IItemRenderProperties> consumer) {
         super.initializeClient(consumer);
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
-                return itemRenderer.get();
-            }
-        });
+        ItemRenderer renderer = createItemRenderer();
+        if (renderer != null) {
+            consumer.accept(new IItemRenderProperties() {
+                @Override
+                public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
+                    return renderer.getRenderer();
+                }
+            });
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public ItemRenderer createItemRenderer() {
+        return null;
     }
 }
