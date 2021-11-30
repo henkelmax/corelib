@@ -12,15 +12,15 @@ import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.fmllegacy.network.NetworkRegistry;
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
-import net.minecraftforge.fmlserverevents.FMLServerAboutToStartEvent;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -165,7 +165,7 @@ public class CommonRegistry {
             T config = configClass.getDeclaredConstructor().newInstance();
             String configFileName = configName + ".toml";
             if (type.equals(DynamicConfig.DynamicConfigType.SERVER)) {
-                Consumer<FMLServerAboutToStartEvent> consumer = event -> {
+                Consumer<ServerAboutToStartEvent> consumer = event -> {
                     Path serverConfig = event.getServer().getWorldPath(SERVERCONFIG).resolve(folderName);
                     serverConfig.toFile().mkdirs();
                     Path configPath = serverConfig.resolve(configFileName);

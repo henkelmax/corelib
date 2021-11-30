@@ -22,7 +22,7 @@ public class ClientRegistry {
      */
     public static KeyMapping registerKeyBinding(String name, String category, int keyCode) {
         KeyMapping keyBinding = new KeyMapping(name, keyCode, category);
-        net.minecraftforge.fmlclient.registry.ClientRegistry.registerKeyBinding(keyBinding);
+        net.minecraftforge.client.ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
     }
 
