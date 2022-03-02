@@ -5,7 +5,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ItemTag implements Tag<Item> {
@@ -27,7 +27,7 @@ public class ItemTag implements Tag<Item> {
     }
 
     @Override
-    public Collection<Item> getAll() {
+    public List<Item> getAll() {
         return holderSet.stream().map(Holder::value).collect(Collectors.toList());
     }
 }

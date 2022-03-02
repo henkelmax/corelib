@@ -5,7 +5,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class FluidTag implements Tag<Fluid> {
@@ -27,7 +27,7 @@ public class FluidTag implements Tag<Fluid> {
     }
 
     @Override
-    public Collection<Fluid> getAll() {
+    public List<Fluid> getAll() {
         return holderSet.stream().map(Holder::value).collect(Collectors.toList());
     }
 }

@@ -75,6 +75,23 @@ public class TagUtils {
         return getBlock(name, false);
     }
 
+    public static Tag<Block> getBlockTag(ResourceLocation name, boolean nullIfNotExists) {
+        Registry<Block> blocks = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BLOCK_REGISTRY);
+        Optional<HolderSet.Named<Block>> tag = blocks.getTag(BlockTags.create(name));
+        if (tag.isEmpty()) {
+            if (nullIfNotExists) {
+                return null;
+            } else {
+                return AIR_BLOCK_TAG;
+            }
+        }
+        return new BlockTag(tag.get());
+    }
+
+    public static Tag<Block> getBlockTag(ResourceLocation name) {
+        return getBlockTag(name, false);
+    }
+
     /**
      * Gets the tag of the provided registry name
      *
@@ -126,6 +143,23 @@ public class TagUtils {
      */
     public static Tag<Item> getItem(String name) {
         return getItem(name, false);
+    }
+
+    public static Tag<Item> getItemTag(ResourceLocation name, boolean nullIfNotExists) {
+        Registry<Item> blocks = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.ITEM_REGISTRY);
+        Optional<HolderSet.Named<Item>> tag = blocks.getTag(ItemTags.create(name));
+        if (tag.isEmpty()) {
+            if (nullIfNotExists) {
+                return null;
+            } else {
+                return AIR_ITEM_TAG;
+            }
+        }
+        return new ItemTag(tag.get());
+    }
+
+    public static Tag<Item> getItemTag(ResourceLocation name) {
+        return getItemTag(name, false);
     }
 
     /**
@@ -181,5 +215,21 @@ public class TagUtils {
         return getFluid(name, false);
     }
 
+    public static Tag<Fluid> getFluidTag(ResourceLocation name, boolean nullIfNotExists) {
+        Registry<Fluid> blocks = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.FLUID_REGISTRY);
+        Optional<HolderSet.Named<Fluid>> tag = blocks.getTag(FluidTags.create(name));
+        if (tag.isEmpty()) {
+            if (nullIfNotExists) {
+                return null;
+            } else {
+                return AIR_FLUID_TAG;
+            }
+        }
+        return new FluidTag(tag.get());
+    }
+
+    public static Tag<Fluid> getFluidTag(ResourceLocation name) {
+        return getFluidTag(name, false);
+    }
 
 }

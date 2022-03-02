@@ -2,7 +2,7 @@ package de.maxhenkel.corelib.tag;
 
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface Tag<T> {
 
@@ -10,6 +10,6 @@ public interface Tag<T> {
 
     boolean contains(T t);
 
-    Collection<T> getAll();
+    List<T> getAll();
 
 }

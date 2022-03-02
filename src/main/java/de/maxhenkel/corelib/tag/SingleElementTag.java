@@ -2,14 +2,14 @@ package de.maxhenkel.corelib.tag;
 
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class SingleElementTag<T> implements Tag<T> {
 
     private final ResourceLocation name;
     private final T element;
-    private final Collection<T> list;
+    private final List<T> list;
 
     public SingleElementTag(ResourceLocation name, T element) {
         this.name = name;
@@ -32,7 +32,7 @@ public class SingleElementTag<T> implements Tag<T> {
     }
 
     @Override
-    public Collection<T> getAll() {
+    public List<T> getAll() {
         return list;
     }
 }
