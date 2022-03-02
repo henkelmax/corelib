@@ -1,10 +1,10 @@
 package de.maxhenkel.corelib.tag;
 
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -14,12 +14,13 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class TagUtils {
 
-    public static Tag.Named<Block> AIR_BLOCK_TAG = new SingleElementTag<>(Blocks.AIR);
-    public static Tag.Named<Item> AIR_ITEM_TAG = new SingleElementTag<>(Items.AIR);
-    public static Tag.Named<Fluid> AIR_FLUID_TAG = new SingleElementTag<>(Fluids.EMPTY);
+    public static Tag<Block> AIR_BLOCK_TAG = new SingleElementTag<>(Blocks.AIR.getRegistryName(), Blocks.AIR);
+    public static Tag<Item> AIR_ITEM_TAG = new SingleElementTag<>(Items.AIR.getRegistryName(), Items.AIR);
+    public static Tag<Fluid> AIR_FLUID_TAG = new SingleElementTag<>(Fluids.EMPTY.getRegistryName(), Fluids.EMPTY);
 
     /**
      * Gets the tag of the provided registry name
@@ -29,18 +30,19 @@ public class TagUtils {
      * @return the tag
      */
     @Nullable
-    public static Tag.Named<Block> getBlock(String name, boolean nullIfNotExists) {
+    public static Tag<Block> getBlock(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            Tag<Block> tag = BlockTags.getAllTags().getTag(id);
-            if (tag == null) {
+            Registry<Block> blocks = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BLOCK_REGISTRY);
+            Optional<HolderSet.Named<Block>> tag = blocks.getTag(TagKey.create(Registry.BLOCK_REGISTRY, id));
+            if (tag.isEmpty()) {
                 if (nullIfNotExists) {
                     return null;
                 } else {
                     return AIR_BLOCK_TAG;
                 }
             }
-            return new NamedTagWrapper<>(tag, id);
+            return new BlockTag(tag.get());
         } else {
             ResourceLocation resourceLocation = new ResourceLocation(name);
             if (!ForgeRegistries.BLOCKS.containsKey(resourceLocation)) {
@@ -58,7 +60,7 @@ public class TagUtils {
                     return AIR_BLOCK_TAG;
                 }
             } else {
-                return new SingleElementTag<>(block);
+                return new SingleElementTag<>(resourceLocation, block);
             }
         }
     }
@@ -69,7 +71,7 @@ public class TagUtils {
      * @param name the registry name of the block or a block tag starting with '#'
      * @return the tag
      */
-    public static Tag.Named<Block> getBlock(String name) {
+    public static Tag<Block> getBlock(String name) {
         return getBlock(name, false);
     }
 
@@ -81,18 +83,19 @@ public class TagUtils {
      * @return the tag
      */
     @Nullable
-    public static Tag.Named<Item> getItem(String name, boolean nullIfNotExists) {
+    public static Tag<Item> getItem(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            Tag<Item> tag = ItemTags.getAllTags().getTag(id);
-            if (tag == null) {
+            Registry<Item> items = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.ITEM_REGISTRY);
+            Optional<HolderSet.Named<Item>> tag = items.getTag(TagKey.create(Registry.ITEM_REGISTRY, id));
+            if (tag.isEmpty()) {
                 if (nullIfNotExists) {
                     return null;
                 } else {
                     return AIR_ITEM_TAG;
                 }
             }
-            return new NamedTagWrapper<>(tag, id);
+            return new ItemTag(tag.get());
         } else {
             ResourceLocation resourceLocation = new ResourceLocation(name);
             if (!ForgeRegistries.ITEMS.containsKey(resourceLocation)) {
@@ -110,7 +113,7 @@ public class TagUtils {
                     return AIR_ITEM_TAG;
                 }
             } else {
-                return new SingleElementTag<>(item);
+                return new SingleElementTag<>(resourceLocation, item);
             }
         }
     }
@@ -121,7 +124,7 @@ public class TagUtils {
      * @param name the registry name of the item or a item tag starting with '#'
      * @return the tag
      */
-    public static Tag.Named<Item> getItem(String name) {
+    public static Tag<Item> getItem(String name) {
         return getItem(name, false);
     }
 
@@ -133,18 +136,19 @@ public class TagUtils {
      * @return the tag
      */
     @Nullable
-    public static Tag.Named<Fluid> getFluid(String name, boolean nullIfNotExists) {
+    public static Tag<Fluid> getFluid(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            Tag<Fluid> tag = FluidTags.getAllTags().getTag(id);
-            if (tag == null) {
+            Registry<Fluid> items = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.FLUID_REGISTRY);
+            Optional<HolderSet.Named<Fluid>> tag = items.getTag(TagKey.create(Registry.FLUID_REGISTRY, id));
+            if (tag.isEmpty()) {
                 if (nullIfNotExists) {
                     return null;
                 } else {
                     return AIR_FLUID_TAG;
                 }
             }
-            return new NamedTagWrapper<>(tag, id);
+            return new FluidTag(tag.get());
         } else {
             ResourceLocation resourceLocation = new ResourceLocation(name);
             if (!ForgeRegistries.FLUIDS.containsKey(resourceLocation)) {
@@ -162,7 +166,7 @@ public class TagUtils {
                     return AIR_FLUID_TAG;
                 }
             } else {
-                return new SingleElementTag<>(fluid);
+                return new SingleElementTag<>(resourceLocation, fluid);
             }
         }
     }
@@ -173,7 +177,7 @@ public class TagUtils {
      * @param name the registry name of the fluid or a fluid tag starting with '#'
      * @return the tag
      */
-    public static Tag.Named<Fluid> getFluid(String name) {
+    public static Tag<Fluid> getFluid(String name) {
         return getFluid(name, false);
     }
 
