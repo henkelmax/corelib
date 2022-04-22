@@ -27,6 +27,22 @@ public class RenderUtils {
         return argb & 0xFF;
     }
 
+    public static float getAlphaFloat(int argb) {
+        return (float) getAlpha(argb) / 255F;
+    }
+
+    public static float getRedFloat(int argb) {
+        return (float) getRed(argb) / 255F;
+    }
+
+    public static float getGreenFloat(int argb) {
+        return (float) getGreen(argb) / 255F;
+    }
+
+    public static float getBlueFloat(int argb) {
+        return (float) getBlue(argb) / 255F;
+    }
+
     public static void vertex(VertexConsumer builder, PoseStack matrixStack, Vector3f position, Vec2 texCoord, Vector3f normal, int light, int overlay) {
         vertex(builder, matrixStack, position.x(), position.y(), position.z(), texCoord.x, texCoord.y, normal.x(), normal.y(), normal.z(), 255, 255, 255, light, overlay);
     }

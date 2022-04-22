@@ -33,7 +33,8 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     public void render(PoseStack matrixStack, int x, int y) {
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(stack.getFluid().getAttributes().getStillTexture());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        int color = stack.getFluid().getAttributes().getColor(stack);
+        RenderSystem.setShaderColor(RenderUtils.getRedFloat(color), RenderUtils.getGreenFloat(color), RenderUtils.getBlueFloat(color), RenderUtils.getAlphaFloat(color));
         RenderSystem.setShaderTexture(0, texture.atlas().location());
         fluidBlit(matrixStack, x, y, 16, 16, texture, stack.getFluid().getAttributes().getColor());
     }
