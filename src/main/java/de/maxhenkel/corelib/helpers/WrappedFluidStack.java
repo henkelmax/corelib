@@ -10,8 +10,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.api.distmarker.Dist;
@@ -49,10 +47,10 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
         if (Minecraft.getInstance().options.advancedItemTooltips) {
             ResourceLocation registryName = ForgeRegistries.FLUIDS.getKey(stack.getFluid());
             if (registryName != null) {
-                tooltip.add((new TextComponent(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
+                tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }
             if (stack.hasTag()) {
-                tooltip.add((new TranslatableComponent("item.nbt_tags", stack.getTag().getAllKeys().size())).withStyle(ChatFormatting.DARK_GRAY));
+                tooltip.add((Component.translatable("item.nbt_tags", stack.getTag().getAllKeys().size())).withStyle(ChatFormatting.DARK_GRAY));
             }
         }
 
@@ -61,7 +59,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
     @Override
     public Component getDisplayName() {
-        return new TextComponent("").append(stack.getDisplayName()).withStyle(stack.getFluid().getAttributes().getRarity().color);
+        return Component.literal("").append(stack.getDisplayName()).withStyle(stack.getFluid().getAttributes().getRarity().color);
     }
 
     @Override
@@ -83,8 +81,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
         bufferbuilder.vertex(matrix, (float) x2, (float) y2, 0F).uv(maxU, maxV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
         bufferbuilder.vertex(matrix, (float) x2, (float) y1, 0F).uv(maxU, minV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
         bufferbuilder.vertex(matrix, (float) x1, (float) y1, 0F).uv(minU, minV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
-        bufferbuilder.end();
-        BufferUploader.end(bufferbuilder);
+        BufferUploader.drawWithShader(bufferbuilder.end());
     }
 
 }

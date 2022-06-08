@@ -1,7 +1,6 @@
 package de.maxhenkel.corelib.inventory;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,7 +21,7 @@ public class TileEntityContainerProvider implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return new TranslatableComponent(tileEntity.getBlockState().getBlock().getDescriptionId());
+        return Component.translatable(tileEntity.getBlockState().getBlock().getDescriptionId());
     }
 
     public static void openGui(Player player, BlockEntity tileEntity, ContainerCreator containerCreator) {

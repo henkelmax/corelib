@@ -104,7 +104,7 @@ public class CommonRegistry {
                 }, classification);
         builderConsumer.accept(builder);
         EntityType<T> type = builder.build(modId + ":" + name);
-        type.setRegistryName(new ResourceLocation(modId, name));
+//        type.setRegistryName(new ResourceLocation(modId, name)); //TODO
         return type;
     }
 

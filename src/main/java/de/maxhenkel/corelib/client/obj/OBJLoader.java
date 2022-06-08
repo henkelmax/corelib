@@ -32,8 +32,13 @@ public class OBJLoader {
             return modelCache.get(model);
         }
 
-        Resource resource = Minecraft.getInstance().getResourceManager().getResource(model);
-        LineReader reader = new LineReader(resource);
+        Optional<Resource> optionalResource = Minecraft.getInstance().getResourceManager().getResource(model);
+
+        if (optionalResource.isEmpty()) {
+            throw new IOException("Failed to load model '%s'".formatted(model));
+        }
+
+        LineReader reader = new LineReader(optionalResource.get());
 
         List<Vector3f> positions = Lists.newArrayList();
         List<Vec2> texCoords = Lists.newArrayList();
@@ -95,8 +100,8 @@ public class OBJLoader {
         private InputStreamReader lineStream;
         private BufferedReader lineReader;
 
-        public LineReader(Resource resource) {
-            this.lineStream = new InputStreamReader(resource.getInputStream(), Charsets.UTF_8);
+        public LineReader(Resource resource) throws IOException {
+            this.lineStream = new InputStreamReader(resource.open(), Charsets.UTF_8);
             this.lineReader = new BufferedReader(lineStream);
         }
 

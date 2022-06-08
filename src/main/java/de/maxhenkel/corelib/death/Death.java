@@ -114,7 +114,7 @@ public class Death {
         Death death = new Death();
         death.id = UUID.randomUUID();
         death.playerUUID = player.getUUID();
-        death.playerName = player.getName().getContents();
+        death.playerName = player.getName().getString();
 
         for (int i = 0; i < death.mainInventory.size(); i++) {
             death.mainInventory.set(i, player.getInventory().items.get(i));

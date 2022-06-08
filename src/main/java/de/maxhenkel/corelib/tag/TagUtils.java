@@ -18,9 +18,9 @@ import java.util.Optional;
 
 public class TagUtils {
 
-    public static Tag<Block> AIR_BLOCK_TAG = new SingleElementTag<>(Blocks.AIR.getRegistryName(), Blocks.AIR);
-    public static Tag<Item> AIR_ITEM_TAG = new SingleElementTag<>(Items.AIR.getRegistryName(), Items.AIR);
-    public static Tag<Fluid> AIR_FLUID_TAG = new SingleElementTag<>(Fluids.EMPTY.getRegistryName(), Fluids.EMPTY);
+    public static Tag<Block> AIR_BLOCK_TAG = new SingleElementTag<>(ForgeRegistries.BLOCKS.getKey(Blocks.AIR), Blocks.AIR);
+    public static Tag<Item> AIR_ITEM_TAG = new SingleElementTag<>(ForgeRegistries.ITEMS.getKey(Items.AIR), Items.AIR);
+    public static Tag<Fluid> AIR_FLUID_TAG = new SingleElementTag<>(ForgeRegistries.FLUIDS.getKey(Fluids.EMPTY), Fluids.EMPTY);
 
     /**
      * Gets the tag of the provided registry name
