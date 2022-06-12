@@ -186,9 +186,20 @@ public class Death {
 
     public static Death fromNBT(CompoundTag compound) {
         Death death = new Death();
-        //TODO replace with put UUID
-        death.id = new UUID(compound.getLong("IdMost"), compound.getLong("IdLeast"));
-        death.playerUUID = new UUID(compound.getLong("PlayerUuidMost"), compound.getLong("PlayerUuidLeast"));
+        if (compound.contains("IdMost") && compound.contains("IdLeast")) {
+            death.id = new UUID(compound.getLong("IdMost"), compound.getLong("IdLeast"));
+        } else if (compound.contains("Id")) {
+            death.id = compound.getUUID("Id");
+        } else {
+            death.id = UUID.randomUUID();
+        }
+        if (compound.contains("PlayerUuidMost") && compound.contains("PlayerUuidLeast")) {
+            death.playerUUID = new UUID(compound.getLong("PlayerUuidMost"), compound.getLong("PlayerUuidLeast"));
+        } else if (compound.contains("PlayerUuid")) {
+            death.playerUUID = compound.getUUID("PlayerUuid");
+        } else {
+            death.playerUUID = UUID.randomUUID();
+        }
         death.playerName = compound.getString("PlayerName");
 
         ItemUtils.readInventory(compound, "MainInventory", death.mainInventory);
@@ -216,11 +227,8 @@ public class Death {
 
     public CompoundTag toNBT(boolean withItems) {
         CompoundTag compound = new CompoundTag();
-        //TODO replace with put UUID
-        compound.putLong("IdMost", id.getMostSignificantBits());
-        compound.putLong("IdLeast", id.getLeastSignificantBits());
-        compound.putLong("PlayerUuidMost", playerUUID.getMostSignificantBits());
-        compound.putLong("PlayerUuidLeast", playerUUID.getLeastSignificantBits());
+        compound.putUUID("Id", id);
+        compound.putUUID("PlayerUuid", playerUUID);
         compound.putString("PlayerName", playerName);
 
         if (withItems) {
