@@ -3,6 +3,7 @@ package de.maxhenkel.corelib.client.obj;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.mojang.math.Vector3f;
+import com.mojang.math.Vector4f;
 import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -49,14 +50,14 @@ public class OBJLoader {
         while ((line = reader.readAndSplitLine(true)) != null) {
             switch (line[0]) {
                 case "v":
-                    positions.add(net.minecraftforge.client.model.obj.OBJModel.parseVector4To3(line));
+                    positions.add(parseVector4To3(line));
                     break;
                 case "vt":
-                    Vec2 vec2f = net.minecraftforge.client.model.obj.OBJModel.parseVector2(line);
+                    Vec2 vec2f = parseVector2(line);
                     texCoords.add(new Vec2(vec2f.x, 1F - vec2f.y));
                     break;
                 case "vn":
-                    normals.add(net.minecraftforge.client.model.obj.OBJModel.parseVector3(line));
+                    normals.add(parseVector3(line));
                     break;
                 case "f":
                     int[][] vertices = new int[line.length - 1][];
@@ -153,5 +154,42 @@ public class OBJLoader {
             lineReader.close();
             lineStream.close();
         }
+    }
+
+    private static Vector3f parseVector4To3(String[] line) {
+        Vector4f vec4 = parseVector4(line);
+        return new Vector3f(
+                vec4.x() / vec4.w(),
+                vec4.y() / vec4.w(),
+                vec4.z() / vec4.w()
+        );
+    }
+
+    private static Vec2 parseVector2(String[] line) {
+        return switch (line.length) {
+            case 1 -> new Vec2(0, 0);
+            case 2 -> new Vec2(Float.parseFloat(line[1]), 0);
+            default -> new Vec2(Float.parseFloat(line[1]), Float.parseFloat(line[2]));
+        };
+    }
+
+    private static Vector3f parseVector3(String[] line) {
+        return switch (line.length) {
+            case 1 -> new Vector3f(0, 0, 0);
+            case 2 -> new Vector3f(Float.parseFloat(line[1]), 0, 0);
+            case 3 -> new Vector3f(Float.parseFloat(line[1]), Float.parseFloat(line[2]), 0);
+            default -> new Vector3f(Float.parseFloat(line[1]), Float.parseFloat(line[2]), Float.parseFloat(line[3]));
+        };
+    }
+
+    static Vector4f parseVector4(String[] line) {
+        return switch (line.length) {
+            case 1 -> new Vector4f(0, 0, 0, 1);
+            case 2 -> new Vector4f(Float.parseFloat(line[1]), 0, 0, 1);
+            case 3 -> new Vector4f(Float.parseFloat(line[1]), Float.parseFloat(line[2]), 0, 1);
+            case 4 -> new Vector4f(Float.parseFloat(line[1]), Float.parseFloat(line[2]), Float.parseFloat(line[3]), 1);
+            default ->
+                    new Vector4f(Float.parseFloat(line[1]), Float.parseFloat(line[2]), Float.parseFloat(line[3]), Float.parseFloat(line[4]));
+        };
     }
 }

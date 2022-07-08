@@ -1,6 +1,5 @@
 package de.maxhenkel.corelib;
 
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
@@ -11,20 +10,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientRegistry {
-
-    /**
-     * Registers a new keybinding
-     *
-     * @param name     the translation key
-     * @param category the category
-     * @param keyCode  the keycode
-     * @return the keybinding
-     */
-    public static KeyMapping registerKeyBinding(String name, String category, int keyCode) {
-        KeyMapping keyBinding = new KeyMapping(name, keyCode, category);
-        net.minecraftforge.client.ClientRegistry.registerKeyBinding(keyBinding);
-        return keyBinding;
-    }
 
     /**
      * Regisers a screen associated to a container

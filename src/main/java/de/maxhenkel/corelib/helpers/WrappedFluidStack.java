@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -29,12 +30,13 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void render(PoseStack matrixStack, int x, int y) {
-        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(stack.getFluid().getAttributes().getStillTexture());
+        IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(stack.getFluid());
+        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(extensions.getStillTexture(stack));
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        int color = stack.getFluid().getAttributes().getColor(stack);
+        int color = extensions.getTintColor(stack);
         RenderSystem.setShaderColor(RenderUtils.getRedFloat(color), RenderUtils.getGreenFloat(color), RenderUtils.getBlueFloat(color), RenderUtils.getAlphaFloat(color));
         RenderSystem.setShaderTexture(0, texture.atlas().location());
-        fluidBlit(matrixStack, x, y, 16, 16, texture, stack.getFluid().getAttributes().getColor());
+        fluidBlit(matrixStack, x, y, 16, 16, texture, color);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -59,7 +61,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("").append(stack.getDisplayName()).withStyle(stack.getFluid().getAttributes().getRarity().color);
+        return Component.literal("").append(stack.getDisplayName()).withStyle(stack.getFluid().getFluidType().getRarity().getStyleModifier());
     }
 
     @Override
