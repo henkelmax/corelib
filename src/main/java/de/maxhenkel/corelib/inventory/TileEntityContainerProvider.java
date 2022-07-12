@@ -26,7 +26,7 @@ public class TileEntityContainerProvider implements MenuProvider {
 
     public static void openGui(Player player, BlockEntity tileEntity, ContainerCreator containerCreator) {
         if (player instanceof ServerPlayer) {
-            NetworkHooks.openGui((ServerPlayer) player, new TileEntityContainerProvider(containerCreator, tileEntity), packetBuffer -> packetBuffer.writeBlockPos(tileEntity.getBlockPos()));
+            NetworkHooks.openScreen((ServerPlayer) player, new TileEntityContainerProvider(containerCreator, tileEntity), packetBuffer -> packetBuffer.writeBlockPos(tileEntity.getBlockPos()));
         }
     }
 
