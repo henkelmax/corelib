@@ -19,6 +19,7 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -70,10 +71,11 @@ public class CommonRegistry {
                 throw new RuntimeException(e);
             }
         }, (msg, fun) -> {
+            NetworkEvent.Context context = fun.get();
             if (msg.getExecutingSide().equals(Dist.CLIENT)) {
-                msg.executeClientSide(fun.get());
+                context.enqueueWork(() -> msg.executeClientSide(context));
             } else if (msg.getExecutingSide().equals(Dist.DEDICATED_SERVER)) {
-                msg.executeServerSide(fun.get());
+                context.enqueueWork(() -> msg.executeServerSide(context));
             }
         });
     }
