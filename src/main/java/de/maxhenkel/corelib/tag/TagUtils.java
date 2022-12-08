@@ -3,6 +3,8 @@ package de.maxhenkel.corelib.tag;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.*;
 import net.minecraft.world.item.Item;
@@ -33,8 +35,7 @@ public class TagUtils {
     public static Tag<Block> getBlock(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            Registry<Block> blocks = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BLOCK_REGISTRY);
-            Optional<HolderSet.Named<Block>> tag = blocks.getTag(TagKey.create(Registry.BLOCK_REGISTRY, id));
+            Optional<HolderSet.Named<Block>> tag = BuiltInRegistries.BLOCK.getTag(TagKey.create(Registries.BLOCK, id));
             if (tag.isEmpty()) {
                 if (nullIfNotExists) {
                     return null;
@@ -76,8 +77,7 @@ public class TagUtils {
     }
 
     public static Tag<Block> getBlockTag(ResourceLocation name, boolean nullIfNotExists) {
-        Registry<Block> blocks = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BLOCK_REGISTRY);
-        Optional<HolderSet.Named<Block>> tag = blocks.getTag(BlockTags.create(name));
+        Optional<HolderSet.Named<Block>> tag = BuiltInRegistries.BLOCK.getTag(BlockTags.create(name));
         if (tag.isEmpty()) {
             if (nullIfNotExists) {
                 return null;
@@ -103,8 +103,7 @@ public class TagUtils {
     public static Tag<Item> getItem(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            Registry<Item> items = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.ITEM_REGISTRY);
-            Optional<HolderSet.Named<Item>> tag = items.getTag(TagKey.create(Registry.ITEM_REGISTRY, id));
+            Optional<HolderSet.Named<Item>> tag = BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, id));
             if (tag.isEmpty()) {
                 if (nullIfNotExists) {
                     return null;
@@ -146,8 +145,7 @@ public class TagUtils {
     }
 
     public static Tag<Item> getItemTag(ResourceLocation name, boolean nullIfNotExists) {
-        Registry<Item> blocks = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.ITEM_REGISTRY);
-        Optional<HolderSet.Named<Item>> tag = blocks.getTag(ItemTags.create(name));
+        Optional<HolderSet.Named<Item>> tag = BuiltInRegistries.ITEM.getTag(ItemTags.create(name));
         if (tag.isEmpty()) {
             if (nullIfNotExists) {
                 return null;
@@ -173,8 +171,7 @@ public class TagUtils {
     public static Tag<Fluid> getFluid(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = new ResourceLocation(name.substring(1));
-            Registry<Fluid> items = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.FLUID_REGISTRY);
-            Optional<HolderSet.Named<Fluid>> tag = items.getTag(TagKey.create(Registry.FLUID_REGISTRY, id));
+            Optional<HolderSet.Named<Fluid>> tag = BuiltInRegistries.FLUID.getTag(TagKey.create(Registries.FLUID, id));
             if (tag.isEmpty()) {
                 if (nullIfNotExists) {
                     return null;
@@ -216,8 +213,7 @@ public class TagUtils {
     }
 
     public static Tag<Fluid> getFluidTag(ResourceLocation name, boolean nullIfNotExists) {
-        Registry<Fluid> blocks = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.FLUID_REGISTRY);
-        Optional<HolderSet.Named<Fluid>> tag = blocks.getTag(FluidTags.create(name));
+        Optional<HolderSet.Named<Fluid>> tag = BuiltInRegistries.FLUID.getTag(FluidTags.create(name));
         if (tag.isEmpty()) {
             if (nullIfNotExists) {
                 return null;

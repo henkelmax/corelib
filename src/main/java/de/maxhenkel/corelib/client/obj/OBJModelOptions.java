@@ -1,9 +1,9 @@
 package de.maxhenkel.corelib.client.obj;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3d;
 import de.maxhenkel.corelib.math.Rotation;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Vector3d;
 
 public class OBJModelOptions<T> {
 

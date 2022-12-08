@@ -1,7 +1,7 @@
 package de.maxhenkel.corelib.client.obj;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -57,12 +57,12 @@ public abstract class OBJEntityRenderer<T extends Entity> extends EntityRenderer
     }
 
     protected void setupYaw(T entity, float yaw, PoseStack matrixStack) {
-        matrixStack.mulPose(Vector3f.YP.rotationDegrees(180F - yaw));
+        matrixStack.mulPose(Axis.YP.rotationDegrees(180F - yaw));
     }
 
     protected void setupPitch(T entity, float partialTicks, PoseStack matrixStack) {
         float pitch = entity.xRotO + (entity.getXRot() - entity.xRotO) * partialTicks;
-        matrixStack.mulPose(Vector3f.XN.rotationDegrees(pitch));
+        matrixStack.mulPose(Axis.XN.rotationDegrees(pitch));
     }
 
 }

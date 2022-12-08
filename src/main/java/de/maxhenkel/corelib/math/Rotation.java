@@ -1,7 +1,8 @@
 package de.maxhenkel.corelib.math;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class Rotation {
 
     public void applyRotation(PoseStack matrixStack) {
         for (AxisRotation rotation : rotations) {
-            matrixStack.mulPose(rotation.axis.rotationDegrees(rotation.angle));
+            matrixStack.mulPose(Axis.of(rotation.axis).rotationDegrees(rotation.angle));
         }
     }
 

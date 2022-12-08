@@ -2,8 +2,8 @@ package de.maxhenkel.corelib.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
 import net.minecraft.world.phys.Vec2;
+import org.joml.Vector3f;
 
 public class RenderUtils {
 

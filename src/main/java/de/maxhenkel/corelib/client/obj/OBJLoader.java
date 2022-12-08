@@ -2,13 +2,13 @@ package de.maxhenkel.corelib.client.obj;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.mojang.math.Vector3f;
-import com.mojang.math.Vector4f;
 import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.phys.Vec2;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;

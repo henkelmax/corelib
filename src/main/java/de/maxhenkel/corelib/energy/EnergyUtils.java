@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
@@ -46,7 +46,7 @@ public class EnergyUtils {
             return null;
         }
 
-        return te.getCapability(CapabilityEnergy.ENERGY, side.getOpposite()).orElse(null);
+        return te.getCapability(ForgeCapabilities.ENERGY, side.getOpposite()).orElse(null);
     }
 
     /**

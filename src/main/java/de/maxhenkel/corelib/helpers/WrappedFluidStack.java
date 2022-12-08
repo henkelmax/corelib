@@ -2,7 +2,6 @@ package de.maxhenkel.corelib.helpers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 import de.maxhenkel.corelib.client.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -17,6 +16,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         int color = extensions.getTintColor(stack);
         RenderSystem.setShaderColor(RenderUtils.getRedFloat(color), RenderUtils.getGreenFloat(color), RenderUtils.getBlueFloat(color), RenderUtils.getAlphaFloat(color));
-        RenderSystem.setShaderTexture(0, texture.atlas().location());
+        RenderSystem.setShaderTexture(0, texture.atlasLocation());
         fluidBlit(matrixStack, x, y, 16, 16, texture, color);
     }
 
