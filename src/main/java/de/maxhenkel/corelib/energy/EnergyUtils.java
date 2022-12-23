@@ -59,7 +59,7 @@ public class EnergyUtils {
      */
     @Nullable
     public static IEnergyStorage getEnergyStorageOffset(LevelAccessor world, BlockPos pos, Direction side) {
-        return getEnergyStorage(world, pos.relative(side), side.getOpposite());
+        return getEnergyStorage(world, pos.relative(side), side);
     }
 
 }
