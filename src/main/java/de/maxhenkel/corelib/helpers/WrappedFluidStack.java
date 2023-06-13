@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.*;
 import de.maxhenkel.corelib.client.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -29,19 +30,19 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(PoseStack matrixStack, int x, int y) {
+    public void render(GuiGraphics guiGraphics, int x, int y) {
         IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(stack.getFluid());
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(extensions.getStillTexture(stack));
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         int color = extensions.getTintColor(stack);
         RenderSystem.setShaderColor(RenderUtils.getRedFloat(color), RenderUtils.getGreenFloat(color), RenderUtils.getBlueFloat(color), RenderUtils.getAlphaFloat(color));
         RenderSystem.setShaderTexture(0, texture.atlasLocation());
-        fluidBlit(matrixStack, x, y, 16, 16, texture, color);
+        fluidBlit(guiGraphics, x, y, 16, 16, texture, color);
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public List<Component> getTooltip(Screen screen) {
+    public List<Component> getTooltip() {
         List<Component> tooltip = new ArrayList<>();
 
         tooltip.add(getDisplayName());
@@ -70,8 +71,8 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static void fluidBlit(PoseStack matrixStack, int x, int y, int width, int height, TextureAtlasSprite sprite, int color) {
-        innerBlit(matrixStack.last().pose(), x, x + width, y, y + height, sprite.getU0(), sprite.getU1(), sprite.getV0(), (sprite.getV1() - sprite.getV0()) * (float) height / 16F + sprite.getV0(), color);
+    public static void fluidBlit(GuiGraphics guiGraphics, int x, int y, int width, int height, TextureAtlasSprite sprite, int color) {
+        innerBlit(guiGraphics.pose().last().pose(), x, x + width, y, y + height, sprite.getU0(), sprite.getU1(), sprite.getV0(), (sprite.getV1() - sprite.getV0()) * (float) height / 16F + sprite.getV0(), color);
     }
 
     @OnlyIn(Dist.CLIENT)

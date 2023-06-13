@@ -1,7 +1,6 @@
 package de.maxhenkel.corelib.block;
 
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.material.Material;
 
 public class BlockUtils {
 
@@ -12,7 +11,7 @@ public class BlockUtils {
      * @return if the block is an air block
      */
     public static boolean isAir(Block block) {
-        return block.defaultBlockState().getMaterial() == Material.AIR;
+        return block.defaultBlockState().isAir();
     }
 
 }

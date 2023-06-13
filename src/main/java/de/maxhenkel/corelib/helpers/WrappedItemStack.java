@@ -1,7 +1,7 @@
 package de.maxhenkel.corelib.helpers;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -18,14 +18,15 @@ public class WrappedItemStack extends AbstractStack<ItemStack> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(PoseStack matrixStack, int x, int y) {
-        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(matrixStack, stack, x, y, 0);
+    public void render(GuiGraphics guiGraphics, int x, int y) {
+        guiGraphics.renderItem(stack, x, y, 0);
+        guiGraphics.renderItemDecorations(Minecraft.getInstance().font, stack, x, y);
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public List<Component> getTooltip(Screen screen) {
-        return screen.getTooltipFromItem(stack);
+    public List<Component> getTooltip() {
+        return Screen.getTooltipFromItem(Minecraft.getInstance(), stack);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package de.maxhenkel.corelib.inventory;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -30,30 +30,29 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
     }
 
     @Override
-    public void render(PoseStack matrixStack, int x, int y, float partialTicks) {
-        renderBackground(matrixStack);
-        super.render(matrixStack, x, y, partialTicks);
-        renderTooltip(matrixStack, x, y);
+    public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, x, y, partialTicks);
+        renderTooltip(guiGraphics, x, y);
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShaderTexture(0, texture);
 
-        blit(matrixStack, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        guiGraphics.blit(texture, leftPos, topPos, 0, 0, imageWidth, imageHeight);
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 
     }
 
-    public void drawHoverAreas(PoseStack matrixStack, int mouseX, int mouseY) {
+    public void drawHoverAreas(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         for (HoverArea hoverArea : hoverAreas) {
             if (hoverArea.tooltip != null && hoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
-                renderTooltip(matrixStack, hoverArea.tooltip.get(), mouseX - leftPos, mouseY - topPos);
+                guiGraphics.renderTooltip(font, hoverArea.tooltip.get(), mouseX - leftPos, mouseY - topPos);
             }
         }
     }
@@ -62,17 +61,17 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
         return size - (int) (((float) amount / (float) max) * (float) size);
     }
 
-    public void drawCentered(PoseStack matrixStack, Component text, int y, int color) {
-        drawCentered(matrixStack, text, imageWidth / 2, y, color);
+    public void drawCentered(GuiGraphics guiGraphics, Component text, int y, int color) {
+        drawCentered(guiGraphics, text, imageWidth / 2, y, color);
     }
 
-    public void drawCentered(PoseStack matrixStack, Component text, int x, int y, int color) {
-        drawCentered(font, matrixStack, text, x, y, color);
+    public void drawCentered(GuiGraphics guiGraphics, Component text, int x, int y, int color) {
+        drawCentered(font, guiGraphics, text, x, y, color);
     }
 
-    public static void drawCentered(Font font, PoseStack matrixStack, Component text, int x, int y, int color) {
+    public static void drawCentered(Font font, GuiGraphics guiGraphics, Component text, int x, int y, int color) {
         int width = font.width(text);
-        font.draw(matrixStack, text, x - width / 2, y, color);
+        guiGraphics.drawString(font, text, x - width / 2, y, color, false);
     }
 
     public static class HoverArea {

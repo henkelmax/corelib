@@ -135,7 +135,7 @@ public class Death {
         death.posX = player.getX();
         death.posY = player.getY();
         death.posZ = player.getZ();
-        death.dimension = player.level.dimension().location().toString();
+        death.dimension = player.level().dimension().location().toString();
         death.model = PlayerUtils.getModel(player);
         return death;
     }

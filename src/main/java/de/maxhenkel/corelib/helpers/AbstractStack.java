@@ -1,6 +1,7 @@
 package de.maxhenkel.corelib.helpers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -17,10 +18,10 @@ public abstract class AbstractStack<T> {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public abstract void render(PoseStack matrixStack, int x, int y);
+    public abstract void render(GuiGraphics guiGraphics, int x, int y);
 
     @OnlyIn(Dist.CLIENT)
-    public abstract List<Component> getTooltip(Screen screen);
+    public abstract List<Component> getTooltip();
 
     public abstract Component getDisplayName();
 
