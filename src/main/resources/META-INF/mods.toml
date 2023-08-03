@@ -6,12 +6,9 @@ issueTrackerURL="https://github.com/henkelmax/corelib/issues"
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-# updateJSONURL=""
 displayURL="https://github.com/henkelmax/corelib"
-# logoFile="corelib.png"
-# credits=""
 authors="${mod_vendor}"
-description=''''''
+description='''A shared library'''
 [[dependencies.${mod_id}]]
     modId="forge"
     mandatory=true

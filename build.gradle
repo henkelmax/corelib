@@ -1,52 +1,34 @@
 plugins {
-    id 'net.minecraftforge.gradle' version '5.+'
+    id 'net.neoforged.gradle' version "${neogradle_version}"
     // Plugin to use the settings.xml for authentication
-    id 'net.linguica.maven-settings' version '0.5'
+    id 'net.linguica.maven-settings' version "${maven_settings_version}"
 }
 
-apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
 
 version = mod_version
 group = mod_packagename
 archivesBaseName = mod_id
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
 
 minecraft {
     mappings channel: 'official', version: mod_minecraft_version
 
     runs {
         client {
-            workingDirectory project.file('run').canonicalPath
+            workingDirectory file('run')
             property 'forge.logging.console.level', 'debug'
-            args = ['--username', 'henkelmax']
-            source sourceSets.main
-            mods {
-                mod_id {
-                    source sourceSets.main
-                }
-            }
+            args = ['--username', "henkelmax${new Random().nextInt(1000)}"]
         }
         server {
-            workingDirectory project.file('run/server').canonicalPath
+            workingDirectory file('run/server')
             property 'forge.logging.console.level', 'debug'
-            source sourceSets.main
-            mods {
-                mod_id {
-                    source sourceSets.main
-                }
-            }
         }
         data {
-            workingDirectory project.file('run')
+            workingDirectory file('run')
             property 'forge.logging.console.level', 'debug'
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/')
-            mods {
-                mod_id {
-                    source sourceSets.main
-                }
-            }
         }
     }
 }
@@ -54,37 +36,37 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
+    minecraft "net.neoforged:forge:${mod_minecraft_version}-${forge_version}"
 
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 jar {
     manifest {
-        attributes(["Specification-Title"     : mod_name,
-                    "Specification-Vendor"    : mod_vendor,
-                    "Specification-Version"   : "1",
-                    "Implementation-Title"    : mod_name,
-                    "Implementation-Version"  : mod_version,
-                    "Implementation-Vendor"   : mod_vendor,
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    "Automatic-Module-Name"   : "de.maxhenkel.corelib",
+        attributes(['Specification-Title'     : mod_name,
+                    'Specification-Vendor'    : mod_vendor,
+                    'Specification-Version'   : "1",
+                    'Implementation-Title'    : mod_name,
+                    'Implementation-Version'  : mod_version,
+                    'Implementation-Vendor'   : mod_vendor,
+                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    'Automatic-Module-Name'   : 'de.maxhenkel.corelib',
         ])
     }
 }
 
-task deobfJar(type: Jar) {
-    classifier 'deobf'
+tasks.register('deobfJar', Jar) {
+    archiveClassifier = 'deobf'
     from sourceSets.main.output
     manifest {
-        attributes(["Specification-Title"     : mod_name,
-                    "Specification-Vendor"    : mod_vendor,
-                    "Specification-Version"   : "1",
-                    "Implementation-Title"    : mod_name,
-                    "Implementation-Version"  : mod_version,
-                    "Implementation-Vendor"   : mod_vendor,
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    "Automatic-Module-Name"   : "de.maxhenkel.corelib",
+        attributes(['Specification-Title'     : mod_name,
+                    'Specification-Vendor'    : mod_vendor,
+                    'Specification-Version'   : '1',
+                    'Implementation-Title'    : mod_name,
+                    'Implementation-Version'  : mod_version,
+                    'Implementation-Vendor'   : mod_vendor,
+                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    'Automatic-Module-Name'   : 'de.maxhenkel.corelib',
         ])
     }
 }
@@ -107,19 +89,20 @@ tasks.withType(JavaCompile).configureEach {
 
 jar.finalizedBy('reobfJar')
 
-task apiJar(type: Jar) {
-    classifier 'api'
+tasks.register('apiJar', Jar) {
+    archiveClassifier = 'api'
     from sourceSets.main.output
     exclude 'de/maxhenkel/corelib/dev'
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier 'javadoc'
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
-task sourcesJar(type: Jar) {
-    classifier 'sources'
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier = 'sources'
     from sourceSets.main.allJava
 }
 

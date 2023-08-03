@@ -1,4 +1,4 @@
-# CoreLib ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/henkelmax/corelib/Build) ![GitHub issues](https://img.shields.io/github/issues-raw/henkelmax/corelib) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/henkelmax/corelib)
+# Corelib
 
 A library containing shared code for all of [my mods](https://modrepo.de).
 
@@ -9,25 +9,16 @@ Here is an example using [shadow](https://github.com/johnrengelman/shadow):
 
 *build.gradle*
 ``` groovy
-buildscript {
-    repositories {
-        // ...
-        mavenCentral()
-    }
-    dependencies {
-        // ...
-        classpath group: 'com.github.jengelman.gradle.plugins', name: 'shadow', version: '4.0.4'
-    }
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
-// ...
-apply plugin: 'com.github.johnrengelman.shadow'
 // ...
 repositories {
     maven {
         name = "henkelmax.public"
         url = 'https://maven.maxhenkel.de/repository/public'
     }
-    mavenLocal()
+    // ...
 }
 // ...
 dependencies {
@@ -37,17 +28,12 @@ dependencies {
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}:javadoc")
 }
 // ...
-artifacts {
-    // ...
-    archives shadowJar
-}
-// ...
 shadowJar {
-    project.configurations.shadow.setTransitive(true);
     configurations = [project.configurations.shadow]
-    classifier = ""
+    archiveClassifier = ''
     relocate 'de.maxhenkel.corelib', "de.maxhenkel.${mod_id}.corelib"
 }
+shadowJar.dependsOn('reobfJar')
 
 reobf {
     shadowJar {}
