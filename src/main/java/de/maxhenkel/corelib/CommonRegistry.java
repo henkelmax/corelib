@@ -9,19 +9,18 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.network.ChannelBuilder;
+import net.minecraftforge.network.SimpleChannel;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -40,8 +39,7 @@ public class CommonRegistry {
      * @return the channel
      */
     public static SimpleChannel registerChannel(String modId, String name, int protocolVersion) {
-        String protocolVersionString = String.valueOf(protocolVersion);
-        return NetworkRegistry.newSimpleChannel(new ResourceLocation(modId, name), () -> protocolVersionString, s -> s.equals(protocolVersionString), s -> s.equals(protocolVersionString));
+        return ChannelBuilder.named(new ResourceLocation(modId, name)).networkProtocolVersion(protocolVersion).simpleChannel();
     }
 
     /**
@@ -52,7 +50,7 @@ public class CommonRegistry {
      * @return the channel
      */
     public static SimpleChannel registerChannel(String modId, String name) {
-        return NetworkRegistry.newSimpleChannel(new ResourceLocation(modId, name), () -> "1.0.0", s -> true, s -> true); //TODO change default version
+        return registerChannel(modId, name, 0);
     }
 
     /**
@@ -62,22 +60,26 @@ public class CommonRegistry {
      * @param id      the packed id (has to be unique)
      * @param message the message
      */
-    public static <T extends Message<?>> void registerMessage(SimpleChannel channel, int id, Class<T> message) {
-        channel.registerMessage(id, (Class) message, Message::toBytes, (buf) -> {
-            try {
-                Message<?> msg = message.getDeclaredConstructor().newInstance();
-                return msg.fromBytes(buf);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }, (msg, fun) -> {
-            NetworkEvent.Context context = fun.get();
-            if (msg.getExecutingSide().equals(Dist.CLIENT)) {
-                context.enqueueWork(() -> msg.executeClientSide(context));
-            } else if (msg.getExecutingSide().equals(Dist.DEDICATED_SERVER)) {
-                context.enqueueWork(() -> msg.executeServerSide(context));
-            }
-        });
+    public static <T extends Message<T>> void registerMessage(SimpleChannel channel, int id, Class<T> message) {
+        channel.messageBuilder(message, id)
+                .encoder(Message::toBytes)
+                .decoder(byteBuf -> {
+                    try {
+                        T msg = message.getDeclaredConstructor().newInstance();
+                        return msg.fromBytes(byteBuf);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .consumerMainThread((msg, ctx) -> {
+                    LogicalSide side = ctx.getDirection().getReceptionSide();
+                    if (side.equals(LogicalSide.CLIENT)) {
+                        msg.executeClientSide(ctx);
+                    } else if (side.equals(LogicalSide.SERVER)) {
+                        msg.executeServerSide(ctx);
+                    }
+                })
+                .add();
     }
 
     /**

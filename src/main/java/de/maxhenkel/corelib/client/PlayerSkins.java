@@ -1,24 +1,38 @@
 package de.maxhenkel.corelib.client;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.UUID;
+
 public class PlayerSkins {
 
-    private static Minecraft minecraft = Minecraft.getInstance();
+    @Nullable
+    private static final Field gameProfileCacheField;
 
-    private static HashMap<String, GameProfile> players = new HashMap<>();
+    static {
+        Field gameProfileCache = null;
+        Field[] fields = SkullBlockEntity.class.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getType().equals(GameProfileCache.class)) {
+                field.setAccessible(true);
+                gameProfileCache = field;
+                break;
+            }
+        }
+        gameProfileCacheField = gameProfileCache;
+    }
+
+    private static HashMap<UUID, GameProfile> PLAYERS = new HashMap<>();
 
     /**
      * Gets the resource location of the skin of provided player UUID and name.
@@ -49,14 +63,7 @@ public class PlayerSkins {
      * @return the resource location to the skin
      */
     public static ResourceLocation getSkin(GameProfile gameProfile) {
-        Minecraft minecraft = Minecraft.getInstance();
-        Map<Type, MinecraftProfileTexture> map = minecraft.getSkinManager().getInsecureSkinInformation(gameProfile);
-
-        if (map.containsKey(Type.SKIN)) {
-            return minecraft.getSkinManager().registerTexture(map.get(Type.SKIN), Type.SKIN);
-        } else {
-            return DefaultPlayerSkin.getDefaultSkin(gameProfile.getId());
-        }
+        return Minecraft.getInstance().getSkinManager().getInsecureSkin(gameProfile).texture();
     }
 
     /**
@@ -67,15 +74,26 @@ public class PlayerSkins {
      * @return the game profile
      */
     public static GameProfile getGameProfile(UUID uuid, String name) {
-        if (players.containsKey(uuid.toString())) {
-            return players.get(uuid.toString());
-        } else {
-            GameProfile profile = new GameProfile(uuid, name);
-            SkullBlockEntity.updateGameprofile(profile, gameProfile -> {
-                players.put(uuid.toString(), gameProfile);
-            });
-            return profile;
+        if (PLAYERS.containsKey(uuid)) {
+            return PLAYERS.get(uuid);
         }
+        GameProfile gameProfile = new GameProfile(uuid, name);
+        if (gameProfileCacheField == null) {
+            return gameProfile;
+        }
+        try {
+            GameProfileCache cache = (GameProfileCache) gameProfileCacheField.get(null);
+            cache.getAsync(name).thenAccept(p -> {
+                p.ifPresent(value -> PLAYERS.put(uuid, value));
+            });
+        } catch (Exception e) {
+            PLAYERS.put(uuid, gameProfile);
+            return gameProfile;
+        }
+        /*CompoundTag tag = new CompoundTag();
+        tag.putString("SkullOwner", name);
+        SkullBlockEntity.resolveGameProfile(tag);*/
+        return gameProfile;
     }
 
     /**
@@ -86,7 +104,7 @@ public class PlayerSkins {
      */
     public static boolean isSlim(UUID uuid) {
         PlayerInfo networkplayerinfo = Minecraft.getInstance().getConnection().getPlayerInfo(uuid);
-        return networkplayerinfo == null ? (uuid.hashCode() & 1) == 1 : networkplayerinfo.getModelName().equals("slim");
+        return networkplayerinfo == null ? (uuid.hashCode() & 1) == 1 : networkplayerinfo.getSkin().model().equals(PlayerSkin.Model.SLIM);
     }
 
     /**

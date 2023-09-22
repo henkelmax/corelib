@@ -1,8 +1,11 @@
 package de.maxhenkel.corelib.net;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.network.SimpleChannel;
 
 public class NetUtils {
 
@@ -14,7 +17,15 @@ public class NetUtils {
      * @param message the message to send
      */
     public static void sendTo(SimpleChannel channel, ServerPlayer player, Message<?> message) {
-        channel.sendTo(message, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        channel.send(message, player.connection.getConnection());
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void sendToServer(SimpleChannel channel, Message<?> message) {
+        ClientPacketListener connection = Minecraft.getInstance().getConnection();
+        if (connection != null) {
+            channel.send(message, connection.getConnection());
+        }
     }
 
 }

@@ -7,7 +7,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkHooks;
 
 public class TileEntityContainerProvider implements MenuProvider {
 
@@ -25,8 +24,8 @@ public class TileEntityContainerProvider implements MenuProvider {
     }
 
     public static void openGui(Player player, BlockEntity tileEntity, ContainerCreator containerCreator) {
-        if (player instanceof ServerPlayer) {
-            NetworkHooks.openScreen((ServerPlayer) player, new TileEntityContainerProvider(containerCreator, tileEntity), packetBuffer -> packetBuffer.writeBlockPos(tileEntity.getBlockPos()));
+        if (player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.openMenu(new TileEntityContainerProvider(containerCreator, tileEntity), packetBuffer -> packetBuffer.writeBlockPos(tileEntity.getBlockPos()));
         }
     }
 

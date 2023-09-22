@@ -31,7 +31,7 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
 
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-        renderBackground(guiGraphics);
+        renderTransparentBackground(guiGraphics);
         super.render(guiGraphics, x, y, partialTicks);
         renderTooltip(guiGraphics, x, y);
     }
