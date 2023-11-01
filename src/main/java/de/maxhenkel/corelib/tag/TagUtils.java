@@ -13,8 +13,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.registries.ForgeRegistries;
-
+import net.neoforged.neoforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 import java.util.Optional;
 

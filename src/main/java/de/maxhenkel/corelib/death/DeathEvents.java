@@ -3,12 +3,11 @@ package de.maxhenkel.corelib.death;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,7 +44,7 @@ public final class DeathEvents {
             death.processDrops(new ArrayList<>(drops));
 
             PlayerDeathEvent playerDeathEvent = new PlayerDeathEvent(death, player, event.getSource());
-            MinecraftForge.EVENT_BUS.post(playerDeathEvent);
+            NeoForge.EVENT_BUS.post(playerDeathEvent);
 
             if (playerDeathEvent.isStoreDeath()) {
                 DeathManager.addDeath(player, death);
@@ -63,7 +62,7 @@ public final class DeathEvents {
      * NOTE: This removes drops from getting spawned
      */
     public static void register() {
-        MinecraftForge.EVENT_BUS.register(new DeathEvents());
+        NeoForge.EVENT_BUS.register(new DeathEvents());
     }
 
 }

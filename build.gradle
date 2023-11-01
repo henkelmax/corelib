@@ -1,5 +1,5 @@
 plugins {
-    id 'net.neoforged.gradle' version "${neogradle_version}"
+    id 'net.neoforged.gradle.userdev' version "${neogradle_version}"
     // Plugin to use the settings.xml for authentication
     id 'net.linguica.maven-settings' version "${maven_settings_version}"
 }
@@ -12,24 +12,17 @@ archivesBaseName = mod_id
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
 
-minecraft {
-    mappings channel: 'official', version: mod_minecraft_version
-
-    runs {
-        client {
-            workingDirectory file('run')
-            property 'forge.logging.console.level', 'debug'
-            args = ['--username', "henkelmax${new Random().nextInt(1000)}"]
-        }
-        server {
-            workingDirectory file('run/server')
-            property 'forge.logging.console.level', 'debug'
-        }
-        data {
-            workingDirectory file('run')
-            property 'forge.logging.console.level', 'debug'
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/')
-        }
+runs {
+    client {
+        workingDirectory file('run')
+        systemProperty 'forge.logging.console.level', 'debug'
+        programArguments = ['--username', "henkelmax${new Random().nextInt(1000)}"]
+        modSource project.sourceSets.main
+    }
+    server {
+        workingDirectory file('run/server')
+        systemProperty 'forge.logging.console.level', 'debug'
+        modSource project.sourceSets.main
     }
 }
 
@@ -40,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
+    implementation "net.neoforged:neoforge:${neoforge_version}"
 
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
@@ -59,31 +52,15 @@ jar {
     }
 }
 
-tasks.register('deobfJar', Jar) {
-    archiveClassifier = 'deobf'
-    from sourceSets.main.output
-    manifest {
-        attributes(['Specification-Title'     : mod_name,
-                    'Specification-Vendor'    : mod_vendor,
-                    'Specification-Version'   : '1',
-                    'Implementation-Title'    : mod_name,
-                    'Implementation-Version'  : mod_version,
-                    'Implementation-Vendor'   : mod_vendor,
-                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    'Automatic-Module-Name'   : 'de.maxhenkel.corelib',
-        ])
-    }
-}
-
 processResources {
     filesMatching('**/*.toml') {
         expand 'mod_id': mod_id,
                 'mod_version': mod_version,
                 'mod_vendor': mod_vendor,
                 'mod_name': mod_name,
-                'mod_loader_version': mod_loader_version,
-                'mod_forge_version': mod_forge_version,
-                'mod_minecraft_version': mod_minecraft_version
+                'loader_version': loader_version,
+                'neoforge_requirement': neoforge_requirement,
+                'minecraft_version': minecraft_version
     }
 }
 
@@ -116,7 +93,6 @@ javadoc {
 
 artifacts {
     archives jar
-    archives deobfJar
     archives apiJar
     archives javadocJar
     archives sourcesJar

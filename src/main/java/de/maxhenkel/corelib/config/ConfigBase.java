@@ -1,13 +1,13 @@
 package de.maxhenkel.corelib.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ConfigBase {
 
-    protected ForgeConfigSpec configSpec;
+    protected ModConfigSpec configSpec;
 
-    public ConfigBase(ForgeConfigSpec.Builder builder) {
+    public ConfigBase(ModConfigSpec.Builder builder) {
 
     }
 
@@ -15,11 +15,11 @@ public class ConfigBase {
 
     }
 
-    public void setConfigSpec(ForgeConfigSpec configSpec) {
+    public void setConfigSpec(ModConfigSpec configSpec) {
         this.configSpec = configSpec;
     }
 
-    public ForgeConfigSpec getConfigSpec() {
+    public ModConfigSpec getConfigSpec() {
         return configSpec;
     }
 }

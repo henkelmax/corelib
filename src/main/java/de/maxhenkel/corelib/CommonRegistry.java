@@ -9,18 +9,18 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLConfig;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.network.ChannelBuilder;
-import net.minecraftforge.network.SimpleChannel;
+import net.neoforged.fml.LogicalSide;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.fml.loading.FMLConfig;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.network.NetworkRegistry;
+import net.neoforged.neoforge.network.simple.SimpleChannel;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -39,7 +39,7 @@ public class CommonRegistry {
      * @return the channel
      */
     public static SimpleChannel registerChannel(String modId, String name, int protocolVersion) {
-        return ChannelBuilder.named(new ResourceLocation(modId, name)).networkProtocolVersion(protocolVersion).simpleChannel();
+        return NetworkRegistry.ChannelBuilder.named(new ResourceLocation(modId, name)).networkProtocolVersion(() -> String.valueOf(protocolVersion)).simpleChannel();
     }
 
     /**
@@ -121,15 +121,15 @@ public class CommonRegistry {
      * @return the instantiated config
      */
     public static <T extends ConfigBase> T registerConfig(ModConfig.Type type, Class<T> configClass, boolean registerListener) {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         T config;
         try {
-            config = configClass.getConstructor(ForgeConfigSpec.Builder.class).newInstance(builder);
+            config = configClass.getConstructor(ModConfigSpec.Builder.class).newInstance(builder);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
 
-        ForgeConfigSpec spec = builder.build();
+        ModConfigSpec spec = builder.build();
         ModLoadingContext.get().registerConfig(type, spec);
         config.setConfigSpec(spec);
         if (registerListener) {
@@ -176,7 +176,7 @@ public class CommonRegistry {
                     Path defaultPath = DEFAULT_CONFIG_PATH.resolve(folderName).resolve(configFileName);
                     config.init(configPath, defaultPath);
                 };
-                MinecraftForge.EVENT_BUS.addListener(consumer);
+                NeoForge.EVENT_BUS.addListener(consumer);
             } else {
                 Path commonConfig = FMLPaths.CONFIGDIR.get().resolve(folderName);
                 commonConfig.toFile().mkdirs();

@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="${mod_loader_version}"
+loaderVersion="${loader_version}"
 license="All rights reserved"
 issueTrackerURL="https://github.com/henkelmax/corelib/issues"
 [[mods]]
@@ -10,14 +10,14 @@ displayURL="https://github.com/henkelmax/corelib"
 authors="${mod_vendor}"
 description='''A shared library'''
 [[dependencies.${mod_id}]]
-    modId="forge"
+    modId="neoforge"
     mandatory=true
-    versionRange="${mod_forge_version}"
+    versionRange="${neoforge_requirement}"
     ordering="NONE"
     side="BOTH"
 [[dependencies.${mod_id}]]
     modId="minecraft"
     mandatory=true
-    versionRange="[${mod_minecraft_version}]"
+    versionRange="[${minecraft_version}]"
     ordering="NONE"
     side="BOTH"

@@ -2,8 +2,7 @@ package de.maxhenkel.corelib.player;
 
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-
+import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import java.lang.reflect.Field;
 
 public class PlayerUtils {
