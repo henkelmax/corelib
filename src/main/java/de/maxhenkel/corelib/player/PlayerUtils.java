@@ -1,5 +1,6 @@
 package de.maxhenkel.corelib.player;
 
+import de.maxhenkel.corelib.Logger;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
@@ -18,8 +19,8 @@ public class PlayerUtils {
         try {
             Field dataPlayerModeCustomization = ObfuscationReflectionHelper.findField(Player.class, "f_36089_");
             return player.getEntityData().get((EntityDataAccessor<Byte>) dataPlayerModeCustomization.get(null));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Logger.INSTANCE.error("Error getting player model", e);
             return 0;
         }
     }
