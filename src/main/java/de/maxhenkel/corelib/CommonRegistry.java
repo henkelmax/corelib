@@ -39,7 +39,12 @@ public class CommonRegistry {
      * @return the channel
      */
     public static SimpleChannel registerChannel(String modId, String name, int protocolVersion) {
-        return NetworkRegistry.ChannelBuilder.named(new ResourceLocation(modId, name)).networkProtocolVersion(() -> String.valueOf(protocolVersion)).simpleChannel();
+        return NetworkRegistry.ChannelBuilder
+                .named(new ResourceLocation(modId, name))
+                .networkProtocolVersion(() -> String.valueOf(protocolVersion))
+                .serverAcceptedVersions(s -> s.equals(String.valueOf(protocolVersion)))
+                .clientAcceptedVersions(s -> s.equals(String.valueOf(protocolVersion)))
+                .simpleChannel();
     }
 
     /**
