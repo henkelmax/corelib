@@ -6,9 +6,9 @@ import de.maxhenkel.corelib.client.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -16,7 +16,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -48,8 +47,8 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
         tooltip.add(getDisplayName());
 
         if (Minecraft.getInstance().options.advancedItemTooltips) {
-            ResourceLocation registryName = ForgeRegistries.FLUIDS.getKey(stack.getFluid());
-            if (registryName != null) {
+            if (BuiltInRegistries.FLUID.containsValue(stack.getFluid())) {
+                ResourceLocation registryName = BuiltInRegistries.FLUID.getKey(stack.getFluid());
                 tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }
             if (stack.hasTag()) {
