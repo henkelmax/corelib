@@ -94,7 +94,7 @@ public class Death {
     }
 
     public BlockPos getBlockPos() {
-        return new BlockPos((int) posX, (int) posY, (int) posZ);
+        return BlockPos.containing(posX, posY, posZ);
     }
 
     public String getDimension() {
@@ -132,9 +132,9 @@ public class Death {
 
         death.timestamp = System.currentTimeMillis();
         death.experience = player.experienceLevel;
-        death.posX = player.getBlockX();
-        death.posY = player.getBlockY();
-        death.posZ = player.getBlockZ();
+        death.posX = player.position().x;
+        death.posY = player.position().y;
+        death.posZ = player.position().z;
         death.dimension = player.level().dimension().location().toString();
         death.model = PlayerUtils.getModel(player);
         return death;
