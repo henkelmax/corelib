@@ -2,10 +2,10 @@ package de.maxhenkel.corelib.energy;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+
 import javax.annotation.Nullable;
 
 public class EnergyUtils {
@@ -38,14 +38,8 @@ public class EnergyUtils {
      * @return the energy storage
      */
     @Nullable
-    public static IEnergyStorage getEnergyStorage(LevelAccessor world, BlockPos pos, Direction side) {
-        BlockEntity te = world.getBlockEntity(pos);
-
-        if (te == null) {
-            return null;
-        }
-
-        return te.getCapability(Capabilities.ENERGY, side.getOpposite()).orElse(null);
+    public static IEnergyStorage getEnergyStorage(Level world, BlockPos pos, Direction side) {
+        return world.getCapability(Capabilities.EnergyStorage.BLOCK, pos, side.getOpposite());
     }
 
     /**
@@ -57,7 +51,7 @@ public class EnergyUtils {
      * @return the energy storage
      */
     @Nullable
-    public static IEnergyStorage getEnergyStorageOffset(LevelAccessor world, BlockPos pos, Direction side) {
+    public static IEnergyStorage getEnergyStorageOffset(Level world, BlockPos pos, Direction side) {
         return getEnergyStorage(world, pos.relative(side), side.getOpposite());
     }
 

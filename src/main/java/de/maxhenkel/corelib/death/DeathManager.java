@@ -30,7 +30,7 @@ public class DeathManager {
         try {
             File deathFile = getDeathFile(player, death.getId());
             deathFile.getParentFile().mkdirs();
-            NbtIo.write(death.toNBT(), deathFile);
+            NbtIo.write(death.toNBT(), deathFile.toPath());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,7 +59,7 @@ public class DeathManager {
     @Nullable
     public static Death getDeath(ServerLevel world, UUID playerUUID, UUID id) {
         try {
-            CompoundTag data = NbtIo.read(getDeathFile(world, playerUUID, id));
+            CompoundTag data = NbtIo.read(getDeathFile(world, playerUUID, id).toPath());
             if (data == null) {
                 return null;
             }
@@ -79,7 +79,7 @@ public class DeathManager {
     @Nullable
     public static Death getDeath(File file) {
         try {
-            CompoundTag data = NbtIo.read(file);
+            CompoundTag data = NbtIo.read(file.toPath());
             if (data == null) {
                 return null;
             }
@@ -152,7 +152,7 @@ public class DeathManager {
         return Arrays.stream(deaths)
                 .map(f -> {
                     try {
-                        return Death.fromNBT(NbtIo.read(f));
+                        return Death.fromNBT(NbtIo.read(f.toPath()));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

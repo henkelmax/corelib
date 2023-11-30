@@ -9,13 +9,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
+
 import javax.annotation.Nullable;
 
 public class FluidUtils {
@@ -28,7 +29,7 @@ public class FluidUtils {
      * @param direction the direction
      * @return if there is a fluid handler at this position and direction
      */
-    public static boolean isFluidHandler(LevelAccessor world, BlockPos pos, Direction direction) {
+    public static boolean isFluidHandler(Level world, BlockPos pos, Direction direction) {
         return getFluidHandler(world, pos, direction) != null;
     }
 
@@ -40,7 +41,7 @@ public class FluidUtils {
      * @param direction the direction
      * @return if there is a fluid handler offset to the specified direction
      */
-    public static boolean isFluidHandlerOffset(LevelAccessor world, BlockPos pos, Direction direction) {
+    public static boolean isFluidHandlerOffset(Level world, BlockPos pos, Direction direction) {
         return getFluidHandlerOffset(world, pos, direction) != null;
     }
 
@@ -53,12 +54,8 @@ public class FluidUtils {
      * @return the fluid handler
      */
     @Nullable
-    public static IFluidHandler getFluidHandler(LevelAccessor world, BlockPos pos, Direction direction) {
-        BlockEntity te = world.getBlockEntity(pos);
-        if (te == null) {
-            return null;
-        }
-        return te.getCapability(Capabilities.FLUID_HANDLER, direction).orElse(null);
+    public static IFluidHandler getFluidHandler(Level world, BlockPos pos, Direction direction) {
+        return world.getCapability(Capabilities.FluidHandler.BLOCK, pos, direction);
     }
 
     /**
@@ -70,7 +67,7 @@ public class FluidUtils {
      * @return the fluid handler
      */
     @Nullable
-    public static IFluidHandler getFluidHandlerOffset(LevelAccessor world, BlockPos pos, Direction direction) {
+    public static IFluidHandler getFluidHandlerOffset(Level world, BlockPos pos, Direction direction) {
         return getFluidHandler(world, pos.relative(direction), direction.getOpposite());
     }
 
