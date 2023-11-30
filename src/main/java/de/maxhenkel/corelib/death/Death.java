@@ -94,7 +94,7 @@ public class Death {
     }
 
     public BlockPos getBlockPos() {
-        return BlockPos.containing(posX, posY, posZ);
+        return new BlockPos(posX, posY, posZ);
     }
 
     public String getDimension() {
