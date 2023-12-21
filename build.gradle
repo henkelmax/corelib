@@ -1,71 +1,26 @@
 plugins {
     id 'net.neoforged.gradle.userdev' version "${neogradle_version}"
+    id 'net.neoforged.gradle.mixin' version "${neogradle_mixin_version}"
+    id 'com.github.johnrengelman.shadow' version "${shadow_version}"
     // Plugin to use the settings.xml for authentication
     id 'net.linguica.maven-settings' version "${maven_settings_version}"
 }
 
 apply plugin: 'maven-publish'
-
-version = mod_version
-group = mod_packagename
-archivesBaseName = mod_id
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
-
-runs {
-    client {
-        workingDirectory file('run')
-        systemProperty 'forge.logging.console.level', 'debug'
-        programArguments = ['--username', "henkelmax${new Random().nextInt(1000)}"]
-        modSource project.sourceSets.main
-    }
-    server {
-        workingDirectory file('run/server')
-        systemProperty 'forge.logging.console.level', 'debug'
-        modSource project.sourceSets.main
-    }
-}
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-repositories {
-    maven { url = 'https://maven.minecraftforge.net' }
-}
-
-dependencies {
-    implementation "net.neoforged:neoforge:${neoforge_version}"
-
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
-}
+apply from: "https://raw.githubusercontent.com/henkelmax/mod-gradle-scripts/${mod_gradle_script_version}/mod.gradle"
 
 jar {
     manifest {
-        attributes(['Specification-Title'     : mod_name,
-                    'Specification-Vendor'    : mod_vendor,
-                    'Specification-Version'   : "1",
-                    'Implementation-Title'    : mod_name,
-                    'Implementation-Version'  : mod_version,
-                    'Implementation-Vendor'   : mod_vendor,
-                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    'Automatic-Module-Name'   : 'de.maxhenkel.corelib',
-        ])
+        attributes(['Automatic-Module-Name'   : 'de.maxhenkel.corelib'])
     }
 }
 
 processResources {
     filesMatching('**/*.toml') {
-        expand 'mod_id': mod_id,
-                'mod_version': mod_version,
-                'mod_vendor': mod_vendor,
-                'mod_name': mod_name,
-                'loader_version': loader_version,
-                'neoforge_requirement': neoforge_requirement,
+        expand 'mod_version': mod_version,
+                'neoforge_dependency': neoforge_dependency,
                 'minecraft_version': minecraft_version
     }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
 }
 
 tasks.register('apiJar', Jar) {
@@ -80,9 +35,8 @@ tasks.register('javadocJar', Jar) {
     from javadoc.destinationDir
 }
 
-tasks.register('sourcesJar', Jar) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allJava
+tasks.matching(it -> it.name.startsWith("publish")).configureEach {
+    it.dependsOn shadowJar
 }
 
 javadoc {
@@ -102,6 +56,7 @@ publishing {
             artifact jar
             artifact apiJar
             artifact javadocJar
+            artifact sourcesJar
         }
     }
     repositories {
