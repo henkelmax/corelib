@@ -3,24 +3,21 @@ package de.maxhenkel.corelib;
 import de.maxhenkel.corelib.config.ConfigBase;
 import de.maxhenkel.corelib.config.DynamicConfig;
 import de.maxhenkel.corelib.net.Message;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
-import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
-import net.neoforged.neoforge.network.NetworkRegistry;
-import net.neoforged.neoforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -31,60 +28,39 @@ public class CommonRegistry {
     private static final Path DEFAULT_CONFIG_PATH = FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath());
 
     /**
-     * Creates a new network channel
-     *
-     * @param modId           the mod ID
-     * @param name            the name of the channel
-     * @param protocolVersion the protocol version
-     * @return the channel
-     */
-    public static SimpleChannel registerChannel(String modId, String name, int protocolVersion) {
-        return NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(modId, name))
-                .networkProtocolVersion(() -> String.valueOf(protocolVersion))
-                .serverAcceptedVersions(s -> s.equals(String.valueOf(protocolVersion)))
-                .clientAcceptedVersions(s -> s.equals(String.valueOf(protocolVersion)))
-                .simpleChannel();
-    }
-
-    /**
-     * Creates a new network channel
-     *
-     * @param modId the mod ID
-     * @param name  the name of the channel
-     * @return the channel
-     */
-    public static SimpleChannel registerChannel(String modId, String name) {
-        return registerChannel(modId, name, 0);
-    }
-
-    /**
      * Registers a new message on the provided network channel
      *
-     * @param channel the channel to register the message on
-     * @param id      the packed id (has to be unique)
-     * @param message the message
+     * @param registrar the pre-configured registrar
+     * @param message   the message
      */
-    public static <T extends Message<T>> void registerMessage(SimpleChannel channel, int id, Class<T> message) {
-        channel.messageBuilder(message, id)
-                .encoder(Message::toBytes)
-                .decoder(byteBuf -> {
-                    try {
-                        T msg = message.getDeclaredConstructor().newInstance();
-                        return msg.fromBytes(byteBuf);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .consumerMainThread((msg, ctx) -> {
-                    LogicalSide side = ctx.getDirection().getReceptionSide();
-                    if (side.equals(LogicalSide.CLIENT)) {
-                        msg.executeClientSide(ctx);
-                    } else if (side.equals(LogicalSide.SERVER)) {
-                        msg.executeServerSide(ctx);
-                    }
-                })
-                .add();
+    public static <T extends Message> void registerMessage(IPayloadRegistrar registrar, Class<T> message) {
+        try {
+            T dummy = message.getDeclaredConstructor().newInstance();
+            registrar.play(dummy.id(), byteBuf -> {
+                try {
+                    T msg = message.getDeclaredConstructor().newInstance();
+                    return msg.fromBytes(byteBuf);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }, (payload, context) -> {
+                if (!payload.getExecutingSide().equals(context.flow())) {
+                    return;
+                }
+
+                if (PacketFlow.CLIENTBOUND.equals(context.flow())) {
+                    context.workHandler().execute(() -> {
+                        payload.executeClientSide(context);
+                    });
+                } else {
+                    context.workHandler().execute(() -> {
+                        payload.executeServerSide(context);
+                    });
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -143,7 +119,7 @@ public class CommonRegistry {
                     config.onReload(evt);
                 }
             };
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+            ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
         }
         return config;
     }

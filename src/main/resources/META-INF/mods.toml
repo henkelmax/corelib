@@ -1,23 +1,23 @@
-modLoader="javafml"
-loaderVersion="*"
-license="All rights reserved"
-issueTrackerURL="https://github.com/henkelmax/corelib/issues"
+modLoader = "javafml"
+loaderVersion = "*"
+license = "All rights reserved"
+issueTrackerURL = "https://github.com/henkelmax/corelib/issues"
 [[mods]]
-modId="corelib"
-version="${mod_version}"
-displayName="Corelib"
-displayURL="https://github.com/henkelmax/corelib"
-authors="Max Henkel"
-description='''A shared library'''
+modId = "corelib"
+version = "${mod_version}"
+displayName = "Corelib"
+displayURL = "https://github.com/henkelmax/corelib"
+authors = "Max Henkel"
+description = '''A shared library'''
 [[dependencies.corelib]]
-    modId="neoforge"
-    mandatory=true
-    versionRange="${neoforge_dependency}"
-    ordering="NONE"
-    side="BOTH"
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_dependency}"
+ordering = "NONE"
+side = "BOTH"
 [[dependencies.corelib]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[${minecraft_version}]"
-    ordering="NONE"
-    side="BOTH"
+modId = "minecraft"
+type = "required"
+versionRange = "[${minecraft_version}]"
+ordering = "NONE"
+side = "BOTH"
