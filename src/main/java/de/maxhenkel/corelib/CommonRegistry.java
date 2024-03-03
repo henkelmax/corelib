@@ -83,6 +83,7 @@ public class CommonRegistry {
                     } else if (side.equals(LogicalSide.SERVER)) {
                         msg.executeServerSide(ctx);
                     }
+                    ctx.setPacketHandled(true);
                 })
                 .add();
     }
