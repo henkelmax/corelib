@@ -73,9 +73,15 @@ public class CommonRegistry {
         }, (msg, fun) -> {
             NetworkEvent.Context context = fun.get();
             if (msg.getExecutingSide().equals(Dist.CLIENT)) {
-                context.enqueueWork(() -> msg.executeClientSide(context));
+                context.enqueueWork(() -> {
+                    msg.executeClientSide(context);
+                    context.setPacketHandled(true);
+                });
             } else if (msg.getExecutingSide().equals(Dist.DEDICATED_SERVER)) {
-                context.enqueueWork(() -> msg.executeServerSide(context));
+                context.enqueueWork(() -> {
+                    msg.executeServerSide(context);
+                    context.setPacketHandled(true);
+                });
             }
         });
     }
