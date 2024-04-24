@@ -20,7 +20,7 @@ public class NetUtils {
      */
     @Deprecated
     public static void sendTo(ServerPlayer player, Message<?> message) {
-        PacketDistributor.PLAYER.with(player).send(message);
+        PacketDistributor.sendToPlayer(player, message);
     }
 
     /**
@@ -30,7 +30,7 @@ public class NetUtils {
     @OnlyIn(Dist.CLIENT)
     @Deprecated
     public static void sendToServer(Message<?> message) {
-        PacketDistributor.SERVER.noArg().send(message);
+        PacketDistributor.sendToServer(message);
     }
 
 }

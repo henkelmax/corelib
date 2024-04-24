@@ -1,32 +1,27 @@
 package de.maxhenkel.corelib.net;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public interface Message<T extends Message<T>> extends CustomPacketPayload {
 
     PacketFlow getExecutingSide();
 
-    default void executeServerSide(PlayPayloadContext context) {
+    default void executeServerSide(IPayloadContext context) {
 
     }
 
-    default void executeClientSide(PlayPayloadContext context) {
+    default void executeClientSide(IPayloadContext context) {
 
     }
 
-    T fromBytes(FriendlyByteBuf buf);
+    T fromBytes(RegistryFriendlyByteBuf buf);
 
-    void toBytes(FriendlyByteBuf buf);
+    void toBytes(RegistryFriendlyByteBuf buf);
 
     @Override
-    default void write(FriendlyByteBuf buf) {
-        toBytes(buf);
-    }
-
-    ResourceLocation id();
+    Type<T> type();
 
 }

@@ -62,7 +62,7 @@ public class RenderUtils {
                 .uv(texX, texY)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(entry.normal(), norX, norY, norZ)
+                .normal(entry, norX, norY, norZ)
                 .endVertex();
     }
 

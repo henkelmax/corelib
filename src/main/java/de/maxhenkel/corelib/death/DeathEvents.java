@@ -8,6 +8,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,11 +31,10 @@ public final class DeathEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     void playerDeath(LivingDropsEvent event) {
         Entity entity = event.getEntity();
-        if (!(entity instanceof ServerPlayer)) {
+        if (!(entity instanceof ServerPlayer player)) {
             return;
         }
         try {
-            ServerPlayer player = (ServerPlayer) event.getEntity();
             Death death = deathMap.remove(player);
 
             if (death == null) {

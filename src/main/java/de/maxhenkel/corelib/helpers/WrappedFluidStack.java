@@ -51,8 +51,8 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
                 ResourceLocation registryName = BuiltInRegistries.FLUID.getKey(stack.getFluid());
                 tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }
-            if (stack.hasTag()) {
-                tooltip.add((Component.translatable("item.nbt_tags", stack.getTag().getAllKeys().size())).withStyle(ChatFormatting.DARK_GRAY));
+            if (!stack.getComponentsPatch().isEmpty()) {
+                tooltip.add((Component.translatable("item.nbt_tags", stack.getComponentsPatch().size())).withStyle(ChatFormatting.DARK_GRAY));
             }
         }
 
@@ -61,7 +61,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("").append(stack.getDisplayName()).withStyle(stack.getFluid().getFluidType().getRarity().getStyleModifier());
+        return Component.literal("").append(stack.getHoverName()).withStyle(stack.getFluid().getFluidType().getRarity().getStyleModifier());
     }
 
     @Override

@@ -3,6 +3,7 @@ package de.maxhenkel.corelib.inventory;
 import de.maxhenkel.corelib.sound.SoundUtils;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.item.component.SeededContainerLoot;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -33,10 +36,6 @@ public abstract class ShulkerBoxInventory implements Container, MenuProvider {
     protected NonNullList<ItemStack> items;
     protected ItemStack shulkerBox;
     protected int invSize;
-    protected CompoundTag blockEntityTag;
-
-    protected ResourceLocation lootTable;
-    protected long lootTableSeed;
 
     public ShulkerBoxInventory(Player player, ItemStack shulkerBox, int invSize) {
         this.shulkerBox = shulkerBox;
@@ -44,26 +43,17 @@ public abstract class ShulkerBoxInventory implements Container, MenuProvider {
         this.items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
         startOpen(player);
 
-        CompoundTag c = shulkerBox.getTag();
+        ItemContainerContents contents = shulkerBox.get(DataComponents.CONTAINER);
 
-        if (c == null) {
-            return;
+        if (contents != null) {
+            contents.copyInto(items);
         }
 
-        if (!c.contains("BlockEntityTag")) {
-            return;
-        }
+        SeededContainerLoot loot = shulkerBox.get(DataComponents.CONTAINER_LOOT);
 
-        blockEntityTag = c.getCompound("BlockEntityTag");
-
-        if (blockEntityTag.contains("Items")) {
-            ContainerHelper.loadAllItems(blockEntityTag, items);
-        } else if (blockEntityTag.contains("LootTable")) {
-            lootTable = new ResourceLocation(blockEntityTag.getString("LootTable"));
-            lootTableSeed = blockEntityTag.getLong("LootTableSeed");
-            fillWithLoot(player);
-            blockEntityTag.remove("LootTable");
-            blockEntityTag.remove("LootTableSeed");
+        if (loot != null) {
+            fillWithLoot(player, loot);
+            shulkerBox.remove(DataComponents.CONTAINER_LOOT);
         }
     }
 
@@ -71,17 +61,17 @@ public abstract class ShulkerBoxInventory implements Container, MenuProvider {
         this(player, shulkerBox, 27);
     }
 
-    public void fillWithLoot(@Nullable Player player) {
-        if (lootTable != null && player != null) {
-            LootTable loottable = player.level().getServer().getLootData().getLootTable(lootTable);
-            lootTable = null;
-
-            LootParams.Builder builder = new LootParams.Builder((ServerLevel) player.level());
-            builder.withLuck(player.getLuck()).withParameter(LootContextParams.THIS_ENTITY, player);
-
-            loottable.fill(this, builder.create(LootContextParamSets.CHEST), lootTableSeed);
-            setChanged();
+    public void fillWithLoot(@Nullable Player player, SeededContainerLoot loot) {
+        if (player == null) {
+            return;
         }
+        LootTable loottable = player.getServer().reloadableRegistries().getLootTable(loot.lootTable());
+
+        LootParams.Builder builder = new LootParams.Builder((ServerLevel) player.level());
+        builder.withLuck(player.getLuck()).withParameter(LootContextParams.THIS_ENTITY, player);
+
+        loottable.fill(this, builder.create(LootContextParamSets.CHEST), loot.seed());
+        setChanged();
     }
 
     @Override
@@ -121,14 +111,7 @@ public abstract class ShulkerBoxInventory implements Container, MenuProvider {
 
     @Override
     public void setChanged() {
-        CompoundTag tag = shulkerBox.getOrCreateTag();
-        if (blockEntityTag == null) {
-            tag.put("BlockEntityTag", blockEntityTag = new CompoundTag());
-        } else {
-            tag.put("BlockEntityTag", blockEntityTag);
-        }
-
-        ContainerHelper.saveAllItems(blockEntityTag, items, true);
+        shulkerBox.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(items));
     }
 
     @Override

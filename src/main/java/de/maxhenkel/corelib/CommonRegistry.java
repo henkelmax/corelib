@@ -3,12 +3,16 @@ package de.maxhenkel.corelib;
 import de.maxhenkel.corelib.config.ConfigBase;
 import de.maxhenkel.corelib.config.DynamicConfig;
 import de.maxhenkel.corelib.net.Message;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
@@ -17,7 +21,8 @@ import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -33,31 +38,48 @@ public class CommonRegistry {
      * @param registrar the pre-configured registrar
      * @param message   the message
      */
-    public static <T extends Message> void registerMessage(IPayloadRegistrar registrar, Class<T> message) {
+    public static <T extends Message<T>> void registerMessage(PayloadRegistrar registrar, Class<T> message) {
         try {
             T dummy = message.getDeclaredConstructor().newInstance();
-            registrar.play(dummy.id(), byteBuf -> {
-                try {
-                    T msg = message.getDeclaredConstructor().newInstance();
-                    return msg.fromBytes(byteBuf);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+
+            StreamCodec<RegistryFriendlyByteBuf, T> codec = new StreamCodec<>() {
+                @Override
+                public void encode(RegistryFriendlyByteBuf buf, T packet) {
+                    packet.toBytes(buf);
                 }
-            }, (payload, context) -> {
+
+                @Override
+                public T decode(RegistryFriendlyByteBuf buf) {
+                    try {
+                        T packet = message.getDeclaredConstructor().newInstance();
+                        packet.fromBytes(buf);
+                        return packet;
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+            IPayloadHandler<T> handler = (payload, context) -> {
                 if (!payload.getExecutingSide().equals(context.flow())) {
                     return;
                 }
-
                 if (PacketFlow.CLIENTBOUND.equals(context.flow())) {
-                    context.workHandler().execute(() -> {
+                    context.enqueueWork(() -> {
                         payload.executeClientSide(context);
                     });
                 } else {
-                    context.workHandler().execute(() -> {
+                    context.enqueueWork(() -> {
                         payload.executeServerSide(context);
                     });
                 }
-            });
+            };
+            if (dummy.getExecutingSide().equals(PacketFlow.CLIENTBOUND)) {
+                registrar.playToClient(dummy.type(), codec, handler);
+            } else if (dummy.getExecutingSide().equals(PacketFlow.SERVERBOUND)) {
+                registrar.playToServer(dummy.type(), codec, handler);
+            } else {
+                throw new RuntimeException("Unknown packet flow: %s".formatted(dummy.getExecutingSide()));
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -96,12 +118,13 @@ public class CommonRegistry {
     /**
      * Registers a config for the provided config type
      *
+     * @param modId            the mod ID
      * @param type             the config type
      * @param configClass      the config class
      * @param registerListener if a config reload listener should be registered
      * @return the instantiated config
      */
-    public static <T extends ConfigBase> T registerConfig(ModConfig.Type type, Class<T> configClass, boolean registerListener) {
+    public static <T extends ConfigBase> T registerConfig(String modId, ModConfig.Type type, Class<T> configClass, boolean registerListener) {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         T config;
         try {
@@ -111,7 +134,8 @@ public class CommonRegistry {
         }
 
         ModConfigSpec spec = builder.build();
-        ModLoadingContext.get().registerConfig(type, spec);
+        ModContainer modContainer = ModList.get().getModContainerById(modId).orElseThrow(() -> new RuntimeException("Could not find mod %s".formatted(modId)));
+        modContainer.registerConfig(type, spec);
         config.setConfigSpec(spec);
         if (registerListener) {
             Consumer<ModConfigEvent> consumer = evt -> {
@@ -127,12 +151,13 @@ public class CommonRegistry {
     /**
      * Registers a config for the provided config type
      *
+     * @param modId       the mod ID
      * @param type        the config type
      * @param configClass the config class
      * @return the instantiated config
      */
-    public static <T extends ConfigBase> T registerConfig(ModConfig.Type type, Class<T> configClass) {
-        return registerConfig(type, configClass, false);
+    public static <T extends ConfigBase> T registerConfig(String modId, ModConfig.Type type, Class<T> configClass) {
+        return registerConfig(modId, type, configClass, false);
     }
 
     /**

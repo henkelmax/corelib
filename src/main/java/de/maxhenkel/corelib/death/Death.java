@@ -3,6 +3,7 @@ package de.maxhenkel.corelib.death;
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.corelib.player.PlayerUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -184,7 +185,7 @@ public class Death {
         return stacks.stream().filter(itemStack -> !itemStack.isEmpty()).collect(Collectors.toList());
     }
 
-    public static Death fromNBT(CompoundTag compound) {
+    public static Death fromNBT(HolderLookup.Provider provider, CompoundTag compound) {
         Death death = new Death();
         if (compound.contains("IdMost") && compound.contains("IdLeast")) {
             death.id = new UUID(compound.getLong("IdMost"), compound.getLong("IdLeast"));
@@ -202,13 +203,13 @@ public class Death {
         }
         death.playerName = compound.getString("PlayerName");
 
-        ItemUtils.readInventory(compound, "MainInventory", death.mainInventory);
-        ItemUtils.readInventory(compound, "ArmorInventory", death.armorInventory);
-        ItemUtils.readInventory(compound, "OffHandInventory", death.offHandInventory);
+        ItemUtils.readInventory(provider, compound, "MainInventory", death.mainInventory);
+        ItemUtils.readInventory(provider, compound, "ArmorInventory", death.armorInventory);
+        ItemUtils.readInventory(provider, compound, "OffHandInventory", death.offHandInventory);
 
-        death.additionalItems = ItemUtils.readItemList(compound, "Items");
+        death.additionalItems = ItemUtils.readItemList(provider, compound, "Items");
 
-        ItemUtils.readItemList(compound, "Equipment", death.equipment);
+        ItemUtils.readItemList(provider, compound, "Equipment", death.equipment);
 
         death.timestamp = compound.getLong("Timestamp");
         death.experience = compound.getInt("Experience");
@@ -221,24 +222,24 @@ public class Death {
         return death;
     }
 
-    public CompoundTag toNBT() {
-        return toNBT(true);
+    public CompoundTag toNBT(HolderLookup.Provider provider) {
+        return toNBT(provider, true);
     }
 
-    public CompoundTag toNBT(boolean withItems) {
+    public CompoundTag toNBT(HolderLookup.Provider provider, boolean withItems) {
         CompoundTag compound = new CompoundTag();
         compound.putUUID("Id", id);
         compound.putUUID("PlayerUuid", playerUUID);
         compound.putString("PlayerName", playerName);
 
         if (withItems) {
-            ItemUtils.saveInventory(compound, "MainInventory", mainInventory);
-            ItemUtils.saveInventory(compound, "ArmorInventory", armorInventory);
-            ItemUtils.saveInventory(compound, "OffHandInventory", offHandInventory);
-            ItemUtils.saveItemList(compound, "Items", additionalItems);
+            ItemUtils.saveInventory(provider, compound, "MainInventory", mainInventory);
+            ItemUtils.saveInventory(provider, compound, "ArmorInventory", armorInventory);
+            ItemUtils.saveInventory(provider, compound, "OffHandInventory", offHandInventory);
+            ItemUtils.saveItemList(provider, compound, "Items", additionalItems);
         }
 
-        ItemUtils.saveItemList(compound, "Equipment", equipment);
+        ItemUtils.saveItemList(provider, compound, "Equipment", equipment);
 
         compound.putLong("Timestamp", timestamp);
         compound.putInt("Experience", experience);
