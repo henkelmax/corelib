@@ -57,13 +57,12 @@ public class RenderUtils {
 
     public static void vertex(VertexConsumer builder, PoseStack matrixStack, float posX, float posY, float posZ, float texX, float texY, float norX, float norY, float norZ, int red, int green, int blue, int light, int overlay) {
         PoseStack.Pose entry = matrixStack.last();
-        builder.vertex(entry.pose(), posX, posY, posZ)
-                .color(red, green, blue, 255)
-                .uv(texX, texY)
-                .overlayCoords(overlay)
-                .uv2(light)
-                .normal(entry, norX, norY, norZ)
-                .endVertex();
+        builder.addVertex(entry.pose(), posX, posY, posZ)
+                .setColor(red, green, blue, 255)
+                .setUv(texX, texY)
+                .setOverlay(overlay)
+                .setLight(light)
+                .setNormal(entry, norX, norY, norZ);
     }
 
 }

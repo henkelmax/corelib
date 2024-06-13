@@ -77,13 +77,12 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     @OnlyIn(Dist.CLIENT)
     private static void innerBlit(Matrix4f matrix, int x1, int x2, int y1, int y2, float minU, float maxU, float minV, float maxV, int color) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
-        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferbuilder.vertex(matrix, (float) x1, (float) y2, 0F).uv(minU, maxV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
-        bufferbuilder.vertex(matrix, (float) x2, (float) y2, 0F).uv(maxU, maxV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
-        bufferbuilder.vertex(matrix, (float) x2, (float) y1, 0F).uv(maxU, minV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
-        bufferbuilder.vertex(matrix, (float) x1, (float) y1, 0F).uv(minU, minV).color(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255).endVertex();
-        BufferUploader.drawWithShader(bufferbuilder.end());
+        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        bufferBuilder.addVertex(matrix, (float) x1, (float) y2, 0F).setUv(minU, maxV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);
+        bufferBuilder.addVertex(matrix, (float) x2, (float) y2, 0F).setUv(maxU, maxV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);
+        bufferBuilder.addVertex(matrix, (float) x2, (float) y1, 0F).setUv(maxU, minV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);
+        bufferBuilder.addVertex(matrix, (float) x1, (float) y1, 0F).setUv(minU, minV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);
+        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
     }
 
 }
