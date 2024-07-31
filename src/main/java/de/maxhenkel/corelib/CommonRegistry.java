@@ -138,12 +138,19 @@ public class CommonRegistry {
         modContainer.registerConfig(type, spec);
         config.setConfigSpec(spec);
         if (registerListener) {
-            Consumer<ModConfigEvent> consumer = evt -> {
+            Consumer<ModConfigEvent.Loading> load = evt -> {
+                if (evt.getConfig().getType() == type) {
+                    config.onLoad(evt);
+                }
+            };
+            ModLoadingContext.get().getActiveContainer().getEventBus().addListener(load);
+
+            Consumer<ModConfigEvent.Reloading> reload = evt -> {
                 if (evt.getConfig().getType() == type) {
                     config.onReload(evt);
                 }
             };
-            ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
+            ModLoadingContext.get().getActiveContainer().getEventBus().addListener(reload);
         }
         return config;
     }

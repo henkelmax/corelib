@@ -11,7 +11,11 @@ public class ConfigBase {
 
     }
 
-    public void onReload(ModConfigEvent event) {
+    public void onLoad(ModConfigEvent.Loading evt) {
+
+    }
+
+    public void onReload(ModConfigEvent.Reloading event) {
 
     }
 
@@ -22,4 +26,5 @@ public class ConfigBase {
     public ModConfigSpec getConfigSpec() {
         return configSpec;
     }
+
 }
