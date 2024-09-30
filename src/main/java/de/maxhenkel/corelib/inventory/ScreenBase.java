@@ -52,7 +52,7 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
     public void drawHoverAreas(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         for (HoverArea hoverArea : hoverAreas) {
             if (hoverArea.tooltip != null && hoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
-                guiGraphics.renderTooltip(font, hoverArea.tooltip.get(), mouseX - leftPos, mouseY - topPos);
+                guiGraphics.renderTooltip(font, hoverArea.tooltip.get(), mouseX, mouseY);
             }
         }
     }
