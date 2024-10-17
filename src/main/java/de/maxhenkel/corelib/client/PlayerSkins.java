@@ -40,9 +40,9 @@ public class PlayerSkins {
      *
      * @param uuid the UUID of the player
      * @param name the name of the player
-     * @return the resource location to the skin
+     * @return the skin
      */
-    public static ResourceLocation getSkin(UUID uuid, String name) {
+    public static PlayerSkin getSkin(UUID uuid, String name) {
         return getSkin(getGameProfile(uuid, name));
     }
 
@@ -50,9 +50,9 @@ public class PlayerSkins {
      * Gets the resource location of the skin of the provided player
      *
      * @param player the player to get the skin of
-     * @return the resource location to the skin
+     * @return the skin
      */
-    public static ResourceLocation getSkin(Player player) {
+    public static PlayerSkin getSkin(Player player) {
         return getSkin(player.getGameProfile());
     }
 
@@ -60,10 +60,10 @@ public class PlayerSkins {
      * Gets the resource location of the skin of the provided game profile
      *
      * @param gameProfile the game profile of the player
-     * @return the resource location to the skin
+     * @return the skin
      */
-    public static ResourceLocation getSkin(GameProfile gameProfile) {
-        return Minecraft.getInstance().getSkinManager().getInsecureSkin(gameProfile).texture();
+    public static PlayerSkin getSkin(GameProfile gameProfile) {
+        return Minecraft.getInstance().getSkinManager().getInsecureSkin(gameProfile);
     }
 
     /**
