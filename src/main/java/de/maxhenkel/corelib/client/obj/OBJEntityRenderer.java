@@ -5,64 +5,65 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 
 import java.util.List;
 
-public abstract class OBJEntityRenderer<T extends Entity> extends EntityRenderer<T> {
+public abstract class OBJEntityRenderer<T extends Entity, S extends EntityRenderState> extends EntityRenderer<T, S> {
 
     protected OBJEntityRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
-    public abstract List<OBJModelInstance<T>> getModels(T entity);
+    public abstract List<OBJModelInstance<S>> getModels(S entity);
 
     @Override
-    public ResourceLocation getTextureLocation(T entity) {
-        return null;
+    public void render(S state, PoseStack pose, MultiBufferSource source, int packedLight) {
+        renderModels(state, pose, source, packedLight);
+        super.render(state, pose, source, packedLight);
     }
 
-    @Override
-    public void render(T entity, float yaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight) {
-        renderModels(entity, yaw, partialTicks, matrixStack, buffer, packedLight);
-        super.render(entity, yaw, partialTicks, matrixStack, buffer, packedLight);
-    }
+    protected void renderModels(S state, PoseStack pose, MultiBufferSource buffer, int packedLight) {
+        List<OBJModelInstance<S>> models = getModels(state);
 
-    protected void renderModels(T entity, float yaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight) {
-        List<OBJModelInstance<T>> models = getModels(entity);
+        pose.pushPose();
 
-        matrixStack.pushPose();
+        //TODO Interpolate yaw
+        setupYaw(state, pose);
+        setupPitch(state, pose);
 
-        setupYaw(entity, yaw, matrixStack);
-        setupPitch(entity, partialTicks, matrixStack);
+        for (OBJModelInstance<S> model : models) {
+            pose.pushPose();
 
-        for (OBJModelInstance<T> model : models) {
-            matrixStack.pushPose();
-
-            matrixStack.translate(model.getOptions().getOffset().x, model.getOptions().getOffset().y, model.getOptions().getOffset().z);
+            pose.translate(model.getOptions().getOffset().x, model.getOptions().getOffset().y, model.getOptions().getOffset().z);
 
             if (model.getOptions().getRotation() != null) {
-                model.getOptions().getRotation().applyRotation(matrixStack);
+                model.getOptions().getRotation().applyRotation(pose);
             }
 
             if (model.getOptions().getOnRender() != null) {
-                model.getOptions().getOnRender().onRender(entity, matrixStack, partialTicks);
+                model.getOptions().getOnRender().onRender(state, pose);
             }
 
-            model.getModel().render(model.getOptions().getTexture(), matrixStack, buffer, packedLight);
-            matrixStack.popPose();
+            model.getModel().render(model.getOptions().getTexture(), pose, buffer, packedLight);
+            pose.popPose();
         }
-        matrixStack.popPose();
+        pose.popPose();
     }
 
-    protected void setupYaw(T entity, float yaw, PoseStack matrixStack) {
-        matrixStack.mulPose(Axis.YP.rotationDegrees(180F - yaw));
+    protected void setupYaw(S state, PoseStack pose) {
+        //TODO Check if this is correct
     }
 
-    protected void setupPitch(T entity, float partialTicks, PoseStack matrixStack) {
-        float pitch = entity.xRotO + (entity.getXRot() - entity.xRotO) * partialTicks;
-        matrixStack.mulPose(Axis.XN.rotationDegrees(pitch));
+    protected void rotateYaw(PoseStack pose, float yaw) {
+        pose.mulPose(Axis.YP.rotationDegrees(180F - yaw));
+    }
+
+    protected void setupPitch(S state, PoseStack matrixStack) {
+        //TODO Check if this is needed
+        /*float pitch = state.xRotO + (state.getXRot() - state.xRotO) * state.partialTick;
+        matrixStack.mulPose(Axis.XN.rotationDegrees(pitch));*/
     }
 
 }

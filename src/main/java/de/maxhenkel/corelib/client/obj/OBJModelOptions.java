@@ -62,7 +62,7 @@ public class OBJModelOptions<T> {
     }
 
     public interface RenderListener<T> {
-        void onRender(T object, PoseStack matrixStack, float partialTicks);
+        void onRender(T object, PoseStack pose);
     }
 
 }

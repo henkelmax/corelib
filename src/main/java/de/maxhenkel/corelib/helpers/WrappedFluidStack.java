@@ -6,7 +6,7 @@ import de.maxhenkel.corelib.client.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -32,7 +32,6 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     public void render(GuiGraphics guiGraphics, int x, int y) {
         IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(stack.getFluid());
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(extensions.getStillTexture(stack));
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         int color = extensions.getTintColor(stack);
         RenderSystem.setShaderColor(RenderUtils.getRedFloat(color), RenderUtils.getGreenFloat(color), RenderUtils.getBlueFloat(color), RenderUtils.getAlphaFloat(color));
         RenderSystem.setShaderTexture(0, texture.atlasLocation());
@@ -76,7 +75,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
     @OnlyIn(Dist.CLIENT)
     private static void innerBlit(Matrix4f matrix, int x1, int x2, int y1, int y2, float minU, float maxU, float minV, float maxV, int color) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
         BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         bufferBuilder.addVertex(matrix, (float) x1, (float) y2, 0F).setUv(minU, maxV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);
         bufferBuilder.addVertex(matrix, (float) x2, (float) y2, 0F).setUv(maxU, maxV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);

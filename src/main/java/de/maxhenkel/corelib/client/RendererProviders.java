@@ -13,7 +13,7 @@ public class RendererProviders {
     }
 
     public static EntityRendererProvider.Context createEntityRendererContext() {
-        return new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getBlockRenderer(), minecraft.gameRenderer.itemInHandRenderer, minecraft.getResourceManager(), minecraft.getEntityModels(), minecraft.font);
+        return new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getMapRenderer(), minecraft.getBlockRenderer(), minecraft.getResourceManager(), minecraft.getEntityModels(), minecraft.getEquipmentModels(), minecraft.font);
     }
 
 }

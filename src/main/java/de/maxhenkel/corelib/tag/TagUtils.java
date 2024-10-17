@@ -35,14 +35,14 @@ public class TagUtils {
     public static Tag<Block> getBlock(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = ResourceLocation.tryParse(name.substring(1));
-            if(id == null) {
+            if (id == null) {
                 if (nullIfNotExists) {
                     return null;
                 } else {
                     return AIR_BLOCK_TAG;
                 }
             }
-            Optional<HolderSet.Named<Block>> tag = BuiltInRegistries.BLOCK.getTag(TagKey.create(Registries.BLOCK, id));
+            Optional<HolderSet.Named<Block>> tag = BuiltInRegistries.BLOCK.get(TagKey.create(Registries.BLOCK, id));
             if (tag.isEmpty()) {
                 if (nullIfNotExists) {
                     return null;
@@ -53,7 +53,7 @@ public class TagUtils {
             return new BlockTag(tag.get());
         } else {
             ResourceLocation resourceLocation = ResourceLocation.tryParse(name);
-            if(resourceLocation == null) {
+            if (resourceLocation == null) {
                 if (nullIfNotExists) {
                     return null;
                 } else {
@@ -67,8 +67,10 @@ public class TagUtils {
                     return AIR_BLOCK_TAG;
                 }
             }
-
-            return new SingleElementTag<>(resourceLocation, BuiltInRegistries.BLOCK.get(resourceLocation));
+            return BuiltInRegistries.BLOCK
+                    .get(resourceLocation)
+                    .map(ref -> (Tag<Block>) new SingleElementTag<>(resourceLocation, ref.value()))
+                    .orElseGet(() -> nullIfNotExists ? null : AIR_BLOCK_TAG);
         }
     }
 
@@ -83,7 +85,7 @@ public class TagUtils {
     }
 
     public static Tag<Block> getBlockTag(ResourceLocation name, boolean nullIfNotExists) {
-        Optional<HolderSet.Named<Block>> tag = BuiltInRegistries.BLOCK.getTag(BlockTags.create(name));
+        Optional<HolderSet.Named<Block>> tag = BuiltInRegistries.BLOCK.get(BlockTags.create(name));
         if (tag.isEmpty()) {
             if (nullIfNotExists) {
                 return null;
@@ -109,14 +111,14 @@ public class TagUtils {
     public static Tag<Item> getItem(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = ResourceLocation.tryParse(name.substring(1));
-            if(id == null) {
+            if (id == null) {
                 if (nullIfNotExists) {
                     return null;
                 } else {
                     return AIR_ITEM_TAG;
                 }
             }
-            Optional<HolderSet.Named<Item>> tag = BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, id));
+            Optional<HolderSet.Named<Item>> tag = BuiltInRegistries.ITEM.get(TagKey.create(Registries.ITEM, id));
             if (tag.isEmpty()) {
                 if (nullIfNotExists) {
                     return null;
@@ -127,7 +129,7 @@ public class TagUtils {
             return new ItemTag(tag.get());
         } else {
             ResourceLocation resourceLocation = ResourceLocation.tryParse(name);
-            if(resourceLocation == null) {
+            if (resourceLocation == null) {
                 if (nullIfNotExists) {
                     return null;
                 } else {
@@ -141,7 +143,10 @@ public class TagUtils {
                     return AIR_ITEM_TAG;
                 }
             }
-            return new SingleElementTag<>(resourceLocation, BuiltInRegistries.ITEM.get(resourceLocation));
+            return BuiltInRegistries.ITEM
+                    .get(resourceLocation)
+                    .map(ref -> (Tag<Item>) new SingleElementTag<>(resourceLocation, ref.value()))
+                    .orElseGet(() -> nullIfNotExists ? null : AIR_ITEM_TAG);
         }
     }
 
@@ -156,7 +161,7 @@ public class TagUtils {
     }
 
     public static Tag<Item> getItemTag(ResourceLocation name, boolean nullIfNotExists) {
-        Optional<HolderSet.Named<Item>> tag = BuiltInRegistries.ITEM.getTag(ItemTags.create(name));
+        Optional<HolderSet.Named<Item>> tag = BuiltInRegistries.ITEM.get(ItemTags.create(name));
         if (tag.isEmpty()) {
             if (nullIfNotExists) {
                 return null;
@@ -182,14 +187,14 @@ public class TagUtils {
     public static Tag<Fluid> getFluid(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
             ResourceLocation id = ResourceLocation.tryParse(name.substring(1));
-            if(id == null) {
+            if (id == null) {
                 if (nullIfNotExists) {
                     return null;
                 } else {
                     return AIR_FLUID_TAG;
                 }
             }
-            Optional<HolderSet.Named<Fluid>> tag = BuiltInRegistries.FLUID.getTag(TagKey.create(Registries.FLUID, id));
+            Optional<HolderSet.Named<Fluid>> tag = BuiltInRegistries.FLUID.get(TagKey.create(Registries.FLUID, id));
             if (tag.isEmpty()) {
                 if (nullIfNotExists) {
                     return null;
@@ -200,7 +205,7 @@ public class TagUtils {
             return new FluidTag(tag.get());
         } else {
             ResourceLocation resourceLocation = ResourceLocation.tryParse(name);
-            if(resourceLocation == null) {
+            if (resourceLocation == null) {
                 if (nullIfNotExists) {
                     return null;
                 } else {
@@ -215,7 +220,10 @@ public class TagUtils {
                 }
             }
 
-            return new SingleElementTag<>(resourceLocation, BuiltInRegistries.FLUID.get(resourceLocation));
+            return BuiltInRegistries.FLUID
+                    .get(resourceLocation)
+                    .map(ref -> (Tag<Fluid>) new SingleElementTag<>(resourceLocation, ref.value()))
+                    .orElseGet(() -> nullIfNotExists ? null : AIR_FLUID_TAG);
         }
     }
 
@@ -230,7 +238,7 @@ public class TagUtils {
     }
 
     public static Tag<Fluid> getFluidTag(ResourceLocation name, boolean nullIfNotExists) {
-        Optional<HolderSet.Named<Fluid>> tag = BuiltInRegistries.FLUID.getTag(FluidTags.create(name));
+        Optional<HolderSet.Named<Fluid>> tag = BuiltInRegistries.FLUID.get(FluidTags.create(name));
         if (tag.isEmpty()) {
             if (nullIfNotExists) {
                 return null;

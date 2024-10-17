@@ -3,9 +3,12 @@ package de.maxhenkel.corelib;
 import de.maxhenkel.corelib.config.ConfigBase;
 import de.maxhenkel.corelib.config.DynamicConfig;
 import de.maxhenkel.corelib.net.Message;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -110,9 +113,7 @@ public class CommonRegistry {
                     }
                 }, classification);
         builderConsumer.accept(builder);
-        EntityType<T> type = builder.build(modId + ":" + name);
-//        type.setRegistryName(new ResourceLocation(modId, name)); //TODO
-        return type;
+        return builder.build(ResourceKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name)));
     }
 
     /**
