@@ -1,22 +1,18 @@
 package de.maxhenkel.corelib.helpers;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
-import de.maxhenkel.corelib.client.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +27,9 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y) {
         IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(stack.getFluid());
-        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(extensions.getStillTexture(stack));
+        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS).getSprite(extensions.getStillTexture(stack));
         int color = extensions.getTintColor(stack);
-        RenderSystem.setShaderColor(RenderUtils.getRedFloat(color), RenderUtils.getGreenFloat(color), RenderUtils.getBlueFloat(color), RenderUtils.getAlphaFloat(color));
-        RenderSystem.setShaderTexture(0, texture.atlasLocation());
-        fluidBlit(guiGraphics, x, y, 16, 16, texture, color);
+        guiGraphics.blitSprite(RenderType::guiTextured, texture, x, y, 16, 16, color);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -66,22 +60,6 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     @Override
     public boolean isEmpty() {
         return stack.isEmpty();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public static void fluidBlit(GuiGraphics guiGraphics, int x, int y, int width, int height, TextureAtlasSprite sprite, int color) {
-        innerBlit(guiGraphics.pose().last().pose(), x, x + width, y, y + height, sprite.getU0(), sprite.getU1(), sprite.getV0(), (sprite.getV1() - sprite.getV0()) * (float) height / 16F + sprite.getV0(), color);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static void innerBlit(Matrix4f matrix, int x1, int x2, int y1, int y2, float minU, float maxU, float minV, float maxV, int color) {
-        RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
-        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        bufferBuilder.addVertex(matrix, (float) x1, (float) y2, 0F).setUv(minU, maxV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);
-        bufferBuilder.addVertex(matrix, (float) x2, (float) y2, 0F).setUv(maxU, maxV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);
-        bufferBuilder.addVertex(matrix, (float) x2, (float) y1, 0F).setUv(maxU, minV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);
-        bufferBuilder.addVertex(matrix, (float) x1, (float) y1, 0F).setUv(minU, minV).setColor(RenderUtils.getRed(color), RenderUtils.getGreen(color), RenderUtils.getBlue(color), 255);
-        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
     }
 
 }
