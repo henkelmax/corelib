@@ -5,6 +5,7 @@ import de.maxhenkel.corelib.player.PlayerUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -118,14 +119,15 @@ public class Death {
         death.playerName = player.getName().getString();
 
         for (int i = 0; i < death.mainInventory.size(); i++) {
-            death.mainInventory.set(i, player.getInventory().items.get(i));
+            death.mainInventory.set(i, player.getInventory().getNonEquipmentItems().get(i));
         }
-        for (int i = 0; i < death.armorInventory.size(); i++) {
-            death.armorInventory.set(i, player.getInventory().armor.get(i));
-        }
-        for (int i = 0; i < death.offHandInventory.size(); i++) {
-            death.offHandInventory.set(i, player.getInventory().offhand.get(i));
-        }
+        death.armorInventory.set(EquipmentSlot.FEET.getIndex(), player.getItemBySlot(EquipmentSlot.FEET));
+        death.armorInventory.set(EquipmentSlot.LEGS.getIndex(), player.getItemBySlot(EquipmentSlot.LEGS));
+        death.armorInventory.set(EquipmentSlot.CHEST.getIndex(), player.getItemBySlot(EquipmentSlot.CHEST));
+        death.armorInventory.set(EquipmentSlot.HEAD.getIndex(), player.getItemBySlot(EquipmentSlot.HEAD));
+
+        death.offHandInventory.set(0, player.getItemBySlot(EquipmentSlot.OFFHAND));
+
         death.equipment = NonNullList.withSize(EquipmentSlot.values().length, ItemStack.EMPTY);
         for (int i = 0; i < death.equipment.size(); i++) {
             death.equipment.set(i, player.getItemBySlot(EquipmentSlot.values()[i]).copy());
@@ -188,20 +190,16 @@ public class Death {
     public static Death fromNBT(HolderLookup.Provider provider, CompoundTag compound) {
         Death death = new Death();
         if (compound.contains("IdMost") && compound.contains("IdLeast")) {
-            death.id = new UUID(compound.getLong("IdMost"), compound.getLong("IdLeast"));
-        } else if (compound.contains("Id")) {
-            death.id = compound.getUUID("Id");
+            death.id = new UUID(compound.getLong("IdMost").orElseThrow(), compound.getLong("IdLeast").orElseThrow());
         } else {
-            death.id = UUID.randomUUID();
+            death.id = compound.read("Id", UUIDUtil.CODEC).orElseGet(UUID::randomUUID);
         }
         if (compound.contains("PlayerUuidMost") && compound.contains("PlayerUuidLeast")) {
-            death.playerUUID = new UUID(compound.getLong("PlayerUuidMost"), compound.getLong("PlayerUuidLeast"));
-        } else if (compound.contains("PlayerUuid")) {
-            death.playerUUID = compound.getUUID("PlayerUuid");
+            death.playerUUID = new UUID(compound.getLong("PlayerUuidMost").orElseThrow(), compound.getLong("PlayerUuidLeast").orElseThrow());
         } else {
-            death.playerUUID = UUID.randomUUID();
+            death.playerUUID = compound.read("PlayerUuid", UUIDUtil.CODEC).orElseGet(UUID::randomUUID);
         }
-        death.playerName = compound.getString("PlayerName");
+        death.playerName = compound.getStringOr("PlayerName", "");
 
         ItemUtils.readInventory(provider, compound, "MainInventory", death.mainInventory);
         ItemUtils.readInventory(provider, compound, "ArmorInventory", death.armorInventory);
@@ -211,13 +209,13 @@ public class Death {
 
         ItemUtils.readItemList(provider, compound, "Equipment", death.equipment);
 
-        death.timestamp = compound.getLong("Timestamp");
-        death.experience = compound.getInt("Experience");
-        death.posX = compound.getDouble("PosX");
-        death.posY = compound.getDouble("PosY");
-        death.posZ = compound.getDouble("PosZ");
-        death.dimension = compound.getString("Dimension");
-        death.model = compound.getByte("Model");
+        death.timestamp = compound.getLongOr("Timestamp", 0L);
+        death.experience = compound.getIntOr("Experience", 0);
+        death.posX = compound.getDoubleOr("PosX", 0.0);
+        death.posY = compound.getDoubleOr("PosY", 0.0);
+        death.posZ = compound.getDoubleOr("PosZ", 0.0);
+        death.dimension = compound.getStringOr("Dimension", "minecraft:overworld");
+        death.model = compound.getByteOr("Model", (byte) 0);
 
         return death;
     }
@@ -228,8 +226,8 @@ public class Death {
 
     public CompoundTag toNBT(HolderLookup.Provider provider, boolean withItems) {
         CompoundTag compound = new CompoundTag();
-        compound.putUUID("Id", id);
-        compound.putUUID("PlayerUuid", playerUUID);
+        compound.store("Id", UUIDUtil.CODEC, id);
+        compound.store("PlayerUuid", UUIDUtil.CODEC, playerUUID);
         compound.putString("PlayerName", playerName);
 
         if (withItems) {

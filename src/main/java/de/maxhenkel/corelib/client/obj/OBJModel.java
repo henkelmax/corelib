@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.IEventBus;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -44,6 +45,10 @@ public class OBJModel {
             RenderUtils.vertex(builder, matrixStack, data.positions.get(face[2][0]), data.texCoords.get(face[2][1]), data.normals.get(face[2][2]), light, OverlayTexture.NO_OVERLAY);
         }
         matrixStack.popPose();
+    }
+
+    public static void registerRenderPipeline(IEventBus bus) {
+        bus.addListener(OBJRenderUtils::onRegisterPipelines);
     }
 
     static class OBJModelData {

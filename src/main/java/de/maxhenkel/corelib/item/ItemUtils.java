@@ -8,6 +8,8 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Optional;
+
 public class ItemUtils {
 
     //TODO Re-add
@@ -170,14 +172,21 @@ public class ItemUtils {
             return;
         }
 
-        ListTag tagList = compound.getList(name, 10);
+        ListTag tagList = compound.getListOrEmpty(name);
 
         for (int i = 0; i < tagList.size(); i++) {
-            CompoundTag slot = tagList.getCompound(i);
-            int j = slot.getInt("Slot");
+            Optional<CompoundTag> slot = tagList.getCompound(i);
+            if (slot.isEmpty()) {
+                continue;
+            }
+            Optional<Integer> slotId = slot.get().getInt("Slot");
+            if (slotId.isEmpty()) {
+                continue;
+            }
+            int j = slotId.get();
 
             if (j >= 0 && j < inv.getContainerSize()) {
-                inv.setItem(j, ItemStack.parseOptional(provider, slot));
+                inv.setItem(j, ItemStack.parse(provider, slot.get()).orElse(ItemStack.EMPTY));
             }
         }
     }
@@ -196,14 +205,21 @@ public class ItemUtils {
             return;
         }
 
-        ListTag tagList = compound.getList(name, 10);
+        ListTag tagList = compound.getListOrEmpty(name);
 
         for (int i = 0; i < tagList.size(); i++) {
-            CompoundTag slot = tagList.getCompound(i);
-            int j = slot.getInt("Slot");
+            Optional<CompoundTag> slot = tagList.getCompound(i);
+            if (slot.isEmpty()) {
+                continue;
+            }
+            Optional<Integer> slotId = slot.get().getInt("Slot");
+            if (slotId.isEmpty()) {
+                continue;
+            }
+            int j = slotId.get();
 
             if (j >= 0 && j < inv.size()) {
-                inv.set(j, ItemStack.parseOptional(provider, slot));
+                inv.set(j, ItemStack.parse(provider, slot.get()).orElse(ItemStack.EMPTY));
             }
         }
     }
@@ -223,9 +239,13 @@ public class ItemUtils {
             return items;
         }
 
-        ListTag itemList = compound.getList(name, 10);
+        ListTag itemList = compound.getListOrEmpty(name);
         for (int i = 0; i < itemList.size(); i++) {
-            ItemStack item = ItemStack.parseOptional(provider, itemList.getCompound(i));
+            Optional<ItemStack> optionalItem = ItemStack.parse(provider, itemList.get(i));
+            if (optionalItem.isEmpty()) {
+                continue;
+            }
+            ItemStack item = optionalItem.get();
             if (!includeEmpty) {
                 if (!item.isEmpty()) {
                     items.add(item);
@@ -264,12 +284,12 @@ public class ItemUtils {
             return;
         }
 
-        ListTag itemList = compound.getList(name, 10);
+        ListTag itemList = compound.getListOrEmpty(name);
         for (int i = 0; i < itemList.size(); i++) {
             if (i >= list.size()) {
                 break;
             }
-            list.set(i, ItemStack.parseOptional(provider, itemList.getCompound(i)));
+            list.set(i, ItemStack.parse(provider, itemList.get(i)).orElse(ItemStack.EMPTY));
         }
     }
 
@@ -322,10 +342,10 @@ public class ItemUtils {
      */
     public static ItemStack readOverstackedItem(HolderLookup.Provider provider, CompoundTag compound) {
         CompoundTag data = compound.copy();
-        int count = data.getInt("Count");
+        int count = data.getIntOr("Count", 0);
         data.remove("Count");
         data.putByte("Count", (byte) 1);
-        ItemStack stack = ItemStack.parseOptional(provider, data);
+        ItemStack stack = ItemStack.parse(provider, data).orElse(ItemStack.EMPTY);
         stack.setCount(count);
         return stack;
     }
