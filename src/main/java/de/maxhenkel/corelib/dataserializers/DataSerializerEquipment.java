@@ -7,6 +7,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 public class DataSerializerEquipment {
@@ -14,9 +15,10 @@ public class DataSerializerEquipment {
     private static final StreamCodec<RegistryFriendlyByteBuf, EnumMap<EquipmentSlot, ItemStack>> CODEC = new StreamCodec<>() {
         @Override
         public void encode(RegistryFriendlyByteBuf buf, EnumMap<EquipmentSlot, ItemStack> equipment) {
-            buf.writeInt(equipment.size());
+            List<Map.Entry<EquipmentSlot, ItemStack>> list = equipment.entrySet().stream().filter(e -> !e.getValue().isEmpty()).toList();
+            buf.writeInt(list.size());
 
-            for (Map.Entry<EquipmentSlot, ItemStack> entry : equipment.entrySet()) {
+            for (Map.Entry<EquipmentSlot, ItemStack> entry : list) {
                 buf.writeUtf(entry.getKey().getName());
                 ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, entry.getValue());
             }
