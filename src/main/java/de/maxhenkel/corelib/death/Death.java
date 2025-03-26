@@ -7,15 +7,14 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Death {
@@ -29,7 +28,7 @@ public class Death {
     private NonNullList<ItemStack> offHandInventory = NonNullList.withSize(1, ItemStack.EMPTY);
     private NonNullList<ItemStack> additionalItems = NonNullList.create();
 
-    private NonNullList<ItemStack> equipment = NonNullList.withSize(EquipmentSlot.values().length, ItemStack.EMPTY);
+    private EnumMap<EquipmentSlot, ItemStack> equipment = new EnumMap<>(EquipmentSlot.class);
 
     private long timestamp;
     private int experience;
@@ -71,7 +70,7 @@ public class Death {
         return additionalItems;
     }
 
-    public NonNullList<ItemStack> getEquipment() {
+    public EnumMap<EquipmentSlot, ItemStack> getEquipment() {
         return equipment;
     }
 
@@ -128,9 +127,12 @@ public class Death {
 
         death.offHandInventory.set(0, player.getItemBySlot(EquipmentSlot.OFFHAND));
 
-        death.equipment = NonNullList.withSize(EquipmentSlot.values().length, ItemStack.EMPTY);
-        for (int i = 0; i < death.equipment.size(); i++) {
-            death.equipment.set(i, player.getItemBySlot(EquipmentSlot.values()[i]).copy());
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            ItemStack itemBySlot = player.getItemBySlot(slot);
+            if (itemBySlot.isEmpty()) {
+                continue;
+            }
+            death.equipment.put(slot, itemBySlot.copy());
         }
 
         death.timestamp = System.currentTimeMillis();
@@ -207,7 +209,31 @@ public class Death {
 
         death.additionalItems = ItemUtils.readItemList(provider, compound, "Items");
 
-        ItemUtils.readItemList(provider, compound, "Equipment", death.equipment);
+        Optional<CompoundTag> optionalEquipmentTag = compound.getCompound("Equipment");
+        if (optionalEquipmentTag.isPresent()) {
+            CompoundTag equipmentTag = optionalEquipmentTag.get();
+            for (Map.Entry<String, Tag> entry : equipmentTag.entrySet()) {
+                try {
+                    EquipmentSlot slot = EquipmentSlot.byName(entry.getKey());
+                    ItemStack.parse(provider, entry.getValue()).ifPresent(stack -> death.equipment.put(slot, stack));
+                } catch (Exception ignored) {
+                }
+            }
+        } else {
+            Optional<ListTag> legacyList = compound.getList("Equipment");
+            if (legacyList.isPresent()) {
+                ListTag itemList = legacyList.get();
+                if (!itemList.isEmpty()) {
+                    ItemStack.parse(provider, itemList.getFirst()).ifPresent(stack -> death.equipment.put(EquipmentSlot.MAINHAND, stack));
+                }
+            }
+            death.equipment.put(EquipmentSlot.OFFHAND, death.offHandInventory.getFirst());
+            death.equipment.put(EquipmentSlot.FEET, death.armorInventory.get(EquipmentSlot.FEET.getIndex()));
+            death.equipment.put(EquipmentSlot.LEGS, death.armorInventory.get(EquipmentSlot.LEGS.getIndex()));
+            death.equipment.put(EquipmentSlot.CHEST, death.armorInventory.get(EquipmentSlot.CHEST.getIndex()));
+            death.equipment.put(EquipmentSlot.HEAD, death.armorInventory.get(EquipmentSlot.HEAD.getIndex()));
+            death.equipment.entrySet().removeIf(e -> e.getValue().isEmpty());
+        }
 
         death.timestamp = compound.getLongOr("Timestamp", 0L);
         death.experience = compound.getIntOr("Experience", 0);
@@ -237,7 +263,15 @@ public class Death {
             ItemUtils.saveItemList(provider, compound, "Items", additionalItems);
         }
 
-        ItemUtils.saveItemList(provider, compound, "Equipment", equipment);
+        CompoundTag equipmentTag = new CompoundTag();
+        for (Map.Entry<EquipmentSlot, ItemStack> entry : equipment.entrySet()) {
+            ItemStack equipmentStack = entry.getValue();
+            if (equipmentStack.isEmpty()) {
+                continue;
+            }
+            equipmentTag.put(entry.getKey().getName(), equipmentStack.save(provider));
+        }
+        compound.put("Equipment", equipmentTag);
 
         compound.putLong("Timestamp", timestamp);
         compound.putInt("Experience", experience);
@@ -300,7 +334,7 @@ public class Death {
             return this;
         }
 
-        public Builder equipment(NonNullList<ItemStack> list) {
+        public Builder equipment(EnumMap<EquipmentSlot, ItemStack> list) {
             death.equipment = list;
             return this;
         }
