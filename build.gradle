@@ -1,7 +1,7 @@
 plugins {
     id 'net.neoforged.gradle.userdev' version "${neogradle_version}"
     id 'net.neoforged.gradle.mixin' version "${neogradle_mixin_version}"
-    id 'com.github.johnrengelman.shadow' version "${shadow_version}"
+    id 'com.gradleup.shadow' version "${shadow_version}"
     // Plugin to use the settings.xml for authentication
     id 'net.linguica.maven-settings' version "${maven_settings_version}"
 }
