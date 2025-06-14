@@ -1,9 +1,9 @@
 package de.maxhenkel.corelib;
 
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.LoggerFactory;
 
 public class Logger {
 
-    public static final org.apache.logging.log4j.Logger INSTANCE = LogManager.getLogger("corelib");
+    public static final org.slf4j.Logger INSTANCE = LoggerFactory.getLogger("corelib");
 
 }

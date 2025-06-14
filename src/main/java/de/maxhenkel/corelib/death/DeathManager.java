@@ -2,7 +2,6 @@ package de.maxhenkel.corelib.death;
 
 import de.maxhenkel.corelib.CommonUtils;
 import de.maxhenkel.corelib.Logger;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerLevel;
@@ -31,7 +30,7 @@ public class DeathManager {
         try {
             File deathFile = getDeathFile(player, death.getId());
             deathFile.getParentFile().mkdirs();
-            NbtIo.write(death.toNBT(player.registryAccess()), deathFile.toPath());
+            NbtIo.write(death.toNBT(), deathFile.toPath());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,7 +45,7 @@ public class DeathManager {
      */
     @Nullable
     public static Death getDeath(ServerPlayer player, UUID id) {
-        return getDeath(player.serverLevel(), player.getUUID(), id);
+        return getDeath(player.level(), player.getUUID(), id);
     }
 
     /**
@@ -64,7 +63,7 @@ public class DeathManager {
             if (data == null) {
                 return null;
             }
-            return Death.fromNBT(world.registryAccess(), data);
+            return Death.fromNBT(data);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -74,18 +73,17 @@ public class DeathManager {
     /**
      * Reads the death from the provided file
      *
-     * @param provider the provider
-     * @param file     the death file
+     * @param file the death file
      * @return the death
      */
     @Nullable
-    public static Death getDeath(HolderLookup.Provider provider, File file) {
+    public static Death getDeath(File file) {
         try {
             CompoundTag data = NbtIo.read(file.toPath());
             if (data == null) {
                 return null;
             }
-            return Death.fromNBT(provider, data);
+            return Death.fromNBT(data);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -154,7 +152,7 @@ public class DeathManager {
         return Arrays.stream(deaths)
                 .map(f -> {
                     try {
-                        return Death.fromNBT(world.registryAccess(), NbtIo.read(f.toPath()));
+                        return Death.fromNBT(NbtIo.read(f.toPath()));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -204,7 +202,7 @@ public class DeathManager {
                 continue;
             }
             for (File d : deaths) {
-                Death death = getDeath(world.registryAccess(), d);
+                Death death = getDeath(d);
                 if (death == null) {
                     continue;
                 }
@@ -247,7 +245,7 @@ public class DeathManager {
      * @return the deaths folder
      */
     public static File getPlayerDeathFolder(ServerPlayer player) {
-        return getPlayerDeathFolder(player.serverLevel(), player.getUUID());
+        return getPlayerDeathFolder(player.level(), player.getUUID());
     }
 
     /**

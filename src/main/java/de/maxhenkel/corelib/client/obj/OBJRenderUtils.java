@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.TriState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
@@ -18,7 +17,7 @@ import java.util.function.Function;
 @OnlyIn(Dist.CLIENT)
 class OBJRenderUtils {
 
-    public static final RenderPipeline.Snippet ENTITY_SNIPPET_TRIANGLES = RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_FOG_LIGHT_DIR_SNIPPET)
+    public static final RenderPipeline.Snippet ENTITY_SNIPPET_TRIANGLES = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_LIGHT_DIR_SNIPPET)
             .withVertexShader("core/entity")
             .withFragmentShader("core/entity")
             .withSampler("Sampler0")
@@ -35,7 +34,7 @@ class OBJRenderUtils {
     public static final Function<ResourceLocation, RenderType> ENTITY_CUTOUT_TRIANGLES = Util.memoize(
             rl -> {
                 RenderType.CompositeState state = RenderType.CompositeState.builder()
-                        .setTextureState(new RenderStateShard.TextureStateShard(rl, TriState.FALSE, false))
+                        .setTextureState(new RenderStateShard.TextureStateShard(rl, false))
                         .setLightmapState(RenderStateShard.LIGHTMAP)
                         .setOverlayState(RenderStateShard.OVERLAY)
                         .createCompositeState(true);

@@ -1,7 +1,12 @@
 package de.maxhenkel.corelib.codec;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
@@ -15,8 +20,18 @@ import java.util.Optional;
 
 public class CodecUtils {
 
+    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
+
     public static <T> Optional<Tag> toNBT(Codec<T> codec, T object) {
         return codec.encodeStart(NbtOps.INSTANCE, object).result();
+    }
+
+    public static <T> Optional<JsonElement> toJson(Codec<T> codec, T object) {
+        return codec.encodeStart(JsonOps.INSTANCE, object).result();
+    }
+
+    public static <T> Optional<String> toJsonString(Codec<T> codec, T object) {
+        return toJson(codec, object).map(GSON::toJson);
     }
 
     public static <T> Optional<T> fromNBT(Codec<T> codec, Tag nbt) {
@@ -25,6 +40,15 @@ public class CodecUtils {
 
     public static <T> Optional<T> fromNBT(Codec<T> codec, String nbtString) {
         return codec.decode(NbtOps.INSTANCE, StringTag.valueOf(nbtString)).result().map(Pair::getFirst);
+    }
+
+    public static <T> Optional<T> fromJson(Codec<T> codec, JsonElement json) {
+        return codec.decode(JsonOps.INSTANCE, json).result().map(Pair::getFirst);
+    }
+
+    public static <T> Optional<T> fromJson(Codec<T> codec, String json) {
+        JsonElement jsonelement = JsonParser.parseString(json);
+        return jsonelement == null ? Optional.empty() : fromJson(codec, jsonelement);
     }
 
     public static <U> StreamCodec<RegistryFriendlyByteBuf, Optional<U>> optionalStreamCodec(StreamCodec<RegistryFriendlyByteBuf, U> streamCodec) {

@@ -3,10 +3,9 @@ package de.maxhenkel.corelib.inventory;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
@@ -17,7 +16,7 @@ import java.util.function.Supplier;
 
 public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
 
-    public static final int FONT_COLOR = 4210752;
+    public static final int FONT_COLOR = -12566464;
 
     protected ResourceLocation texture;
     protected List<HoverArea> hoverAreas;
@@ -30,14 +29,13 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
 
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-        renderTransparentBackground(guiGraphics);
         super.render(guiGraphics, x, y, partialTicks);
         renderTooltip(guiGraphics, x, y);
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        guiGraphics.blit(RenderType::guiTextured, texture, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
     }
 
     @Override
@@ -48,7 +46,7 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
     public void drawHoverAreas(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         for (HoverArea hoverArea : hoverAreas) {
             if (hoverArea.tooltip != null && hoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
-                guiGraphics.renderTooltip(font, hoverArea.tooltip.get(), mouseX, mouseY);
+                guiGraphics.setComponentTooltipForNextFrame(font, hoverArea.tooltip.get(), mouseX, mouseY);
             }
         }
     }
@@ -74,13 +72,13 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
         private final int posX, posY;
         private final int width, height;
         @Nullable
-        private final Supplier<List<FormattedCharSequence>> tooltip;
+        private final Supplier<List<Component>> tooltip;
 
         public HoverArea(int posX, int posY, int width, int height) {
             this(posX, posY, width, height, null);
         }
 
-        public HoverArea(int posX, int posY, int width, int height, Supplier<List<FormattedCharSequence>> tooltip) {
+        public HoverArea(int posX, int posY, int width, int height, Supplier<List<Component>> tooltip) {
             this.posX = posX;
             this.posY = posY;
             this.width = width;
@@ -105,7 +103,7 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
         }
 
         @Nullable
-        public Supplier<List<FormattedCharSequence>> getTooltip() {
+        public Supplier<List<Component>> getTooltip() {
             return tooltip;
         }
 

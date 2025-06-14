@@ -1,9 +1,9 @@
 package de.maxhenkel.corelib.death;
 
+import de.maxhenkel.corelib.codec.CodecUtils;
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.corelib.player.PlayerUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
@@ -189,7 +189,7 @@ public class Death {
         return stacks.stream().filter(itemStack -> !itemStack.isEmpty()).collect(Collectors.toList());
     }
 
-    public static Death fromNBT(HolderLookup.Provider provider, CompoundTag compound) {
+    public static Death fromNBT(CompoundTag compound) {
         Death death = new Death();
         if (compound.contains("IdMost") && compound.contains("IdLeast")) {
             death.id = new UUID(compound.getLong("IdMost").orElseThrow(), compound.getLong("IdLeast").orElseThrow());
@@ -203,11 +203,11 @@ public class Death {
         }
         death.playerName = compound.getStringOr("PlayerName", "");
 
-        ItemUtils.readInventory(provider, compound, "MainInventory", death.mainInventory);
-        ItemUtils.readInventory(provider, compound, "ArmorInventory", death.armorInventory);
-        ItemUtils.readInventory(provider, compound, "OffHandInventory", death.offHandInventory);
+        ItemUtils.readInventory(compound, "MainInventory", death.mainInventory);
+        ItemUtils.readInventory(compound, "ArmorInventory", death.armorInventory);
+        ItemUtils.readInventory(compound, "OffHandInventory", death.offHandInventory);
 
-        death.additionalItems = ItemUtils.readItemList(provider, compound, "Items");
+        death.additionalItems = ItemUtils.readItemList(compound, "Items");
 
         Optional<CompoundTag> optionalEquipmentTag = compound.getCompound("Equipment");
         if (optionalEquipmentTag.isPresent()) {
@@ -215,7 +215,7 @@ public class Death {
             for (Map.Entry<String, Tag> entry : equipmentTag.entrySet()) {
                 try {
                     EquipmentSlot slot = EquipmentSlot.byName(entry.getKey());
-                    ItemStack.parse(provider, entry.getValue()).ifPresent(stack -> death.equipment.put(slot, stack));
+                    CodecUtils.fromNBT(ItemStack.CODEC, entry.getValue()).ifPresent(stack -> death.equipment.put(slot, stack));
                 } catch (Exception ignored) {
                 }
             }
@@ -224,7 +224,7 @@ public class Death {
             if (legacyList.isPresent()) {
                 ListTag itemList = legacyList.get();
                 if (!itemList.isEmpty()) {
-                    ItemStack.parse(provider, itemList.getFirst()).ifPresent(stack -> death.equipment.put(EquipmentSlot.MAINHAND, stack));
+                    CodecUtils.fromNBT(ItemStack.CODEC, itemList.getFirst()).ifPresent(stack -> death.equipment.put(EquipmentSlot.MAINHAND, stack));
                 }
             }
             death.equipment.put(EquipmentSlot.OFFHAND, death.offHandInventory.getFirst());
@@ -246,21 +246,21 @@ public class Death {
         return death;
     }
 
-    public CompoundTag toNBT(HolderLookup.Provider provider) {
-        return toNBT(provider, true);
+    public CompoundTag toNBT() {
+        return toNBT(true);
     }
 
-    public CompoundTag toNBT(HolderLookup.Provider provider, boolean withItems) {
+    public CompoundTag toNBT(boolean withItems) {
         CompoundTag compound = new CompoundTag();
         compound.store("Id", UUIDUtil.CODEC, id);
         compound.store("PlayerUuid", UUIDUtil.CODEC, playerUUID);
         compound.putString("PlayerName", playerName);
 
         if (withItems) {
-            ItemUtils.saveInventory(provider, compound, "MainInventory", mainInventory);
-            ItemUtils.saveInventory(provider, compound, "ArmorInventory", armorInventory);
-            ItemUtils.saveInventory(provider, compound, "OffHandInventory", offHandInventory);
-            ItemUtils.saveItemList(provider, compound, "Items", additionalItems);
+            ItemUtils.saveInventory(compound, "MainInventory", mainInventory);
+            ItemUtils.saveInventory(compound, "ArmorInventory", armorInventory);
+            ItemUtils.saveInventory(compound, "OffHandInventory", offHandInventory);
+            ItemUtils.saveItemList(compound, "Items", additionalItems);
         }
 
         CompoundTag equipmentTag = new CompoundTag();
@@ -269,7 +269,7 @@ public class Death {
             if (equipmentStack.isEmpty()) {
                 continue;
             }
-            equipmentTag.put(entry.getKey().getName(), equipmentStack.save(provider));
+            CodecUtils.toNBT(ItemStack.CODEC, equipmentStack).ifPresent(tag -> equipmentTag.put(entry.getKey().getName(), tag));
         }
         compound.put("Equipment", equipmentTag);
 

@@ -3,7 +3,7 @@ package de.maxhenkel.corelib.helpers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,7 +29,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
         IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(stack.getFluid());
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS).getSprite(extensions.getStillTexture(stack));
         int color = extensions.getTintColor(stack);
-        guiGraphics.blitSprite(RenderType::guiTextured, texture, x, y, 16, 16, color);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, x, y, 16, 16, color);
     }
 
     @OnlyIn(Dist.CLIENT)

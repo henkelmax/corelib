@@ -1,5 +1,6 @@
 package de.maxhenkel.corelib.item;
 
+import de.maxhenkel.corelib.codec.CodecUtils;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -97,20 +98,23 @@ public class ItemUtils {
     /**
      * Stores the provided inventory to the provided compound under the given name
      *
-     * @param provider the provider
      * @param compound the compound to save the inventory to
      * @param name     the name of the tag list in the compound
      * @param inv      the inventory
      */
-    public static void saveInventory(HolderLookup.Provider provider, CompoundTag compound, String name, Container inv) {
+    public static void saveInventory(CompoundTag compound, String name, Container inv) {
         ListTag tagList = new ListTag();
 
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack item = inv.getItem(i);
             if (!item.isEmpty()) {
-                CompoundTag slot = new CompoundTag();
+                Optional<CompoundTag> optionalTag = CodecUtils.toNBT(ItemStack.CODEC, item).filter(CompoundTag.class::isInstance).map(CompoundTag.class::cast);
+                if (optionalTag.isEmpty()) {
+                    continue;
+                }
+                CompoundTag slot = optionalTag.get();
                 slot.putInt("Slot", i);
-                tagList.add(item.save(provider, slot));
+                tagList.add(slot);
             }
         }
 
@@ -120,19 +124,22 @@ public class ItemUtils {
     /**
      * Stores the provided item list to the provided compound under the given name
      *
-     * @param provider the provider
      * @param compound the compound to save the inventory to
      * @param name     the name of the tag list in the compound
      * @param inv      the item list
      */
-    public static void saveInventory(HolderLookup.Provider provider, CompoundTag compound, String name, NonNullList<ItemStack> inv) {
+    public static void saveInventory(CompoundTag compound, String name, NonNullList<ItemStack> inv) {
         ListTag tagList = new ListTag();
         for (int i = 0; i < inv.size(); i++) {
             ItemStack item = inv.get(i);
             if (!item.isEmpty()) {
-                CompoundTag slot = new CompoundTag();
+                Optional<CompoundTag> optionalTag = CodecUtils.toNBT(ItemStack.CODEC, item).filter(CompoundTag.class::isInstance).map(CompoundTag.class::cast);
+                if (optionalTag.isEmpty()) {
+                    continue;
+                }
+                CompoundTag slot = optionalTag.get();
                 slot.putInt("Slot", i);
-                tagList.add(item.save(provider, slot));
+                tagList.add(slot);
             }
         }
 
@@ -142,18 +149,17 @@ public class ItemUtils {
     /**
      * Stores the provided item list to the provided compound under the given name
      *
-     * @param provider the provider
      * @param compound the compound to save the inventory to
      * @param name     the name of the tag list in the compound
      * @param list     the item list
      */
-    public static void saveItemList(HolderLookup.Provider provider, CompoundTag compound, String name, NonNullList<ItemStack> list) {
+    public static void saveItemList(CompoundTag compound, String name, NonNullList<ItemStack> list) {
         ListTag itemList = new ListTag();
         for (ItemStack stack : list) {
             if (stack.isEmpty()) {
                 continue;
             }
-            itemList.add(stack.save(provider));
+            CodecUtils.toNBT(ItemStack.CODEC, stack).ifPresent(itemList::add);
         }
         compound.put(name, itemList);
     }
@@ -162,12 +168,11 @@ public class ItemUtils {
      * Loads the provided compound to the provided inventory
      * Does not clear inventory - empty stacks will not overwrite existing items
      *
-     * @param provider the provider
      * @param compound the compound to read the inventory from
      * @param name     the name of the tag list in the compound
      * @param inv      the inventory
      */
-    public static void readInventory(HolderLookup.Provider provider, CompoundTag compound, String name, Container inv) {
+    public static void readInventory(CompoundTag compound, String name, Container inv) {
         if (!compound.contains(name)) {
             return;
         }
@@ -186,7 +191,7 @@ public class ItemUtils {
             int j = slotId.get();
 
             if (j >= 0 && j < inv.getContainerSize()) {
-                inv.setItem(j, ItemStack.parse(provider, slot.get()).orElse(ItemStack.EMPTY));
+                inv.setItem(j, CodecUtils.fromNBT(ItemStack.CODEC, slot.get()).orElse(ItemStack.EMPTY));
             }
         }
     }
@@ -195,12 +200,11 @@ public class ItemUtils {
      * Loads the provided compound to the provided item list
      * Does not clear the list - empty stacks will not overwrite existing items
      *
-     * @param provider the provider
      * @param compound the compound to read the inventory from
      * @param name     the name of the tag list in the compound
      * @param inv      the item list
      */
-    public static void readInventory(HolderLookup.Provider provider, CompoundTag compound, String name, NonNullList<ItemStack> inv) {
+    public static void readInventory(CompoundTag compound, String name, NonNullList<ItemStack> inv) {
         if (!compound.contains(name)) {
             return;
         }
@@ -219,7 +223,7 @@ public class ItemUtils {
             int j = slotId.get();
 
             if (j >= 0 && j < inv.size()) {
-                inv.set(j, ItemStack.parse(provider, slot.get()).orElse(ItemStack.EMPTY));
+                inv.set(j, CodecUtils.fromNBT(ItemStack.CODEC, slot.get()).orElse(ItemStack.EMPTY));
             }
         }
     }
@@ -227,13 +231,12 @@ public class ItemUtils {
     /**
      * Loads the provided compound to the provided item list
      *
-     * @param provider     the provider
      * @param compound     the compound to read the item list from
      * @param name         the name of the tag list in the compound
      * @param includeEmpty if empty stacks should be included
      * @return the item list
      */
-    public static NonNullList<ItemStack> readItemList(HolderLookup.Provider provider, CompoundTag compound, String name, boolean includeEmpty) {
+    public static NonNullList<ItemStack> readItemList(CompoundTag compound, String name, boolean includeEmpty) {
         NonNullList<ItemStack> items = NonNullList.create();
         if (!compound.contains(name)) {
             return items;
@@ -241,7 +244,7 @@ public class ItemUtils {
 
         ListTag itemList = compound.getListOrEmpty(name);
         for (int i = 0; i < itemList.size(); i++) {
-            Optional<ItemStack> optionalItem = ItemStack.parse(provider, itemList.get(i));
+            Optional<ItemStack> optionalItem = CodecUtils.fromNBT(ItemStack.CODEC, itemList.get(i));
             if (optionalItem.isEmpty()) {
                 continue;
             }
@@ -261,13 +264,12 @@ public class ItemUtils {
      * Loads the provided compound to the provided item list
      * Includes empty items
      *
-     * @param provider the provider
      * @param compound the compound to read the item list from
      * @param name     the name of the tag list in the compound
      * @return the item list
      */
-    public static NonNullList<ItemStack> readItemList(HolderLookup.Provider provider, CompoundTag compound, String name) {
-        return readItemList(provider, compound, name, true);
+    public static NonNullList<ItemStack> readItemList(CompoundTag compound, String name) {
+        return readItemList(compound, name, true);
     }
 
     /**
@@ -289,7 +291,7 @@ public class ItemUtils {
             if (i >= list.size()) {
                 break;
             }
-            list.set(i, ItemStack.parse(provider, itemList.get(i)).orElse(ItemStack.EMPTY));
+            list.set(i, CodecUtils.fromNBT(ItemStack.CODEC, itemList.get(i)).orElse(ItemStack.EMPTY));
         }
     }
 
@@ -325,7 +327,8 @@ public class ItemUtils {
      * @return the provided compound
      */
     public static CompoundTag writeOverstackedItem(HolderLookup.Provider provider, CompoundTag compound, ItemStack stack) {
-        stack.save(provider, compound);
+        CompoundTag itemStackTag = CodecUtils.toNBT(ItemStack.CODEC, stack).filter(CompoundTag.class::isInstance).map(CompoundTag.class::cast).orElseGet(CompoundTag::new);
+        compound.merge(itemStackTag);
         compound.remove("Count");
         compound.putInt("Count", stack.getCount());
         return compound;
@@ -345,7 +348,7 @@ public class ItemUtils {
         int count = data.getIntOr("Count", 0);
         data.remove("Count");
         data.putByte("Count", (byte) 1);
-        ItemStack stack = ItemStack.parse(provider, data).orElse(ItemStack.EMPTY);
+        ItemStack stack = CodecUtils.fromNBT(ItemStack.CODEC, data).orElse(ItemStack.EMPTY);
         stack.setCount(count);
         return stack;
     }
