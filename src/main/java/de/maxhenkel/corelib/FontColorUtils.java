@@ -5,6 +5,9 @@ import net.minecraft.util.ARGB;
 
 public class FontColorUtils {
 
+    public static final int BLACK = getFontColor(ChatFormatting.BLACK);
+    public static final int WHITE = getFontColor(ChatFormatting.WHITE);
+
     public static int getFontColor(ChatFormatting color) {
         if (color.getColor() == null) {
             return ARGB.colorFromFloat(1F, 0F, 0F, 0F);
