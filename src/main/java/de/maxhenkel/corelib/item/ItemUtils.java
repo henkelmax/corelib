@@ -276,12 +276,11 @@ public class ItemUtils {
      * Reads the compound into the item list
      * Only fills the list to its maximum capacity
      *
-     * @param provider the provider
      * @param compound the compound to read the item list from
      * @param name     the name of the tag list in the compound
      * @param list     the item list
      */
-    public static void readItemList(HolderLookup.Provider provider, CompoundTag compound, String name, NonNullList<ItemStack> list) {
+    public static void readItemList(CompoundTag compound, String name, NonNullList<ItemStack> list) {
         if (!compound.contains(name)) {
             return;
         }
@@ -321,12 +320,11 @@ public class ItemUtils {
      * Ignores the maximum stack size of the stack.
      * Can stack up to the integer limit.
      *
-     * @param provider the provider
      * @param compound the compound to store the stack in
      * @param stack    the stack to store
      * @return the provided compound
      */
-    public static CompoundTag writeOverstackedItem(HolderLookup.Provider provider, CompoundTag compound, ItemStack stack) {
+    public static CompoundTag writeOverstackedItem(CompoundTag compound, ItemStack stack) {
         CompoundTag itemStackTag = CodecUtils.toNBT(ItemStack.CODEC, stack).filter(CompoundTag.class::isInstance).map(CompoundTag.class::cast).orElseGet(CompoundTag::new);
         compound.merge(itemStackTag);
         compound.remove("Count");
@@ -339,11 +337,10 @@ public class ItemUtils {
      * Ignores the maximum stack size of the stack.
      * Can stack up to the integer limit.
      *
-     * @param provider the provider
      * @param compound the compound to store the stack in
      * @return the deserialized stack
      */
-    public static ItemStack readOverstackedItem(HolderLookup.Provider provider, CompoundTag compound) {
+    public static ItemStack readOverstackedItem(CompoundTag compound) {
         CompoundTag data = compound.copy();
         int count = data.getIntOr("Count", 0);
         data.remove("Count");
