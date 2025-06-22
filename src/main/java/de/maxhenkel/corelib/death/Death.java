@@ -262,7 +262,7 @@ public class Death {
     }
 
     public void write(ValueOutput valueOutput, String key) {
-        write(valueOutput, key, false);
+        write(valueOutput, key, true);
     }
 
     public CompoundTag write(HolderLookup.Provider registryAccess) {
