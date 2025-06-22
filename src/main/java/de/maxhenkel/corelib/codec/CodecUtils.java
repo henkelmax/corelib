@@ -6,8 +6,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
@@ -21,6 +24,17 @@ import java.util.Optional;
 public class CodecUtils {
 
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
+
+    public static final Codec<ListTag> LIST_TAG_CODEC = Codec.PASSTHROUGH
+            .comapFlatMap(
+                    dynamic -> {
+                        Tag tag = dynamic.convert(NbtOps.INSTANCE).getValue();
+                        return tag instanceof ListTag listTag
+                                ? DataResult.success(listTag == dynamic.getValue() ? listTag.copy() : listTag)
+                                : DataResult.error(() -> "Not a list tag: " + tag);
+                    },
+                    p_311526_ -> new Dynamic<>(NbtOps.INSTANCE, p_311526_.copy())
+            );
 
     public static <T> Optional<Tag> toNBT(Codec<T> codec, T object) {
         return codec.encodeStart(NbtOps.INSTANCE, object).result();

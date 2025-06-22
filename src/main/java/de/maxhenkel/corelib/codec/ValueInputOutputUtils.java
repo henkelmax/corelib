@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import de.maxhenkel.corelib.Logger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -18,6 +19,10 @@ public class ValueInputOutputUtils {
 
     public static Optional<CompoundTag> getTag(ValueInput valueInput, String key) {
         return valueInput.read(key, CompoundTag.CODEC);
+    }
+
+    public static Optional<ListTag> getListTag(ValueInput valueInput, String key) {
+        return valueInput.read(key, CodecUtils.LIST_TAG_CODEC);
     }
 
     public static void setTag(ValueOutput valueOutput, String key, CompoundTag tag) {
@@ -36,6 +41,12 @@ public class ValueInputOutputUtils {
 
     public static TagValueOutput createValueOutput(Entity entity, HolderLookup.Provider provider) {
         try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(entity.problemPath(), Logger.INSTANCE)) {
+            return TagValueOutput.createWithContext(scopedCollector, provider);
+        }
+    }
+
+    public static TagValueOutput createValueOutput(String problemPath, HolderLookup.Provider provider) {
+        try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(createPath(problemPath), Logger.INSTANCE)) {
             return TagValueOutput.createWithContext(scopedCollector, provider);
         }
     }

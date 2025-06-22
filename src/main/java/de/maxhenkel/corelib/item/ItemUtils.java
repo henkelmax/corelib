@@ -1,15 +1,16 @@
 package de.maxhenkel.corelib.item;
 
 import de.maxhenkel.corelib.codec.CodecUtils;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.Container;
+import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
-import java.util.Optional;
+import java.util.List;
 
 public class ItemUtils {
 
@@ -98,100 +99,66 @@ public class ItemUtils {
     /**
      * Stores the provided inventory to the provided compound under the given name
      *
-     * @param compound the compound to save the inventory to
-     * @param name     the name of the tag list in the compound
-     * @param inv      the inventory
+     * @param valueOutput the value output
+     * @param name        the name of the tag list in the compound
+     * @param inv         the inventory
      */
-    public static void saveInventory(CompoundTag compound, String name, Container inv) {
-        ListTag tagList = new ListTag();
-
+    public static void saveInventory(ValueOutput valueOutput, String name, Container inv) {
+        ValueOutput.TypedOutputList<ItemStackWithSlot> list = valueOutput.list(name, ItemStackWithSlot.CODEC);
         for (int i = 0; i < inv.getContainerSize(); i++) {
-            ItemStack item = inv.getItem(i);
-            if (!item.isEmpty()) {
-                Optional<CompoundTag> optionalTag = CodecUtils.toNBT(ItemStack.CODEC, item).filter(CompoundTag.class::isInstance).map(CompoundTag.class::cast);
-                if (optionalTag.isEmpty()) {
-                    continue;
-                }
-                CompoundTag slot = optionalTag.get();
-                slot.putInt("Slot", i);
-                tagList.add(slot);
+            ItemStack itemstack = inv.getItem(i);
+            if (!itemstack.isEmpty()) {
+                list.add(new ItemStackWithSlot(i, itemstack));
             }
         }
-
-        compound.put(name, tagList);
     }
 
     /**
      * Stores the provided item list to the provided compound under the given name
      *
-     * @param compound the compound to save the inventory to
-     * @param name     the name of the tag list in the compound
-     * @param inv      the item list
+     * @param valueOutput the value output
+     * @param name        the name of the tag list in the compound
+     * @param inv         the item list
      */
-    public static void saveInventory(CompoundTag compound, String name, NonNullList<ItemStack> inv) {
-        ListTag tagList = new ListTag();
+    public static void saveInventory(ValueOutput valueOutput, String name, NonNullList<ItemStack> inv) {
+        ValueOutput.TypedOutputList<ItemStackWithSlot> list = valueOutput.list(name, ItemStackWithSlot.CODEC);
         for (int i = 0; i < inv.size(); i++) {
-            ItemStack item = inv.get(i);
-            if (!item.isEmpty()) {
-                Optional<CompoundTag> optionalTag = CodecUtils.toNBT(ItemStack.CODEC, item).filter(CompoundTag.class::isInstance).map(CompoundTag.class::cast);
-                if (optionalTag.isEmpty()) {
-                    continue;
-                }
-                CompoundTag slot = optionalTag.get();
-                slot.putInt("Slot", i);
-                tagList.add(slot);
+            ItemStack itemstack = inv.get(i);
+            if (!itemstack.isEmpty()) {
+                list.add(new ItemStackWithSlot(i, itemstack));
             }
         }
-
-        compound.put(name, tagList);
     }
 
     /**
      * Stores the provided item list to the provided compound under the given name
      *
-     * @param compound the compound to save the inventory to
-     * @param name     the name of the tag list in the compound
-     * @param list     the item list
+     * @param valueOutput the value output
+     * @param name        the name of the tag list in the compound
+     * @param list        the item list
      */
-    public static void saveItemList(CompoundTag compound, String name, NonNullList<ItemStack> list) {
-        ListTag itemList = new ListTag();
+    public static void saveItemList(ValueOutput valueOutput, String name, NonNullList<ItemStack> list) {
+        ValueOutput.TypedOutputList<ItemStack> out = valueOutput.list(name, ItemStack.CODEC);
         for (ItemStack stack : list) {
             if (stack.isEmpty()) {
                 continue;
             }
-            CodecUtils.toNBT(ItemStack.CODEC, stack).ifPresent(itemList::add);
+            out.add(stack);
         }
-        compound.put(name, itemList);
     }
 
     /**
      * Loads the provided compound to the provided inventory
      * Does not clear inventory - empty stacks will not overwrite existing items
      *
-     * @param compound the compound to read the inventory from
-     * @param name     the name of the tag list in the compound
-     * @param inv      the inventory
+     * @param valueInput the value input
+     * @param name       the name of the tag list in the compound
+     * @param inv        the inventory
      */
-    public static void readInventory(CompoundTag compound, String name, Container inv) {
-        if (!compound.contains(name)) {
-            return;
-        }
-
-        ListTag tagList = compound.getListOrEmpty(name);
-
-        for (int i = 0; i < tagList.size(); i++) {
-            Optional<CompoundTag> slot = tagList.getCompound(i);
-            if (slot.isEmpty()) {
-                continue;
-            }
-            Optional<Integer> slotId = slot.get().getInt("Slot");
-            if (slotId.isEmpty()) {
-                continue;
-            }
-            int j = slotId.get();
-
-            if (j >= 0 && j < inv.getContainerSize()) {
-                inv.setItem(j, CodecUtils.fromNBT(ItemStack.CODEC, slot.get()).orElse(ItemStack.EMPTY));
+    public static void readInventory(ValueInput valueInput, String name, Container inv) {
+        for (ItemStackWithSlot stack : valueInput.listOrEmpty(name, ItemStackWithSlot.CODEC)) {
+            if (stack.isValidInContainer(inv.getContainerSize())) {
+                inv.setItem(stack.slot(), stack.stack());
             }
         }
     }
@@ -200,30 +167,14 @@ public class ItemUtils {
      * Loads the provided compound to the provided item list
      * Does not clear the list - empty stacks will not overwrite existing items
      *
-     * @param compound the compound to read the inventory from
-     * @param name     the name of the tag list in the compound
-     * @param inv      the item list
+     * @param valueInput the value input
+     * @param name       the name of the tag list in the compound
+     * @param inv        the item list
      */
-    public static void readInventory(CompoundTag compound, String name, NonNullList<ItemStack> inv) {
-        if (!compound.contains(name)) {
-            return;
-        }
-
-        ListTag tagList = compound.getListOrEmpty(name);
-
-        for (int i = 0; i < tagList.size(); i++) {
-            Optional<CompoundTag> slot = tagList.getCompound(i);
-            if (slot.isEmpty()) {
-                continue;
-            }
-            Optional<Integer> slotId = slot.get().getInt("Slot");
-            if (slotId.isEmpty()) {
-                continue;
-            }
-            int j = slotId.get();
-
-            if (j >= 0 && j < inv.size()) {
-                inv.set(j, CodecUtils.fromNBT(ItemStack.CODEC, slot.get()).orElse(ItemStack.EMPTY));
+    public static void readInventory(ValueInput valueInput, String name, NonNullList<ItemStack> inv) {
+        for (ItemStackWithSlot stack : valueInput.listOrEmpty(name, ItemStackWithSlot.CODEC)) {
+            if (stack.isValidInContainer(inv.size())) {
+                inv.set(stack.slot(), stack.stack());
             }
         }
     }
@@ -231,31 +182,15 @@ public class ItemUtils {
     /**
      * Loads the provided compound to the provided item list
      *
-     * @param compound     the compound to read the item list from
+     * @param valueInput   the value input
      * @param name         the name of the tag list in the compound
      * @param includeEmpty if empty stacks should be included
      * @return the item list
      */
-    public static NonNullList<ItemStack> readItemList(CompoundTag compound, String name, boolean includeEmpty) {
+    public static NonNullList<ItemStack> readItemList(ValueInput valueInput, String name, boolean includeEmpty) {
         NonNullList<ItemStack> items = NonNullList.create();
-        if (!compound.contains(name)) {
-            return items;
-        }
-
-        ListTag itemList = compound.getListOrEmpty(name);
-        for (int i = 0; i < itemList.size(); i++) {
-            Optional<ItemStack> optionalItem = CodecUtils.fromNBT(ItemStack.CODEC, itemList.get(i));
-            if (optionalItem.isEmpty()) {
-                continue;
-            }
-            ItemStack item = optionalItem.get();
-            if (!includeEmpty) {
-                if (!item.isEmpty()) {
-                    items.add(item);
-                }
-            } else {
-                items.add(item);
-            }
+        for (ItemStack stack : valueInput.listOrEmpty(name, ItemStack.CODEC)) {
+            items.add(stack);
         }
         return items;
     }
@@ -264,33 +199,29 @@ public class ItemUtils {
      * Loads the provided compound to the provided item list
      * Includes empty items
      *
-     * @param compound the compound to read the item list from
-     * @param name     the name of the tag list in the compound
+     * @param valueInput the value input
+     * @param name       the name of the tag list in the compound
      * @return the item list
      */
-    public static NonNullList<ItemStack> readItemList(CompoundTag compound, String name) {
-        return readItemList(compound, name, true);
+    public static NonNullList<ItemStack> readItemList(ValueInput valueInput, String name) {
+        return readItemList(valueInput, name, true);
     }
 
     /**
      * Reads the compound into the item list
      * Only fills the list to its maximum capacity
      *
-     * @param compound the compound to read the item list from
-     * @param name     the name of the tag list in the compound
-     * @param list     the item list
+     * @param valueInput the value input
+     * @param name       the name of the tag list in the compound
+     * @param list       the item list
      */
-    public static void readItemList(CompoundTag compound, String name, NonNullList<ItemStack> list) {
-        if (!compound.contains(name)) {
-            return;
-        }
-
-        ListTag itemList = compound.getListOrEmpty(name);
+    public static void readItemList(ValueInput valueInput, String name, NonNullList<ItemStack> list) {
+        List<ItemStack> itemList = valueInput.listOrEmpty(name, ItemStack.CODEC).stream().toList();
         for (int i = 0; i < itemList.size(); i++) {
             if (i >= list.size()) {
                 break;
             }
-            list.set(i, CodecUtils.fromNBT(ItemStack.CODEC, itemList.get(i)).orElse(ItemStack.EMPTY));
+            list.set(i, itemList.get(i));
         }
     }
 

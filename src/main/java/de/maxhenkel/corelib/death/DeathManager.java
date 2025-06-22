@@ -2,11 +2,15 @@ package de.maxhenkel.corelib.death;
 
 import de.maxhenkel.corelib.CommonUtils;
 import de.maxhenkel.corelib.Logger;
+import de.maxhenkel.corelib.codec.ValueInputOutputUtils;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -30,7 +34,9 @@ public class DeathManager {
         try {
             File deathFile = getDeathFile(player, death.getId());
             deathFile.getParentFile().mkdirs();
-            NbtIo.write(death.toNBT(), deathFile.toPath());
+            TagValueOutput valueOutput = ValueInputOutputUtils.createValueOutput(player, player.registryAccess());
+            death.write(valueOutput);
+            NbtIo.write(ValueInputOutputUtils.toTag(valueOutput), deathFile.toPath());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,7 +69,8 @@ public class DeathManager {
             if (data == null) {
                 return null;
             }
-            return Death.fromNBT(data);
+            ValueInput valueInput = ValueInputOutputUtils.createValueInput("death", world.registryAccess(), data);
+            return Death.read(valueInput);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -77,13 +84,14 @@ public class DeathManager {
      * @return the death
      */
     @Nullable
-    public static Death getDeath(File file) {
+    public static Death getDeath(HolderLookup.Provider registryAccess, File file) {
         try {
             CompoundTag data = NbtIo.read(file.toPath());
             if (data == null) {
                 return null;
             }
-            return Death.fromNBT(data);
+            ValueInput valueInput = ValueInputOutputUtils.createValueInput("death", registryAccess, data);
+            return Death.read(valueInput);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -152,7 +160,8 @@ public class DeathManager {
         return Arrays.stream(deaths)
                 .map(f -> {
                     try {
-                        return Death.fromNBT(NbtIo.read(f.toPath()));
+                        ValueInput valueInput = ValueInputOutputUtils.createValueInput("death", world.registryAccess(), NbtIo.read(f.toPath()));
+                        return Death.read(valueInput);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -202,7 +211,7 @@ public class DeathManager {
                 continue;
             }
             for (File d : deaths) {
-                Death death = getDeath(d);
+                Death death = getDeath(world.registryAccess(), d);
                 if (death == null) {
                     continue;
                 }
