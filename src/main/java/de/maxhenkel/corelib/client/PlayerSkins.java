@@ -1,49 +1,34 @@
 package de.maxhenkel.corelib.client;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.resources.PlayerSkin;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.SkullBlockEntity;
+import net.minecraft.world.item.component.ResolvableProfile;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.loading.FMLEnvironment;
 
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 
 public class PlayerSkins {
 
-    @Nullable
-    private static final Field gameProfileCacheField;
-
-    static {
-        Field gameProfileCache = null;
-        Field[] fields = SkullBlockEntity.class.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getType().equals(GameProfileCache.class)) {
-                field.setAccessible(true);
-                gameProfileCache = field;
-                break;
-            }
-        }
-        gameProfileCacheField = gameProfileCache;
-    }
-
-    private static HashMap<UUID, GameProfile> PLAYERS = new HashMap<>();
+    private static final Map<UUID, ResolvableProfile> PLAYERS = new ConcurrentHashMap<>();
 
     /**
      * Gets the resource location of the skin of provided player UUID and name.
      * Defaults to the steve and alex skin.
      *
      * @param uuid the UUID of the player
-     * @param name the name of the player
      * @return the skin
      */
-    public static PlayerSkin getSkin(UUID uuid, String name) {
-        return getSkin(getGameProfile(uuid, name));
+    public static PlayerSkin getSkin(UUID uuid) {
+        return getSkin(getGameProfile(uuid));
     }
 
     /**
@@ -67,33 +52,40 @@ public class PlayerSkins {
     }
 
     /**
-     * Gets the game profile of the provided player UUID and name
+     * Gets and resolves the game profile of the provided player UUID and name
      *
      * @param uuid the UUID of the player
-     * @param name the name of the player
      * @return the game profile
      */
-    public static GameProfile getGameProfile(UUID uuid, String name) {
+    public static GameProfile getGameProfile(UUID uuid) {
         if (PLAYERS.containsKey(uuid)) {
-            return PLAYERS.get(uuid);
+            return PLAYERS.get(uuid).gameProfile();
         }
-        GameProfile gameProfile = new GameProfile(uuid, name);
-        if (gameProfileCacheField == null) {
-            return gameProfile;
+
+        ResolvableProfile resolvableProfile = new ResolvableProfile(Optional.empty(), Optional.ofNullable(uuid), new PropertyMap());
+
+        PLAYERS.put(uuid, resolvableProfile);
+
+        if (!resolvableProfile.isResolved()) {
+            resolvableProfile.resolve().thenAcceptAsync(profile -> {
+                PLAYERS.put(uuid, profile);
+            }, getMainExecutor());
         }
-        try {
-            GameProfileCache cache = (GameProfileCache) gameProfileCacheField.get(null);
-            cache.getAsync(name).thenAccept(p -> {
-                p.ifPresent(value -> PLAYERS.put(uuid, value));
-            });
-        } catch (Exception e) {
-            PLAYERS.put(uuid, gameProfile);
-            return gameProfile;
+
+        return resolvableProfile.gameProfile();
+    }
+
+    private static Executor getMainExecutor() {
+        if (FMLEnvironment.dist.isClient()) {
+            return getClientExecutor();
+        } else {
+            throw new IllegalStateException("Skins can only be fetched on the client");
         }
-        /*CompoundTag tag = new CompoundTag();
-        tag.putString("SkullOwner", name);
-        SkullBlockEntity.resolveGameProfile(tag);*/
-        return gameProfile;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private static Executor getClientExecutor() {
+        return Minecraft.getInstance();
     }
 
     /**
@@ -103,8 +95,7 @@ public class PlayerSkins {
      * @return if the skin is slim
      */
     public static boolean isSlim(UUID uuid) {
-        PlayerInfo networkplayerinfo = Minecraft.getInstance().getConnection().getPlayerInfo(uuid);
-        return networkplayerinfo == null ? (uuid.hashCode() & 1) == 1 : networkplayerinfo.getSkin().model().equals(PlayerSkin.Model.SLIM);
+        return PlayerSkin.Model.SLIM.equals(getSkin(uuid).model());
     }
 
     /**
