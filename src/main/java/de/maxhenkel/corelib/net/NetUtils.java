@@ -3,6 +3,7 @@ package de.maxhenkel.corelib.net;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
@@ -30,7 +31,7 @@ public class NetUtils {
     @OnlyIn(Dist.CLIENT)
     @Deprecated
     public static void sendToServer(Message<?> message) {
-        PacketDistributor.sendToServer(message);
+        ClientPacketDistributor.sendToServer(message);
     }
 
 }
