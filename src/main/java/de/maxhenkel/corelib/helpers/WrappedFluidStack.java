@@ -9,8 +9,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -23,7 +21,6 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
         super(stack);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y) {
         IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(stack.getFluid());
@@ -32,7 +29,6 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, x, y, 16, 16, color);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public List<Component> getTooltip() {
         List<Component> tooltip = new ArrayList<>();

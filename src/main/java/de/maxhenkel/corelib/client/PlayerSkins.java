@@ -6,15 +6,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.component.ResolvableProfile;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.fml.loading.FMLEnvironment;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 
 public class PlayerSkins {
 
@@ -69,23 +65,10 @@ public class PlayerSkins {
         if (!resolvableProfile.isResolved()) {
             resolvableProfile.resolve().thenAcceptAsync(profile -> {
                 PLAYERS.put(uuid, profile);
-            }, getMainExecutor());
+            }, Minecraft.getInstance());
         }
 
         return resolvableProfile.gameProfile();
-    }
-
-    private static Executor getMainExecutor() {
-        if (FMLEnvironment.dist.isClient()) {
-            return getClientExecutor();
-        } else {
-            throw new IllegalStateException("Skins can only be fetched on the client");
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static Executor getClientExecutor() {
-        return Minecraft.getInstance();
     }
 
     /**

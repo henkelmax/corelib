@@ -7,8 +7,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import org.joml.Vector3f;
 
@@ -24,14 +22,12 @@ public class OBJModel {
         this.model = model;
     }
 
-    @OnlyIn(Dist.CLIENT)
     private void load() {
         if (data == null) {
             data = OBJLoader.load(model);
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void render(ResourceLocation texture, PoseStack matrixStack, MultiBufferSource buffer, int light) {
         load();
         matrixStack.pushPose();
