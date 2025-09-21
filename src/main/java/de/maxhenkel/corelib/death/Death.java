@@ -132,9 +132,9 @@ public class Death {
 
         death.timestamp = System.currentTimeMillis();
         death.experience = player.experienceLevel;
-        death.posX = player.position().x;
-        death.posY = player.position().y;
-        death.posZ = player.position().z;
+        death.posX = player.getX();
+        death.posY = Math.max(player.getY(), player.getRootVehicle().getY());
+        death.posZ = player.getZ();
         death.dimension = player.level().dimension().location().toString();
         death.model = PlayerUtils.getModel(player);
         return death;
