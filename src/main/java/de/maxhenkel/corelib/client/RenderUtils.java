@@ -43,26 +43,25 @@ public class RenderUtils {
         return (float) getBlue(argb) / 255F;
     }
 
-    public static void vertex(VertexConsumer builder, PoseStack matrixStack, Vector3f position, Vec2 texCoord, Vector3f normal, int light, int overlay) {
-        vertex(builder, matrixStack, position.x(), position.y(), position.z(), texCoord.x, texCoord.y, normal.x(), normal.y(), normal.z(), 255, 255, 255, light, overlay);
+    public static void vertex(VertexConsumer builder, PoseStack.Pose pose, Vector3f position, Vec2 texCoord, Vector3f normal, int light, int overlay) {
+        vertex(builder, pose, position.x(), position.y(), position.z(), texCoord.x, texCoord.y, normal.x(), normal.y(), normal.z(), 255, 255, 255, light, overlay);
     }
 
-    public static void vertex(VertexConsumer builder, PoseStack matrixStack, float posX, float posY, float posZ, float texX, float texY, int red, int green, int blue, int light, int overlay) {
-        vertex(builder, matrixStack, posX, posY, posZ, texX, texY, 0F, 0F, -1F, red, green, blue, light, overlay);
+    public static void vertex(VertexConsumer builder, PoseStack.Pose pose, float posX, float posY, float posZ, float texX, float texY, int red, int green, int blue, int light, int overlay) {
+        vertex(builder, pose, posX, posY, posZ, texX, texY, 0F, 0F, -1F, red, green, blue, light, overlay);
     }
 
-    public static void vertex(VertexConsumer builder, PoseStack matrixStack, float posX, float posY, float posZ, float texX, float texY, int light, int overlay) {
-        vertex(builder, matrixStack, posX, posY, posZ, texX, texY, 0F, 0F, -1F, 255, 255, 255, light, overlay);
+    public static void vertex(VertexConsumer builder, PoseStack.Pose pose, float posX, float posY, float posZ, float texX, float texY, int light, int overlay) {
+        vertex(builder, pose, posX, posY, posZ, texX, texY, 0F, 0F, -1F, 255, 255, 255, light, overlay);
     }
 
-    public static void vertex(VertexConsumer builder, PoseStack matrixStack, float posX, float posY, float posZ, float texX, float texY, float norX, float norY, float norZ, int red, int green, int blue, int light, int overlay) {
-        PoseStack.Pose entry = matrixStack.last();
-        builder.addVertex(entry.pose(), posX, posY, posZ)
+    public static void vertex(VertexConsumer builder, PoseStack.Pose pose, float posX, float posY, float posZ, float texX, float texY, float norX, float norY, float norZ, int red, int green, int blue, int light, int overlay) {
+        builder.addVertex(pose.pose(), posX, posY, posZ)
                 .setColor(red, green, blue, 255)
                 .setUv(texX, texY)
                 .setOverlay(overlay)
                 .setLight(light)
-                .setNormal(entry, norX, norY, norZ);
+                .setNormal(pose, norX, norY, norZ);
     }
 
 }

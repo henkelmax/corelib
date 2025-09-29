@@ -1,9 +1,9 @@
 package de.maxhenkel.corelib.client.obj;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import de.maxhenkel.corelib.client.RenderUtils;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class OBJModel {
 
-    private ResourceLocation model;
+    private final ResourceLocation model;
 
     private OBJModelData data;
 
@@ -28,19 +28,19 @@ public class OBJModel {
         }
     }
 
-    public void render(ResourceLocation texture, PoseStack matrixStack, MultiBufferSource buffer, int light) {
+    public void submitModels(ResourceLocation texture, PoseStack stack, SubmitNodeCollector collector, CameraRenderState cameraRenderState, int lightCoords) {
         load();
-        matrixStack.pushPose();
+        stack.pushPose();
 
-        VertexConsumer builder = buffer.getBuffer(OBJRenderUtils.ENTITY_CUTOUT_TRIANGLES.apply(texture));
-
-        for (int i = 0; i < data.faces.size(); i++) {
-            int[][] face = data.faces.get(i);
-            RenderUtils.vertex(builder, matrixStack, data.positions.get(face[0][0]), data.texCoords.get(face[0][1]), data.normals.get(face[0][2]), light, OverlayTexture.NO_OVERLAY);
-            RenderUtils.vertex(builder, matrixStack, data.positions.get(face[1][0]), data.texCoords.get(face[1][1]), data.normals.get(face[1][2]), light, OverlayTexture.NO_OVERLAY);
-            RenderUtils.vertex(builder, matrixStack, data.positions.get(face[2][0]), data.texCoords.get(face[2][1]), data.normals.get(face[2][2]), light, OverlayTexture.NO_OVERLAY);
-        }
-        matrixStack.popPose();
+        collector.submitCustomGeometry(stack, OBJRenderUtils.ENTITY_CUTOUT_TRIANGLES.apply(texture), (pose, consumer) -> {
+            for (int i = 0; i < data.faces.size(); i++) {
+                int[][] face = data.faces.get(i);
+                RenderUtils.vertex(consumer, pose, data.positions.get(face[0][0]), data.texCoords.get(face[0][1]), data.normals.get(face[0][2]), lightCoords, OverlayTexture.NO_OVERLAY);
+                RenderUtils.vertex(consumer, pose, data.positions.get(face[1][0]), data.texCoords.get(face[1][1]), data.normals.get(face[1][2]), lightCoords, OverlayTexture.NO_OVERLAY);
+                RenderUtils.vertex(consumer, pose, data.positions.get(face[2][0]), data.texCoords.get(face[2][1]), data.normals.get(face[2][2]), lightCoords, OverlayTexture.NO_OVERLAY);
+            }
+        });
+        stack.popPose();
     }
 
     public static void registerRenderPipeline(IEventBus bus) {

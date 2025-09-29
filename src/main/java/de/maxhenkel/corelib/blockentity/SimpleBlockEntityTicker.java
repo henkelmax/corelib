@@ -13,7 +13,7 @@ public class SimpleBlockEntityTicker<T extends BlockEntity> implements BlockEnti
         if (entity instanceof ITickableBlockEntity tickable) {
             tickable.tick();
         }
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             if (entity instanceof IClientTickableBlockEntity tickable) {
                 tickable.tickClient();
             }

@@ -1,14 +1,10 @@
 package de.maxhenkel.corelib.inventory;
 
 import de.maxhenkel.corelib.sound.SoundUtils;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -16,18 +12,18 @@ import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.ContainerUser;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.component.SeededContainerLoot;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 
@@ -65,7 +61,7 @@ public abstract class ShulkerBoxInventory implements Container, MenuProvider {
         if (player == null) {
             return;
         }
-        LootTable loottable = player.getServer().reloadableRegistries().getLootTable(loot.lootTable());
+        LootTable loottable = player.level().getServer().reloadableRegistries().getLootTable(loot.lootTable());
 
         LootParams.Builder builder = new LootParams.Builder((ServerLevel) player.level());
         builder.withLuck(player.getLuck()).withParameter(LootContextParams.THIS_ENTITY, player);
@@ -115,14 +111,16 @@ public abstract class ShulkerBoxInventory implements Container, MenuProvider {
     }
 
     @Override
-    public void startOpen(Player player) {
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), getOpenSound(), SoundSource.BLOCKS, 0.5F, SoundUtils.getVariatedPitch(player.level()));
+    public void startOpen(ContainerUser containerUser) {
+        LivingEntity e = containerUser.getLivingEntity();
+        e.level().playSound(null, e.getX(), e.getY(), e.getZ(), getOpenSound(), SoundSource.BLOCKS, 0.5F, SoundUtils.getVariatedPitch(e.level()));
     }
 
     @Override
-    public void stopOpen(Player player) {
+    public void stopOpen(ContainerUser containerUser) {
         setChanged();
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), getCloseSound(), SoundSource.BLOCKS, 0.5F, player.level().random.nextFloat() * 0.1F + 0.9F);
+        LivingEntity e = containerUser.getLivingEntity();
+        e.level().playSound(null, e.getX(), e.getY(), e.getZ(), getCloseSound(), SoundSource.BLOCKS, 0.5F, e.level().random.nextFloat() * 0.1F + 0.9F);
     }
 
     protected SoundEvent getOpenSound() {

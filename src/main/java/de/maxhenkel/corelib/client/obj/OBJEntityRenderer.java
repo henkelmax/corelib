@@ -2,10 +2,11 @@ package de.maxhenkel.corelib.client.obj;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.world.entity.Entity;
 
 import java.util.List;
@@ -19,12 +20,12 @@ public abstract class OBJEntityRenderer<T extends Entity, S extends EntityRender
     public abstract List<OBJModelInstance<S>> getModels(S entity);
 
     @Override
-    public void render(S state, PoseStack pose, MultiBufferSource source, int packedLight) {
-        renderModels(state, pose, source, packedLight);
-        super.render(state, pose, source, packedLight);
+    public void submit(S state, PoseStack pose, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
+        super.submit(state, pose, submitNodeCollector, cameraRenderState);
+        submitModels(state, pose, submitNodeCollector, cameraRenderState);
     }
 
-    protected void renderModels(S state, PoseStack pose, MultiBufferSource buffer, int packedLight) {
+    protected void submitModels(S state, PoseStack pose, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
         List<OBJModelInstance<S>> models = getModels(state);
 
         pose.pushPose();
@@ -46,7 +47,7 @@ public abstract class OBJEntityRenderer<T extends Entity, S extends EntityRender
                 model.getOptions().getOnRender().onRender(state, pose);
             }
 
-            model.getModel().render(model.getOptions().getTexture(), pose, buffer, packedLight);
+            model.getModel().submitModels(model.getOptions().getTexture(), pose, submitNodeCollector, cameraRenderState, state.lightCoords);
             pose.popPose();
         }
         pose.popPose();

@@ -4,9 +4,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -24,7 +24,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y) {
         IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(stack.getFluid());
-        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS).getSprite(extensions.getStillTexture(stack));
+        TextureAtlasSprite texture = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS).getSprite(extensions.getStillTexture(stack));
         int color = extensions.getTintColor(stack);
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, x, y, 16, 16, color);
     }

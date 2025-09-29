@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
 
-    public static final int FONT_COLOR = -12566464;
+    public static final int FONT_COLOR = 0xFF404040;
 
     protected ResourceLocation texture;
     protected List<HoverArea> hoverAreas;

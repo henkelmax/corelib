@@ -1,20 +1,20 @@
 package de.maxhenkel.corelib.client;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.client.renderer.PlayerSkinRenderCache;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelType;
+import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.item.component.ResolvableProfile;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerSkins {
 
-    private static final Map<UUID, ResolvableProfile> PLAYERS = new ConcurrentHashMap<>();
+    private static final Map<UUID, GameProfile> PLAYERS = new ConcurrentHashMap<>();
 
     /**
      * Gets the resource location of the skin of provided player UUID and name.
@@ -44,7 +44,8 @@ public class PlayerSkins {
      * @return the skin
      */
     public static PlayerSkin getSkin(GameProfile gameProfile) {
-        return Minecraft.getInstance().getSkinManager().getInsecureSkin(gameProfile);
+        PlayerSkinRenderCache.RenderInfo renderInfo = Minecraft.getInstance().playerSkinRenderCache().getOrDefault(ResolvableProfile.createResolved(gameProfile));
+        return renderInfo.playerSkin();
     }
 
     /**
@@ -55,20 +56,18 @@ public class PlayerSkins {
      */
     public static GameProfile getGameProfile(UUID uuid) {
         if (PLAYERS.containsKey(uuid)) {
-            return PLAYERS.get(uuid).gameProfile();
+            return PLAYERS.get(uuid);
         }
 
-        ResolvableProfile resolvableProfile = new ResolvableProfile(Optional.empty(), Optional.ofNullable(uuid), new PropertyMap());
+        ResolvableProfile resolvableProfile = ResolvableProfile.createUnresolved(uuid);
+        GameProfile gameProfile = resolvableProfile.partialProfile();
+        PLAYERS.put(uuid, gameProfile);
 
-        PLAYERS.put(uuid, resolvableProfile);
 
-        if (!resolvableProfile.isResolved()) {
-            resolvableProfile.resolve().thenAcceptAsync(profile -> {
-                PLAYERS.put(uuid, profile);
-            }, Minecraft.getInstance());
-        }
-
-        return resolvableProfile.gameProfile();
+        resolvableProfile.resolveProfile(Minecraft.getInstance().services().profileResolver()).thenAcceptAsync(profile -> {
+            PLAYERS.put(uuid, profile);
+        });
+        return gameProfile;
     }
 
     /**
@@ -78,7 +77,7 @@ public class PlayerSkins {
      * @return if the skin is slim
      */
     public static boolean isSlim(UUID uuid) {
-        return PlayerSkin.Model.SLIM.equals(getSkin(uuid).model());
+        return PlayerModelType.SLIM.equals(getSkin(uuid).model());
     }
 
     /**
