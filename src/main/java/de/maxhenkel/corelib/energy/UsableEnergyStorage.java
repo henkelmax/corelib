@@ -1,8 +1,9 @@
 package de.maxhenkel.corelib.energy;
 
-import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 
-public class UsableEnergyStorage extends EnergyStorage {
+@Deprecated
+public class UsableEnergyStorage extends SimpleEnergyHandler {
 
     public UsableEnergyStorage(int capacity) {
         super(capacity);

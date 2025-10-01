@@ -4,10 +4,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import javax.annotation.Nullable;
 
+@Deprecated
 public class EnergyUtils {
 
     /**
@@ -18,14 +21,19 @@ public class EnergyUtils {
      * @param maxAmount the maximum amount to push
      * @return the amount that actually got transferred
      */
-    public static int pushEnergy(IEnergyStorage provider, IEnergyStorage receiver, int maxAmount) {
-        int energySim = provider.extractEnergy(maxAmount, true);
-
-        int receivedSim = receiver.receiveEnergy(energySim, true);
-
-        int energy = provider.extractEnergy(receivedSim, false);
-
-        receiver.receiveEnergy(energy, false);
+    public static int pushEnergy(EnergyHandler provider, EnergyHandler receiver, int maxAmount, @Nullable TransactionContext transaction) {
+        int energySim;
+        int receivedSim;
+        try (Transaction t = Transaction.open(transaction)) {
+            energySim = provider.extract(maxAmount, t);
+            receivedSim = receiver.insert(energySim, t);
+        }
+        int energy;
+        try (Transaction t = Transaction.open(transaction)) {
+            energy = provider.extract(receivedSim, t);
+            receiver.insert(energy, t);
+            t.commit();
+        }
         return energy;
     }
 
@@ -38,8 +46,8 @@ public class EnergyUtils {
      * @return the energy storage
      */
     @Nullable
-    public static IEnergyStorage getEnergyStorage(Level world, BlockPos pos, Direction side) {
-        return world.getCapability(Capabilities.EnergyStorage.BLOCK, pos, side.getOpposite());
+    public static EnergyHandler getEnergyStorage(Level world, BlockPos pos, Direction side) {
+        return world.getCapability(Capabilities.Energy.BLOCK, pos, side.getOpposite());
     }
 
     /**
@@ -51,7 +59,7 @@ public class EnergyUtils {
      * @return the energy storage
      */
     @Nullable
-    public static IEnergyStorage getEnergyStorageOffset(Level world, BlockPos pos, Direction side) {
+    public static EnergyHandler getEnergyStorageOffset(Level world, BlockPos pos, Direction side) {
         return getEnergyStorage(world, pos.relative(side), side.getOpposite());
     }
 

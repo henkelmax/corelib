@@ -16,9 +16,14 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 import javax.annotation.Nullable;
 
+@Deprecated
 public class FluidUtils {
 
     /**
@@ -54,8 +59,8 @@ public class FluidUtils {
      * @return the fluid handler
      */
     @Nullable
-    public static IFluidHandler getFluidHandler(Level world, BlockPos pos, Direction direction) {
-        return world.getCapability(Capabilities.FluidHandler.BLOCK, pos, direction);
+    public static ResourceHandler<FluidResource> getFluidHandler(Level world, BlockPos pos, Direction direction) {
+        return world.getCapability(Capabilities.Fluid.BLOCK, pos, direction);
     }
 
     /**
@@ -67,7 +72,7 @@ public class FluidUtils {
      * @return the fluid handler
      */
     @Nullable
-    public static IFluidHandler getFluidHandlerOffset(Level world, BlockPos pos, Direction direction) {
+    public static ResourceHandler<FluidResource> getFluidHandlerOffset(Level world, BlockPos pos, Direction direction) {
         return getFluidHandler(world, pos.relative(direction), direction.getOpposite());
     }
 
@@ -79,34 +84,17 @@ public class FluidUtils {
      * @param maxAmount        the maximum amount to transfer
      * @param doTransfer       false to simulate
      * @param filter           the fluid that should get transferred
-     * @return the transferred fluid stack
+     * @return the transferred amount
      */
-    public static FluidStack tryFluidTransfer(IFluidHandler fluidDestination, IFluidHandler fluidSource, int maxAmount, boolean doTransfer, @Nullable Fluid filter) {
-        FluidStack drainable;
-        if (filter == null) {
-            drainable = fluidSource.drain(maxAmount, IFluidHandler.FluidAction.SIMULATE);
-        } else {
-            drainable = fluidSource.drain(new FluidStack(filter, maxAmount), IFluidHandler.FluidAction.SIMULATE);
-        }
-        if (drainable.getAmount() > 0) {
-            int fillableAmount = fluidDestination.fill(drainable, IFluidHandler.FluidAction.SIMULATE);
-            if (fillableAmount > 0) {
-                if (doTransfer) {
-                    FluidStack drained;
-                    if (filter == null) {
-                        drained = fluidSource.drain(fillableAmount, IFluidHandler.FluidAction.EXECUTE);
-                    } else {
-                        drained = fluidSource.drain(new FluidStack(filter, fillableAmount), IFluidHandler.FluidAction.EXECUTE);
-                    }
-                    drained.setAmount(fluidDestination.fill(drained, IFluidHandler.FluidAction.EXECUTE));
-                    return drained;
-                } else {
-                    drainable.setAmount(fillableAmount);
-                    return drainable;
-                }
+    @Deprecated
+    public static int tryFluidTransfer(ResourceHandler<FluidResource> fluidDestination, ResourceHandler<FluidResource> fluidSource, int maxAmount, boolean doTransfer, @Nullable Fluid filter) {
+        try (Transaction transaction = Transaction.open(null)) {
+            int moved = ResourceHandlerUtil.move(fluidSource, fluidDestination, resource -> filter == null || resource.is(filter), maxAmount, transaction);
+            if (doTransfer) {
+                transaction.commit();
             }
+            return moved;
         }
-        return FluidStack.EMPTY;
     }
 
     /**
@@ -118,6 +106,7 @@ public class FluidUtils {
      * @param doTransfer       false to simulate
      * @return the transferred fluid stack
      */
+    @Deprecated
     public static FluidStack tryFluidTransfer(IFluidHandler fluidDestination, IFluidHandler fluidSource, int maxAmount, boolean doTransfer) {
         return FluidUtil.tryFluidTransfer(fluidDestination, fluidSource, maxAmount, doTransfer);
     }
@@ -131,6 +120,7 @@ public class FluidUtils {
      * @param pos    the position of the fluid handler
      * @return if it was successful
      */
+    @Deprecated
     public static boolean tryFluidInteraction(Player player, InteractionHand hand, Level world, BlockPos pos) {
         ItemStack stack = player.getItemInHand(hand);
 
@@ -160,6 +150,7 @@ public class FluidUtils {
      * @param hand   the hand
      * @return if it was successful
      */
+    @Deprecated
     public static boolean handleEmpty(LevelAccessor world, BlockPos pos, Player player, InteractionHand hand) {
         BlockEntity te = world.getBlockEntity(pos);
 
@@ -192,6 +183,7 @@ public class FluidUtils {
      * @param hand   the hand
      * @return if it was successful
      */
+    @Deprecated
     public static boolean handleFill(LevelAccessor world, BlockPos pos, Player player, InteractionHand hand) {
         BlockEntity te = world.getBlockEntity(pos);
 
