@@ -2,7 +2,7 @@ package de.maxhenkel.corelib.energy;
 
 import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 
-@Deprecated
+@Deprecated(forRemoval = true)
 public class UsableEnergyStorage extends SimpleEnergyHandler {
 
     public UsableEnergyStorage(int capacity) {

@@ -10,7 +10,7 @@ import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import javax.annotation.Nullable;
 
-@Deprecated
+@Deprecated(forRemoval = true)
 public class EnergyUtils {
 
     /**

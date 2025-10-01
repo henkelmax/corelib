@@ -23,7 +23,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 import javax.annotation.Nullable;
 
-@Deprecated
+@Deprecated(forRemoval = true)
 public class FluidUtils {
 
     /**
