@@ -3,11 +3,10 @@ package de.maxhenkel.corelib.client.obj;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 
 import java.util.function.Function;
@@ -28,14 +27,16 @@ class OBJRenderUtils {
         event.registerPipeline(ENTITY_CUTOUT_TRIANGLES_PIPELINE);
     }
 
-    public static final Function<ResourceLocation, RenderType> ENTITY_CUTOUT_TRIANGLES = Util.memoize(
-            rl -> {
-                RenderType.CompositeState state = RenderType.CompositeState.builder()
-                        .setTextureState(new RenderStateShard.TextureStateShard(rl, false))
-                        .setLightmapState(RenderStateShard.LIGHTMAP)
-                        .setOverlayState(RenderStateShard.OVERLAY)
-                        .createCompositeState(true);
-                return RenderType.create("entity_cutout_triangles", 1536, true, false, ENTITY_CUTOUT_TRIANGLES_PIPELINE, state);
+    public static final Function<Identifier, net.minecraft.client.renderer.rendertype.RenderType> ENTITY_CUTOUT_TRIANGLES = Util.memoize(
+            p_465686_ -> {
+                RenderSetup rendersetup = RenderSetup.builder(ENTITY_CUTOUT_TRIANGLES_PIPELINE)
+                        .withTexture("Sampler0", p_465686_)
+                        .useLightmap()
+                        .useOverlay()
+                        .affectsCrumbling()
+                        .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                        .createRenderSetup();
+                return net.minecraft.client.renderer.rendertype.RenderType.create("entity_cutout_triangles", rendersetup);
             }
     );
 

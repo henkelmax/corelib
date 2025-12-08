@@ -3,7 +3,7 @@ package de.maxhenkel.corelib.tag;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
@@ -34,7 +34,7 @@ public class TagUtils {
     @Nullable
     public static Tag<Block> getBlock(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
-            ResourceLocation id = ResourceLocation.tryParse(name.substring(1));
+            Identifier id = Identifier.tryParse(name.substring(1));
             if (id == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -52,7 +52,7 @@ public class TagUtils {
             }
             return new BlockTag(tag.get());
         } else {
-            ResourceLocation resourceLocation = ResourceLocation.tryParse(name);
+            Identifier resourceLocation = Identifier.tryParse(name);
             if (resourceLocation == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -84,7 +84,7 @@ public class TagUtils {
         return getBlock(name, false);
     }
 
-    public static Tag<Block> getBlockTag(ResourceLocation name, boolean nullIfNotExists) {
+    public static Tag<Block> getBlockTag(Identifier name, boolean nullIfNotExists) {
         Optional<HolderSet.Named<Block>> tag = BuiltInRegistries.BLOCK.get(BlockTags.create(name));
         if (tag.isEmpty()) {
             if (nullIfNotExists) {
@@ -96,7 +96,7 @@ public class TagUtils {
         return new BlockTag(tag.get());
     }
 
-    public static Tag<Block> getBlockTag(ResourceLocation name) {
+    public static Tag<Block> getBlockTag(Identifier name) {
         return getBlockTag(name, false);
     }
 
@@ -110,7 +110,7 @@ public class TagUtils {
     @Nullable
     public static Tag<Item> getItem(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
-            ResourceLocation id = ResourceLocation.tryParse(name.substring(1));
+            Identifier id = Identifier.tryParse(name.substring(1));
             if (id == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -128,7 +128,7 @@ public class TagUtils {
             }
             return new ItemTag(tag.get());
         } else {
-            ResourceLocation resourceLocation = ResourceLocation.tryParse(name);
+            Identifier resourceLocation = Identifier.tryParse(name);
             if (resourceLocation == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -160,7 +160,7 @@ public class TagUtils {
         return getItem(name, false);
     }
 
-    public static Tag<Item> getItemTag(ResourceLocation name, boolean nullIfNotExists) {
+    public static Tag<Item> getItemTag(Identifier name, boolean nullIfNotExists) {
         Optional<HolderSet.Named<Item>> tag = BuiltInRegistries.ITEM.get(ItemTags.create(name));
         if (tag.isEmpty()) {
             if (nullIfNotExists) {
@@ -172,7 +172,7 @@ public class TagUtils {
         return new ItemTag(tag.get());
     }
 
-    public static Tag<Item> getItemTag(ResourceLocation name) {
+    public static Tag<Item> getItemTag(Identifier name) {
         return getItemTag(name, false);
     }
 
@@ -186,7 +186,7 @@ public class TagUtils {
     @Nullable
     public static Tag<Fluid> getFluid(String name, boolean nullIfNotExists) {
         if (name.startsWith("#")) {
-            ResourceLocation id = ResourceLocation.tryParse(name.substring(1));
+            Identifier id = Identifier.tryParse(name.substring(1));
             if (id == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -204,7 +204,7 @@ public class TagUtils {
             }
             return new FluidTag(tag.get());
         } else {
-            ResourceLocation resourceLocation = ResourceLocation.tryParse(name);
+            Identifier resourceLocation = Identifier.tryParse(name);
             if (resourceLocation == null) {
                 if (nullIfNotExists) {
                     return null;
@@ -237,7 +237,7 @@ public class TagUtils {
         return getFluid(name, false);
     }
 
-    public static Tag<Fluid> getFluidTag(ResourceLocation name, boolean nullIfNotExists) {
+    public static Tag<Fluid> getFluidTag(Identifier name, boolean nullIfNotExists) {
         Optional<HolderSet.Named<Fluid>> tag = BuiltInRegistries.FLUID.get(FluidTags.create(name));
         if (tag.isEmpty()) {
             if (nullIfNotExists) {
@@ -249,7 +249,7 @@ public class TagUtils {
         return new FluidTag(tag.get());
     }
 
-    public static Tag<Fluid> getFluidTag(ResourceLocation name) {
+    public static Tag<Fluid> getFluidTag(Identifier name) {
         return getFluidTag(name, false);
     }
 

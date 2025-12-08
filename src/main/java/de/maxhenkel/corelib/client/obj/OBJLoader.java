@@ -4,7 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Vector3f;
@@ -18,9 +18,9 @@ import java.util.*;
 
 public class OBJLoader {
 
-    private static Map<ResourceLocation, OBJModel.OBJModelData> modelCache = new HashMap<>();
+    private static Map<Identifier, OBJModel.OBJModelData> modelCache = new HashMap<>();
 
-    public static OBJModel.OBJModelData load(ResourceLocation model) {
+    public static OBJModel.OBJModelData load(Identifier model) {
         try {
             return loadInternal(model);
         } catch (Exception e) {
@@ -28,7 +28,7 @@ public class OBJLoader {
         }
     }
 
-    private static OBJModel.OBJModelData loadInternal(ResourceLocation model) throws IOException {
+    private static OBJModel.OBJModelData loadInternal(Identifier model) throws IOException {
         if (modelCache.containsKey(model)) {
             return modelCache.get(model);
         }

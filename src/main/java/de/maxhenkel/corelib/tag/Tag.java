@@ -1,12 +1,12 @@
 package de.maxhenkel.corelib.tag;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
 public interface Tag<T> {
 
-    ResourceLocation getName();
+    Identifier getName();
 
     boolean contains(T t);
 

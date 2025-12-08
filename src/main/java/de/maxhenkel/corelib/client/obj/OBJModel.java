@@ -5,7 +5,7 @@ import de.maxhenkel.corelib.client.RenderUtils;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.bus.api.IEventBus;
 import org.joml.Vector3f;
@@ -14,11 +14,11 @@ import java.util.List;
 
 public class OBJModel {
 
-    private final ResourceLocation model;
+    private final Identifier model;
 
     private OBJModelData data;
 
-    public OBJModel(ResourceLocation model) {
+    public OBJModel(Identifier model) {
         this.model = model;
     }
 
@@ -28,7 +28,7 @@ public class OBJModel {
         }
     }
 
-    public void submitModels(ResourceLocation texture, PoseStack stack, SubmitNodeCollector collector, CameraRenderState cameraRenderState, int lightCoords) {
+    public void submitModels(Identifier texture, PoseStack stack, SubmitNodeCollector collector, CameraRenderState cameraRenderState, int lightCoords) {
         load();
         stack.pushPose();
 

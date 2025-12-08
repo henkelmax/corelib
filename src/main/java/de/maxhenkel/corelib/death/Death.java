@@ -5,13 +5,13 @@ import de.maxhenkel.corelib.codec.EquipmentItem;
 import de.maxhenkel.corelib.codec.ValueInputOutputUtils;
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.corelib.player.PlayerUtils;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -147,7 +147,7 @@ public class Death {
         death.posX = player.getX();
         death.posY = Math.max(player.getY(), player.getRootVehicle().getY());
         death.posZ = player.getZ();
-        death.dimension = player.level().dimension().location().toString();
+        death.dimension = player.level().dimension().identifier().toString();
         death.model = PlayerUtils.getModel(player);
         return death;
     }

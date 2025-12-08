@@ -2,7 +2,7 @@ package de.maxhenkel.corelib.tag;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class BlockTag implements Tag<Block> {
     }
 
     @Override
-    public ResourceLocation getName() {
+    public Identifier getName() {
         return holderSet.key().location();
     }
 

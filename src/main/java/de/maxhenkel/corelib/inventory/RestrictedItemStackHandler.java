@@ -5,6 +5,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 
+@Deprecated(forRemoval = true)
 public class RestrictedItemStackHandler extends ItemStackHandler {
 
     private ItemValidator itemValidator;

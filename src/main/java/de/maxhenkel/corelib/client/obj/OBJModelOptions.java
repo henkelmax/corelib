@@ -2,40 +2,40 @@ package de.maxhenkel.corelib.client.obj;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import de.maxhenkel.corelib.math.Rotation;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.joml.Vector3d;
 
 public class OBJModelOptions<T> {
 
-    private ResourceLocation texture;
+    private Identifier texture;
     private Vector3d offset;
     private Rotation rotation;
     private RenderListener<T> onRender;
 
-    public OBJModelOptions(ResourceLocation texture, Vector3d offset, Rotation rotation, RenderListener<T> onRender) {
+    public OBJModelOptions(Identifier texture, Vector3d offset, Rotation rotation, RenderListener<T> onRender) {
         this.texture = texture;
         this.offset = offset;
         this.rotation = rotation;
         this.onRender = onRender;
     }
 
-    public OBJModelOptions(ResourceLocation texture, Vector3d offset, Rotation rotation) {
+    public OBJModelOptions(Identifier texture, Vector3d offset, Rotation rotation) {
         this(texture, offset, rotation, null);
     }
 
-    public OBJModelOptions(ResourceLocation texture, Vector3d offset) {
+    public OBJModelOptions(Identifier texture, Vector3d offset) {
         this(texture, offset, null, null);
     }
 
-    public OBJModelOptions(ResourceLocation texture, Vector3d offset, RenderListener<T> onRender) {
+    public OBJModelOptions(Identifier texture, Vector3d offset, RenderListener<T> onRender) {
         this(texture, offset, null, onRender);
     }
 
-    public ResourceLocation getTexture() {
+    public Identifier getTexture() {
         return texture;
     }
 
-    public void setTexture(ResourceLocation texture) {
+    public void setTexture(Identifier texture) {
         this.texture = texture;
     }
 

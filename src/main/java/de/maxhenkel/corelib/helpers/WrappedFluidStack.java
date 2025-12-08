@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -37,7 +37,7 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
 
         if (Minecraft.getInstance().options.advancedItemTooltips) {
             if (BuiltInRegistries.FLUID.containsValue(stack.getFluid())) {
-                ResourceLocation registryName = BuiltInRegistries.FLUID.getKey(stack.getFluid());
+                Identifier registryName = BuiltInRegistries.FLUID.getKey(stack.getFluid());
                 tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }
             if (!stack.getComponentsPatch().isEmpty()) {

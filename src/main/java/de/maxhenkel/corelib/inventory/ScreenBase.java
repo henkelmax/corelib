@@ -5,7 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
@@ -18,10 +18,10 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
 
     public static final int FONT_COLOR = 0xFF404040;
 
-    protected ResourceLocation texture;
+    protected Identifier texture;
     protected List<HoverArea> hoverAreas;
 
-    public ScreenBase(ResourceLocation texture, T container, Inventory playerInventory, Component title) {
+    public ScreenBase(Identifier texture, T container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);
         this.texture = texture;
         this.hoverAreas = new ArrayList<>();
