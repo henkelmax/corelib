@@ -7,13 +7,13 @@ plugins {
 
 apply from: "https://raw.githubusercontent.com/henkelmax/mod-gradle-scripts/${mod_gradle_script_version}/mod.gradle"
 
-java{
+java {
     withSourcesJar()
 }
 
 jar {
     manifest {
-        attributes(['Automatic-Module-Name'   : 'de.maxhenkel.corelib'])
+        attributes(['Automatic-Module-Name': 'de.maxhenkel.corelib'])
     }
 }
 

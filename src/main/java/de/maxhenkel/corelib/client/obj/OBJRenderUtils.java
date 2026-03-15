@@ -18,7 +18,7 @@ class OBJRenderUtils {
             .withFragmentShader("core/entity")
             .withSampler("Sampler0")
             .withSampler("Sampler2")
-            .withVertexFormat(DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.TRIANGLES)
+            .withVertexFormat(DefaultVertexFormat.ENTITY, VertexFormat.Mode.TRIANGLES)
             .buildSnippet();
 
     public static final RenderPipeline ENTITY_CUTOUT_TRIANGLES_PIPELINE = RenderPipeline.builder(ENTITY_SNIPPET_TRIANGLES).withLocation("pipeline/entity_cutout_triangles").withShaderDefine("ALPHA_CUTOUT", 0.1F).withSampler("Sampler1").build();

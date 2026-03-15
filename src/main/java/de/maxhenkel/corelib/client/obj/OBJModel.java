@@ -3,7 +3,7 @@ package de.maxhenkel.corelib.client.obj;
 import com.mojang.blaze3d.vertex.PoseStack;
 import de.maxhenkel.corelib.client.RenderUtils;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec2;

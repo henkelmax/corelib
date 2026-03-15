@@ -120,7 +120,7 @@ public abstract class ShulkerBoxInventory implements Container, MenuProvider {
     public void stopOpen(ContainerUser containerUser) {
         setChanged();
         LivingEntity e = containerUser.getLivingEntity();
-        e.level().playSound(null, e.getX(), e.getY(), e.getZ(), getCloseSound(), SoundSource.BLOCKS, 0.5F, e.level().random.nextFloat() * 0.1F + 0.9F);
+        e.level().playSound(null, e.getX(), e.getY(), e.getZ(), getCloseSound(), SoundSource.BLOCKS, 0.5F, e.level().getRandom().nextFloat() * 0.1F + 0.9F);
     }
 
     protected SoundEvent getOpenSound() {
