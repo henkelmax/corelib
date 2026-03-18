@@ -1,15 +1,14 @@
 package de.maxhenkel.corelib.helpers;
 
+import de.maxhenkel.corelib.FluidUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
@@ -22,11 +21,9 @@ public class WrappedFluidStack extends AbstractStack<FluidStack> {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int x, int y) {
-        IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(stack.getFluid());
-        TextureAtlasSprite texture = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS).getSprite(extensions.getStillTexture(stack));
-        int color = extensions.getTintColor(stack);
-        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, x, y, 16, 16, color);
+    public void render(GuiGraphicsExtractor guiGraphics, int x, int y) {
+        TextureAtlasSprite texture = FluidUtils.getFluidModel(stack.getFluid()).stillMaterial().sprite();
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, x, y, 16, 16, FluidUtils.getTint(stack));
     }
 
     @Override

@@ -1,7 +1,7 @@
 package de.maxhenkel.corelib.inventory;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -21,29 +21,29 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
     protected Identifier texture;
     protected List<HoverArea> hoverAreas;
 
-    public ScreenBase(Identifier texture, T container, Inventory playerInventory, Component title) {
-        super(container, playerInventory, title);
+    public ScreenBase(Identifier texture, T container, Inventory playerInventory, Component title, int width, int height) {
+        super(container, playerInventory, title, width, height);
         this.texture = texture;
         this.hoverAreas = new ArrayList<>();
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-        super.render(guiGraphics, x, y, partialTicks);
-        renderTooltip(guiGraphics, x, y);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int x, int y, float partialTicks) {
+        super.extractRenderState(guiGraphics, x, y, partialTicks);
+        extractTooltip(guiGraphics, x, y);
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
 
     }
 
-    public void drawHoverAreas(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    public void extractHoverAreas(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         for (HoverArea hoverArea : hoverAreas) {
             if (hoverArea.tooltip != null && hoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
                 guiGraphics.setComponentTooltipForNextFrame(font, hoverArea.tooltip.get(), mouseX, mouseY);
@@ -55,17 +55,17 @@ public class ScreenBase<T extends AbstractContainerMenu> extends AbstractContain
         return size - (int) (((float) amount / (float) max) * (float) size);
     }
 
-    public void drawCentered(GuiGraphics guiGraphics, Component text, int y, int color) {
+    public void drawCentered(GuiGraphicsExtractor guiGraphics, Component text, int y, int color) {
         drawCentered(guiGraphics, text, imageWidth / 2, y, color);
     }
 
-    public void drawCentered(GuiGraphics guiGraphics, Component text, int x, int y, int color) {
+    public void drawCentered(GuiGraphicsExtractor guiGraphics, Component text, int x, int y, int color) {
         drawCentered(font, guiGraphics, text, x, y, color);
     }
 
-    public static void drawCentered(Font font, GuiGraphics guiGraphics, Component text, int x, int y, int color) {
+    public static void drawCentered(Font font, GuiGraphicsExtractor guiGraphics, Component text, int x, int y, int color) {
         int width = font.width(text);
-        guiGraphics.drawString(font, text, x - width / 2, y, color, false);
+        guiGraphics.text(font, text, x - width / 2, y, color, false);
     }
 
     public static class HoverArea {

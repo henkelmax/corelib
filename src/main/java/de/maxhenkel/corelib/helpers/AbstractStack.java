@@ -1,6 +1,6 @@
 package de.maxhenkel.corelib.helpers;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -13,7 +13,7 @@ public abstract class AbstractStack<T> {
         this.stack = stack;
     }
 
-    public abstract void render(GuiGraphics guiGraphics, int x, int y);
+    public abstract void render(GuiGraphicsExtractor guiGraphics, int x, int y);
 
     public abstract List<Component> getTooltip();
 

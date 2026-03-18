@@ -1,7 +1,7 @@
 package de.maxhenkel.corelib.helpers;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -15,9 +15,9 @@ public class WrappedItemStack extends AbstractStack<ItemStack> {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.renderItem(stack, x, y, 0);
-        guiGraphics.renderItemDecorations(Minecraft.getInstance().font, stack, x, y);
+    public void render(GuiGraphicsExtractor guiGraphics, int x, int y) {
+        guiGraphics.item(stack, x, y, 0);
+        guiGraphics.itemDecorations(Minecraft.getInstance().font, stack, x, y);
     }
 
     @Override
