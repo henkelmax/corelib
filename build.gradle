@@ -1,5 +1,5 @@
 plugins {
-    id 'net.neoforged.gradle.userdev' version "${neogradle_version}"
+    id 'net.neoforged.moddev' version "${moddevgradle_version}"
     id 'com.gradleup.shadow' version "${shadow_version}"
     id 'net.linguica.maven-settings' version "${maven_settings_version}"
     id 'maven-publish'
