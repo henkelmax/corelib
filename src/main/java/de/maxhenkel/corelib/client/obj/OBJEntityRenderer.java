@@ -58,7 +58,7 @@ public abstract class OBJEntityRenderer<T extends Entity, S extends EntityRender
     }
 
     protected void rotateYaw(PoseStack pose, float yaw) {
-        pose.mulPose(Axis.YP.rotationDegrees(180F - yaw));
+        pose.rotate(Axis.YP.rotationDegrees(180F - yaw));
     }
 
     protected void setupPitch(S state, PoseStack matrixStack) {
