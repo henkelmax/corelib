@@ -1,6 +1,7 @@
 package de.maxhenkel.corelib.client.obj;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
 import com.mojang.renderpearl.api.pipeline.DepthStencilState;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
@@ -22,6 +23,7 @@ class OBJRenderUtils {
             .withBindGroupLayout(BindGroupLayouts.SAMPLER0_SAMPLER2)
             .withVertexBinding(0, DefaultVertexFormat.ENTITY)
             .withPrimitiveTopology(PrimitiveTopology.TRIANGLES)
+            .withColorTargetState(ColorTargetState.DEFAULT)
             .withDepthStencilState(DepthStencilState.DEFAULT)
             .buildSnippet();
 
